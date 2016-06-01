@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:NoChat/NoChat.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:NoChatTG/NoChatTG.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:NoChatMM/NoChatMM.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:NoChatSLK/NoChatSLK.xcodeproj">
+   </FileRef>
+</Workspace>
