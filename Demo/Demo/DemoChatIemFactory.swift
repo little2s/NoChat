@@ -156,7 +156,7 @@ class DemoChatItemFactory {
                     let isIncomming = (senderId == "incoming")
                     
                     let chatItem = SLKMessageFactory.createTextMessage(text: item.1, senderId: senderId, isIncoming: isIncomming)
-                    result.append(chatItem)
+                    result.insert(chatItem, atIndex: 0)
                 }
             }
             
