@@ -1,10 +1,10 @@
 PODS:
-  - NoChat (0.2.0)
-  - NoChatMM (0.2.0):
+  - NoChat (0.2.1)
+  - NoChatMM (0.2.1):
     - NoChat (~> 0.1)
-  - NoChatSLK (0.2.0):
+  - NoChatSLK (0.2.1):
     - NoChat (~> 0.1)
-  - NoChatTG (0.2.0):
+  - NoChatTG (0.2.1):
     - NoChat (~> 0.1)
 
 DEPENDENCIES:
@@ -24,9 +24,9 @@ EXTERNAL SOURCES:
     :path: ../
 
 SPEC CHECKSUMS:
-  NoChat: 6742808b2869d481cfc27e08272e1ddc151d7d29
-  NoChatMM: fdd68c97db49809229ae1ac919fc1a3bf0db5dee
-  NoChatSLK: cb141fedbb0ba479534094c625f16d67548d4ce2
-  NoChatTG: d9773dc97b266b603ad60b3a169db515e2611953
+  NoChat: 7b25f4af971dd454b76eda972aaa7fa06dffe3a3
+  NoChatMM: 3024440c78ef8baa0d61643b19c21528810d5412
+  NoChatSLK: 07e3cd81433439f140c7731af621698bca4c653b
+  NoChatTG: ddb65bdbb258880271693e7229013821c89aea4d
 
 COCOAPODS: 0.39.0

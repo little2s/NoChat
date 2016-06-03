@@ -66,6 +66,14 @@ public struct ChatCollectionViewLayoutModel {
 public class ChatCollectionViewLayout: UICollectionViewLayout {
     public var layoutModel: ChatCollectionViewLayoutModel!
     public weak var delegate: ChatCollectionViewLayoutDelegate?
+    
+    public override init() {
+        super.init()
+    }
+    
+    public required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
 
     // Optimization: after reloadData we'll get invalidateLayout, but prepareLayout will be delayed until next run loop.
     // Client may need to force prepareLayout after reloadData, but we don't want to compute layout again in the next run loop.
