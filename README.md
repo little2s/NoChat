@@ -18,6 +18,10 @@ These companion frameworks are just different user interface, you can custom you
 - Supports custom message bubble and toolbar
 - Invert mode
 
+## Requirements
+- iOS 8.0+
+- Xcode 7.3 or above
+
 ## Install
 ### CocoaPods
 
@@ -25,6 +29,62 @@ Include the following in your `Podfile`:
     ```
     pod 'NoChat', '~> 0.1'
     ```
+    
+## Usage
+
+Import the framework you want to use
+
+``` swift
+import NoChat
+```
+
+You can create a subclass of `ChatViewController`, and provide the data.
+
+``` swift
+
+class TGChatViewController: ChatViewController {
+
+    // ...
+    
+    override func viewDidLoad() {
+        inverted = true
+        super.viewDidLoad()
+    }
+
+    
+    // Setup chat items
+    override func createPresenterBuilders() -> [ChatItemType: [ChatItemPresenterBuilderProtocol]] {
+        return [
+            DateItem.itemType : [
+                DateItemPresenterBuider()
+            ],
+            MessageType.Text.rawValue : [
+                MessagePresenterBuilder<TextBubbleView, TGTextMessageViewModelBuilder>(
+                    viewModelBuilder: TGTextMessageViewModelBuilder(),
+                    layoutCache: messageLayoutCache
+                )
+            ]
+        ]
+    }
+    
+    // Setup chat input views
+    override func createChatInputViewController() -> UIViewController {
+        let inputController = NoChatTG.ChatInputViewController()
+
+        // ...
+        
+        return inputController
+    }
+
+    // ...
+    
+}
+
+```
+
+And I also suggest you custom the view controller of chat with the protocols provide by NoChat.
+I mean you can write your own `ChatViewController` without `NoChat.ChatViewController`.
+Source code is mind, not just code, I think.
 
 ## Architechture
 The architechture of the chat UI looks like this:
@@ -32,6 +92,12 @@ The architechture of the chat UI looks like this:
 
 ## More
 See the Demo project inside.
+
+## About the name
+Why call it `NoChat`?
+Because the boss let us write many apps with chat UI,
+sorry I really don't want to write chat UI anymore 😢
+
 
 ## License
 Source code is distributed under MIT license.
