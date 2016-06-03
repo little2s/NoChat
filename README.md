@@ -25,10 +25,11 @@ These companion frameworks are just different user interface, you can custom you
 ## Install
 ### CocoaPods
 
-Include the following in your `Podfile`:
-    ```
-    pod 'NoChat', '~> 0.1'
-    ```
+Include the following in your `Podfile`:    
+
+``` ruby
+pod 'NoChat'
+```
     
 ## Usage
 
