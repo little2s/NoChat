@@ -28,33 +28,33 @@ public protocol UniqueIdentificable {
     var uid: String { get }
 }
 
-struct CollectionChangeMove: Equatable, Hashable {
-    let indexPathOld: NSIndexPath
-    let indexPathNew: NSIndexPath
-    init(indexPathOld: NSIndexPath, indexPathNew: NSIndexPath) {
+public struct CollectionChangeMove: Equatable, Hashable {
+    public let indexPathOld: NSIndexPath
+    public let indexPathNew: NSIndexPath
+    public init(indexPathOld: NSIndexPath, indexPathNew: NSIndexPath) {
         self.indexPathOld = indexPathOld
         self.indexPathNew = indexPathNew
     }
 
-    var hashValue: Int { return indexPathOld.hash ^ indexPathNew.hash }
+    public var hashValue: Int { return indexPathOld.hash ^ indexPathNew.hash }
 }
 
 extension CollectionChangeMove: CustomStringConvertible {
-    var description: String {
+    public var description: String {
         return "<CollectionChangeMove: old=\(indexPathOld), new=\(indexPathNew)>"
     }
 }
 
-func == (lhs: CollectionChangeMove, rhs: CollectionChangeMove) -> Bool {
+public func == (lhs: CollectionChangeMove, rhs: CollectionChangeMove) -> Bool {
     return lhs.indexPathOld == rhs.indexPathOld && lhs.indexPathNew == rhs.indexPathNew
 }
 
-struct CollectionChanges {
-    let insertedIndexPaths: Set<NSIndexPath>
-    let deletedIndexPaths: Set<NSIndexPath>
-    let movedIndexPaths: [CollectionChangeMove]
+public struct CollectionChanges {
+    public let insertedIndexPaths: Set<NSIndexPath>
+    public let deletedIndexPaths: Set<NSIndexPath>
+    public let movedIndexPaths: [CollectionChangeMove]
 
-    init(insertedIndexPaths: Set<NSIndexPath>, deletedIndexPaths: Set<NSIndexPath>, movedIndexPaths: [CollectionChangeMove]) {
+    public init(insertedIndexPaths: Set<NSIndexPath>, deletedIndexPaths: Set<NSIndexPath>, movedIndexPaths: [CollectionChangeMove]) {
         self.insertedIndexPaths = insertedIndexPaths
         self.deletedIndexPaths = deletedIndexPaths
         self.movedIndexPaths = movedIndexPaths
@@ -62,12 +62,12 @@ struct CollectionChanges {
 }
 
 extension CollectionChanges: CustomStringConvertible {
-    var description: String {
+    public var description: String {
         return "<CollectionChanges: inserted=\(insertedIndexPaths)>, deleted=\(deletedIndexPaths), moved=\(movedIndexPaths)"
     }
 }
 
-func generateChanges(oldCollection oldCollection: [UniqueIdentificable], newCollection: [UniqueIdentificable]) -> CollectionChanges {
+public func generateChanges(oldCollection oldCollection: [UniqueIdentificable], newCollection: [UniqueIdentificable]) -> CollectionChanges {
     func generateIndexesById(uids: [String]) -> [String: Int] {
         var map = [String: Int](minimumCapacity: uids.count)
         for (index, uid) in uids.enumerate() {

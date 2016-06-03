@@ -29,10 +29,10 @@ public protocol ChatCollectionViewLayoutDelegate: class {
 }
 
 public struct ChatCollectionViewLayoutModel {
-    let contentSize: CGSize
-    let layoutAttributes: [UICollectionViewLayoutAttributes]
-    let layoutAttributesBySectionAndItem: [[UICollectionViewLayoutAttributes]]
-    let calculatedForWidth: CGFloat
+    public let contentSize: CGSize
+    public let layoutAttributes: [UICollectionViewLayoutAttributes]
+    public let layoutAttributesBySectionAndItem: [[UICollectionViewLayoutAttributes]]
+    public let calculatedForWidth: CGFloat
 
     public static func createModel(collectionViewWidth: CGFloat, itemsLayoutData: [(height: CGFloat, bottomMargin: CGFloat)]) -> ChatCollectionViewLayoutModel {
         var layoutAttributes = [UICollectionViewLayoutAttributes]()
@@ -64,7 +64,7 @@ public struct ChatCollectionViewLayoutModel {
 
 
 public class ChatCollectionViewLayout: UICollectionViewLayout {
-    var layoutModel: ChatCollectionViewLayoutModel!
+    public var layoutModel: ChatCollectionViewLayoutModel!
     public weak var delegate: ChatCollectionViewLayoutDelegate?
 
     // Optimization: after reloadData we'll get invalidateLayout, but prepareLayout will be delayed until next run loop.

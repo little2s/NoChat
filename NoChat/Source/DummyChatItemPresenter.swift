@@ -25,28 +25,28 @@
 import Foundation
 
 // Handles messages that aren't supported so they appear as invisible
-class DummyChatItemPresenter: ChatItemPresenterProtocol {
+public class DummyChatItemPresenter: ChatItemPresenterProtocol {
 
-    class func registerCells(collectionView: UICollectionView) {
+    public class func registerCells(collectionView: UICollectionView) {
         collectionView.registerClass(DummyCollectionViewCell.self, forCellWithReuseIdentifier: "cell-id-unhandled-message")
     }
 
-    var canCalculateHeightInBackground: Bool {
+    public var canCalculateHeightInBackground: Bool {
         return true
     }
 
-    func heightForCell(maximumWidth width: CGFloat, decorationAttributes: ChatItemDecorationAttributesProtocol?) -> CGFloat {
+    public func heightForCell(maximumWidth width: CGFloat, decorationAttributes: ChatItemDecorationAttributesProtocol?) -> CGFloat {
         return 0
     }
 
-    func dequeueCell(collectionView collectionView: UICollectionView, indexPath: NSIndexPath) -> UICollectionViewCell {
+    public func dequeueCell(collectionView collectionView: UICollectionView, indexPath: NSIndexPath) -> UICollectionViewCell {
         return collectionView.dequeueReusableCellWithReuseIdentifier("cell-id-unhandled-message", forIndexPath: indexPath)
     }
 
-    func configureCell(cell: UICollectionViewCell, decorationAttributes: ChatItemDecorationAttributesProtocol?) {
+    public func configureCell(cell: UICollectionViewCell, decorationAttributes: ChatItemDecorationAttributesProtocol?) {
         cell.hidden = true
     }
 }
 
 
-class DummyCollectionViewCell: UICollectionViewCell {}
+public class DummyCollectionViewCell: UICollectionViewCell {}
