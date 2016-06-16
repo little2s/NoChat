@@ -69,12 +69,12 @@ class TGChatViewController: ChatViewController {
     override func createChatInputViewController() -> UIViewController {
         let inputController = NoChatTG.ChatInputViewController()
         
-        inputController.onSendText = { text in
-            self.sendText(text)
+        inputController.onSendText = { [weak self] text in
+            self?.sendText(text)
         }
         
-        inputController.onChooseAttach = {
-            self.showAttachSheet()
+        inputController.onChooseAttach = { [weak self] in
+            self?.showAttachSheet()
         }
         
         return inputController

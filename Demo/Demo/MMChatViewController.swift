@@ -65,8 +65,8 @@ class MMChatViewController: ChatViewController {
     override func createChatInputViewController() -> UIViewController {
         let inputController = NoChatMM.ChatInputViewController()
         
-        inputController.onSendText = { text in
-            self.sendText(text)
+        inputController.onSendText = { [weak self] text in
+            self?.sendText(text)
         }
         
         return inputController
