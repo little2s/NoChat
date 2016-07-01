@@ -222,10 +222,6 @@ public class MessageCollectionViewCell<BubbleViewT where
         }
     }
     
-//    public override func sizeThatFits(size: CGSize) -> CGSize {
-//        return calculateLayout(availableWidth: size.width).size
-//    }
-    
     public func cellSizeThatFits(size: CGSize) -> CGSize {
         if size.width == 0 { // TODO: find out why
             return size
@@ -236,15 +232,10 @@ public class MessageCollectionViewCell<BubbleViewT where
     
     private func calculateLayout(availableWidth availableWidth: CGFloat) -> MessageLayoutModel {
         
-//        if messageViewModel == nil {
-//            print("fuck nil, cell=\(self), sizingCell=\(MessageCollectionViewCell.sizingCell())")
-//            print("")
-//        }
-        
         let cacheKey = messageViewModel.message.msgId
         
-        if let layoutModel = layoutCache.objectForKey(cacheKey) as? MessageLayoutModel{
-            return layoutModel
+        if let layoutModel = layoutCache.objectForKey(cacheKey) as? MessageLayoutModel where layoutModel.size.width == availableWidth {
+                return layoutModel
         }
         
         let parameters = MessageLayoutModelParameters(

@@ -189,7 +189,7 @@ public class MessageCollectionViewCell<BubbleViewT where
         
         let cacheKey = messageViewModel.message.msgId
         
-        if let layoutModel = layoutCache.objectForKey(cacheKey) as? MessageLayoutModel{
+        if let layoutModel = layoutCache.objectForKey(cacheKey) as? MessageLayoutModel where layoutModel.size.width == availableWidth {
             return layoutModel
         }
         
