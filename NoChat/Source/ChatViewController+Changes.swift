@@ -107,7 +107,7 @@ extension ChatViewController {
 
         let visibleIndexPaths = Set(self.collectionView.indexPathsForVisibleItems().filter { (indexPath) -> Bool in
             return !changes.insertedIndexPaths.contains(indexPath) && !changes.deletedIndexPaths.contains(indexPath)
-            })
+        })
 
         var updatedIndexPaths = Set<NSIndexPath>()
         for move in changes.movedIndexPaths {
