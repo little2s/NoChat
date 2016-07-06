@@ -228,7 +228,6 @@ public class ChatViewController: UIViewController {
     var autoLoadingEnabled: Bool = false
     var inputContainer: UIView!
     var presenterBuildersByType = [ChatItemType: [ChatItemPresenterBuilderProtocol]]()
-    var presenters = [ChatItemPresenterProtocol]()
     let presentersByChatItem = NSMapTable(keyOptions: .WeakMemory, valueOptions: .StrongMemory)
     let presentersByCell = NSMapTable(keyOptions: .WeakMemory, valueOptions: .WeakMemory)
     var updateQueue: SerialTaskQueueProtocol = SerialTaskQueue()
