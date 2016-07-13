@@ -92,7 +92,7 @@ public class ChatViewController: UIViewController {
     
     // Detect touches in status bar
     // http://stackoverflow.com/questions/3753097/how-to-detect-touches-in-status-bar
-    private var scrollProxy: UIScrollView!
+    public private(set) var scrollProxy: UIScrollView!
     private func addScrollProxyView() {
         scrollProxy = UIScrollView()
         scrollProxy.translatesAutoresizingMaskIntoConstraints = false
