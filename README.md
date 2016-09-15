@@ -31,6 +31,9 @@ Include the following in your `Podfile`:
 pod 'NoChat'
 ```
     
+#### Manually
+Download and drop ```/NoChat/Source```folder in your project.  
+
 ## Usage
 
 Import the framework you want to use
