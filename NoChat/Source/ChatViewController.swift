@@ -196,7 +196,7 @@ public class ChatViewController: UIViewController {
         view.addConstraint(NSLayoutConstraint(item: inputContainer, attribute: .Top, relatedBy: .Equal, toItem: chatItemsContainer, attribute: .Bottom, multiplier: 1, constant: 0))
         view.addConstraint(NSLayoutConstraint(item: view, attribute: .Leading, relatedBy: .Equal, toItem: inputContainer, attribute: .Leading, multiplier: 1, constant: 0))
         view.addConstraint(NSLayoutConstraint(item: view, attribute: .Trailing, relatedBy: .Equal, toItem: inputContainer, attribute: .Trailing, multiplier: 1, constant: 0))
-        view.addConstraint(NSLayoutConstraint(item: bottomLayoutGuide, attribute: .Top, relatedBy: .Equal, toItem: inputContainer, attribute: .Bottom, multiplier: 1, constant: 0))
+        view.addConstraint(NSLayoutConstraint(item: view, attribute: .Bottom, relatedBy: .Equal, toItem: inputContainer, attribute: .Bottom, multiplier: 1, constant: 0))
         inputContainerHeightConstraint = NSLayoutConstraint(item: inputContainer, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .Height, multiplier: 1, constant: defaultInputContainerHeight)
         inputContainer.addConstraint(inputContainerHeightConstraint)
         

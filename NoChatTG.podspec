@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "NoChatTG"
-  s.version      = "0.2.1"
+  s.version      = "0.2.2"
   s.summary      = "UI componentes for NoChat"
   s.homepage     = "https://github.com/little2s/NoChat.git"
   s.license      = "MIT"
@@ -10,5 +10,5 @@ Pod::Spec.new do |s|
   s.source_files = "NoChatTG/Source/*.{h,swift}"
   s.public_header_files = "NoChatTG/Source/*.h"
   s.resources = ["NoChatTG/Source/*.xcassets"]
-  s.dependency "NoChat", "~> 0.1"
+  s.dependency "NoChat", "~> 0.2"
 end
