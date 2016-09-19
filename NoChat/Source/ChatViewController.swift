@@ -19,12 +19,12 @@ public struct HeightChange {
 }
 
 public protocol ChatInputControllerProtocol {
-    var onHeightChange: (HeightChange -> Void)? { get set }
-    func endInputting(animated: Bool)
+    var onHeightChange: ((HeightChange) -> Void)? { get set }
+    func endInputting(_ animated: Bool)
 }
 
 public protocol ChatItemsDecoratorProtocol {
-    func decorateItems(chatItems: [ChatItemProtocol], inverted: Bool) -> [DecoratedChatItem]
+    func decorateItems(_ chatItems: [ChatItemProtocol], inverted: Bool) -> [DecoratedChatItem]
 }
 
 public struct DecoratedChatItem {
@@ -36,28 +36,28 @@ public struct DecoratedChatItem {
     }
 }
 
-public class ChatViewController: UIViewController {
+open class ChatViewController: UIViewController {
     
     public struct Constants {
         var updatesAnimationDuration = 0.33
         var defaultContentInsets = UIEdgeInsets(top: 8, left: 0, bottom: 8, right: 0)
-        var defaultScrollIndicatorInsets = UIEdgeInsetsZero
+        var defaultScrollIndicatorInsets = UIEdgeInsets.zero
         var preferredMaxMessageCount: Int? = 500 // It not nil, will ask data source to reduce number of messages when limit is reached. @see ChatDataSourceDelegateProtocol
         var preferredMaxMessageCountAdjustment: Int = 400 // When the above happens, will ask to adjust with this value. It may be wise for this to be smaller to reduce number of adjustments
         var autoloadingFractionalThreshold: CGFloat = 0.05 // in [0, 1]
     }
     
-    public var constants = Constants()
-    public var defaultInputContainerHeight: CGFloat = 45
+    open var constants = Constants()
+    open var defaultInputContainerHeight: CGFloat = 45
     
-    public private(set) var wallpaperView: UIImageView!
-    public private(set) var chatItemsContainer: UIView!
-    public private(set) var collectionView: UICollectionView!
+    open fileprivate(set) var wallpaperView: UIImageView!
+    open fileprivate(set) var chatItemsContainer: UIView!
+    open fileprivate(set) var collectionView: UICollectionView!
     var decoratedChatItems = [DecoratedChatItem]()
-    public var chatDataSource: ChatDataSourceProtocol? {
+    open var chatDataSource: ChatDataSourceProtocol? {
         didSet {
             self.chatDataSource?.delegate = self
-            self.enqueueModelUpdate(context: .Reload)
+            self.enqueueModelUpdate(context: .reload)
         }
     }
     
@@ -66,12 +66,12 @@ public class ChatViewController: UIViewController {
         self.collectionView.dataSource = nil
     }
     
-    public override func loadView() {
+    open override func loadView() {
         view = UIView()
-        view.backgroundColor = UIColor.whiteColor()
+        view.backgroundColor = UIColor.white
     }
     
-    override public func viewDidLoad() {
+    override open func viewDidLoad() {
         super.viewDidLoad()
         addWallpaperView()
         addScrollProxyView()
@@ -82,35 +82,35 @@ public class ChatViewController: UIViewController {
         automaticallyAdjustsScrollViewInsets = false // Use `chatItemsContainer` & layoutGuide
     }
     
-    private func addWallpaperView() {
+    fileprivate func addWallpaperView() {
         wallpaperView = UIImageView(frame: CGRect.zero)
         wallpaperView.translatesAutoresizingMaskIntoConstraints = false
-        wallpaperView.contentMode = .ScaleAspectFill
+        wallpaperView.contentMode = .scaleAspectFill
         wallpaperView.clipsToBounds = true
         view.addSubview(wallpaperView)
     }
     
     // Detect touches in status bar
     // http://stackoverflow.com/questions/3753097/how-to-detect-touches-in-status-bar
-    public private(set) var scrollProxy: UIScrollView!
-    private func addScrollProxyView() {
+    open fileprivate(set) var scrollProxy: UIScrollView!
+    fileprivate func addScrollProxyView() {
         scrollProxy = UIScrollView()
         scrollProxy.translatesAutoresizingMaskIntoConstraints = false
         scrollProxy.contentSize = CGSize(width: 600, height: 1000)
         scrollProxy.contentOffset = CGPoint(x: 0, y: 1)
         scrollProxy.scrollsToTop = true
-        scrollProxy.scrollEnabled = true
+        scrollProxy.isScrollEnabled = true
         scrollProxy.showsVerticalScrollIndicator = false
         scrollProxy.showsHorizontalScrollIndicator = false
-        scrollProxy.backgroundColor = UIColor.clearColor()
+        scrollProxy.backgroundColor = UIColor.clear
         scrollProxy.delegate = self
         view.addSubview(scrollProxy)
     }
     
-    private func addChatItemsView() {
+    fileprivate func addChatItemsView() {
         chatItemsContainer = UIView(frame: CGRect.zero)
         chatItemsContainer.translatesAutoresizingMaskIntoConstraints = false
-        chatItemsContainer.backgroundColor = UIColor.clearColor()
+        chatItemsContainer.backgroundColor = UIColor.clear
         chatItemsContainer.addGestureRecognizer(tapBlankRecognizer)
         view.addSubview(chatItemsContainer)
         
@@ -119,20 +119,20 @@ public class ChatViewController: UIViewController {
         collectionView.contentInset = constants.defaultContentInsets
         collectionView.scrollIndicatorInsets = constants.defaultScrollIndicatorInsets
         collectionView.alwaysBounceVertical = true
-        collectionView.backgroundColor = UIColor.clearColor()
+        collectionView.backgroundColor = UIColor.clear
         collectionView.showsVerticalScrollIndicator = true
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.allowsSelection = false
         collectionView.scrollsToTop = false
         collectionView.dataSource = self
         collectionView.delegate = self
-        collectionView.transform = inverted ? CGAffineTransformMake(1, 0, 0, -1, 0, 0) : CGAffineTransformIdentity
+        collectionView.transform = inverted ? CGAffineTransform(a: 1, b: 0, c: 0, d: -1, tx: 0, ty: 0) : CGAffineTransform.identity
         chatItemsContainer.addSubview(self.collectionView)
         
         registerCells()
     }
     
-    private func registerCells() {
+    fileprivate func registerCells() {
         presenterBuildersByType = createPresenterBuilders()
         
         for presenterBuilder in presenterBuildersByType.flatMap({ $0.1 }) {
@@ -142,12 +142,12 @@ public class ChatViewController: UIViewController {
         DummyChatItemPresenter.registerCells(collectionView)
     }
     
-    public weak var chatInputViewController: UIViewController?
-    private var inputContainerHeightConstraint: NSLayoutConstraint!
-    private func addChatInputView() {
+    open weak var chatInputViewController: UIViewController?
+    fileprivate var inputContainerHeightConstraint: NSLayoutConstraint!
+    fileprivate func addChatInputView() {
         inputContainer = UIView(frame: CGRect.zero)
         inputContainer.translatesAutoresizingMaskIntoConstraints = false
-        inputContainer.backgroundColor = UIColor.clearColor()
+        inputContainer.backgroundColor = UIColor.clear
         view.addSubview(inputContainer)
         
         let chatInputViewController = createChatInputViewController()
@@ -162,54 +162,54 @@ public class ChatViewController: UIViewController {
         inputView?.translatesAutoresizingMaskIntoConstraints = false
         
         addChildViewController(chatInputViewController)
-        inputContainer.addSubview(inputView)
+        inputContainer.addSubview(inputView!)
         
         self.chatInputViewController = chatInputViewController
     }
     
-    private func addConstraints() {
-        wallpaperView.setContentHuggingPriority(UILayoutPriority(240), forAxis: .Horizontal)
-        wallpaperView.setContentHuggingPriority(UILayoutPriority(240), forAxis: .Vertical)
-        wallpaperView.setContentCompressionResistancePriority(UILayoutPriority(240), forAxis: .Horizontal)
-        wallpaperView.setContentCompressionResistancePriority(UILayoutPriority(240), forAxis: .Vertical)
+    fileprivate func addConstraints() {
+        wallpaperView.setContentHuggingPriority(UILayoutPriority(240), for: .horizontal)
+        wallpaperView.setContentHuggingPriority(UILayoutPriority(240), for: .vertical)
+        wallpaperView.setContentCompressionResistancePriority(UILayoutPriority(240), for: .horizontal)
+        wallpaperView.setContentCompressionResistancePriority(UILayoutPriority(240), for: .vertical)
         
-        view.addConstraint(NSLayoutConstraint(item: wallpaperView, attribute: .Top, relatedBy: .Equal, toItem: view, attribute: .Top, multiplier: 1, constant: 0))
-        view.addConstraint(NSLayoutConstraint(item: wallpaperView, attribute: .Leading, relatedBy: .Equal, toItem: view, attribute: .Leading, multiplier: 1, constant: 0))
-        view.addConstraint(NSLayoutConstraint(item: wallpaperView, attribute: .Bottom, relatedBy: .Equal, toItem: view, attribute: .Bottom, multiplier: 1, constant: 0))
-        view.addConstraint(NSLayoutConstraint(item: wallpaperView, attribute: .Trailing, relatedBy: .Equal, toItem: view, attribute: .Trailing, multiplier: 1, constant: 0))
+        view.addConstraint(NSLayoutConstraint(item: wallpaperView, attribute: .top, relatedBy: .equal, toItem: view, attribute: .top, multiplier: 1, constant: 0))
+        view.addConstraint(NSLayoutConstraint(item: wallpaperView, attribute: .leading, relatedBy: .equal, toItem: view, attribute: .leading, multiplier: 1, constant: 0))
+        view.addConstraint(NSLayoutConstraint(item: wallpaperView, attribute: .bottom, relatedBy: .equal, toItem: view, attribute: .bottom, multiplier: 1, constant: 0))
+        view.addConstraint(NSLayoutConstraint(item: wallpaperView, attribute: .trailing, relatedBy: .equal, toItem: view, attribute: .trailing, multiplier: 1, constant: 0))
         
-        view.addConstraint(NSLayoutConstraint(item: scrollProxy, attribute: .Top, relatedBy: .Equal, toItem: view, attribute: .Top, multiplier: 1, constant: 0))
-        view.addConstraint(NSLayoutConstraint(item: scrollProxy, attribute: .Leading, relatedBy: .Equal, toItem: view, attribute: .Leading, multiplier: 1, constant: 0))
-        view.addConstraint(NSLayoutConstraint(item: scrollProxy, attribute: .Bottom, relatedBy: .Equal, toItem: view, attribute: .Bottom, multiplier: 1, constant: 0))
-        view.addConstraint(NSLayoutConstraint(item: scrollProxy, attribute: .Trailing, relatedBy: .Equal, toItem: view, attribute: .Trailing, multiplier: 1, constant: 0))
+        view.addConstraint(NSLayoutConstraint(item: scrollProxy, attribute: .top, relatedBy: .equal, toItem: view, attribute: .top, multiplier: 1, constant: 0))
+        view.addConstraint(NSLayoutConstraint(item: scrollProxy, attribute: .leading, relatedBy: .equal, toItem: view, attribute: .leading, multiplier: 1, constant: 0))
+        view.addConstraint(NSLayoutConstraint(item: scrollProxy, attribute: .bottom, relatedBy: .equal, toItem: view, attribute: .bottom, multiplier: 1, constant: 0))
+        view.addConstraint(NSLayoutConstraint(item: scrollProxy, attribute: .trailing, relatedBy: .equal, toItem: view, attribute: .trailing, multiplier: 1, constant: 0))
         
-        view.addConstraint(NSLayoutConstraint(item: topLayoutGuide, attribute: .Bottom, relatedBy: .Equal, toItem: chatItemsContainer, attribute: .Top, multiplier: 1, constant: 0))
-        view.addConstraint(NSLayoutConstraint(item: view, attribute: .Leading, relatedBy: .Equal, toItem: chatItemsContainer, attribute: .Leading, multiplier: 1, constant: 0))
-        view.addConstraint(NSLayoutConstraint(item: inputContainer, attribute: .Top, relatedBy: .Equal, toItem: chatItemsContainer, attribute: .Bottom, multiplier: 1, constant: 0))
-        view.addConstraint(NSLayoutConstraint(item: view, attribute: .Trailing, relatedBy: .Equal, toItem: chatItemsContainer, attribute: .Trailing, multiplier: 1, constant: 0))
+        view.addConstraint(NSLayoutConstraint(item: topLayoutGuide, attribute: .bottom, relatedBy: .equal, toItem: chatItemsContainer, attribute: .top, multiplier: 1, constant: 0))
+        view.addConstraint(NSLayoutConstraint(item: view, attribute: .leading, relatedBy: .equal, toItem: chatItemsContainer, attribute: .leading, multiplier: 1, constant: 0))
+        view.addConstraint(NSLayoutConstraint(item: inputContainer, attribute: .top, relatedBy: .equal, toItem: chatItemsContainer, attribute: .bottom, multiplier: 1, constant: 0))
+        view.addConstraint(NSLayoutConstraint(item: view, attribute: .trailing, relatedBy: .equal, toItem: chatItemsContainer, attribute: .trailing, multiplier: 1, constant: 0))
         
-        chatItemsContainer.addConstraint(NSLayoutConstraint(item: chatItemsContainer, attribute: .Top, relatedBy: .Equal, toItem: collectionView, attribute: .Top, multiplier: 1, constant: 0))
-        chatItemsContainer.addConstraint(NSLayoutConstraint(item: chatItemsContainer, attribute: .Leading, relatedBy: .Equal, toItem: collectionView, attribute: .Leading, multiplier: 1, constant: 0))
-        chatItemsContainer.addConstraint(NSLayoutConstraint(item: chatItemsContainer, attribute: .Bottom, relatedBy: .Equal, toItem: collectionView, attribute: .Bottom, multiplier: 1, constant: 0))
-        chatItemsContainer.addConstraint(NSLayoutConstraint(item: chatItemsContainer, attribute: .Trailing, relatedBy: .Equal, toItem: collectionView, attribute: .Trailing, multiplier: 1, constant: 0))
+        chatItemsContainer.addConstraint(NSLayoutConstraint(item: chatItemsContainer, attribute: .top, relatedBy: .equal, toItem: collectionView, attribute: .top, multiplier: 1, constant: 0))
+        chatItemsContainer.addConstraint(NSLayoutConstraint(item: chatItemsContainer, attribute: .leading, relatedBy: .equal, toItem: collectionView, attribute: .leading, multiplier: 1, constant: 0))
+        chatItemsContainer.addConstraint(NSLayoutConstraint(item: chatItemsContainer, attribute: .bottom, relatedBy: .equal, toItem: collectionView, attribute: .bottom, multiplier: 1, constant: 0))
+        chatItemsContainer.addConstraint(NSLayoutConstraint(item: chatItemsContainer, attribute: .trailing, relatedBy: .equal, toItem: collectionView, attribute: .trailing, multiplier: 1, constant: 0))
         
-        view.addConstraint(NSLayoutConstraint(item: inputContainer, attribute: .Top, relatedBy: .Equal, toItem: chatItemsContainer, attribute: .Bottom, multiplier: 1, constant: 0))
-        view.addConstraint(NSLayoutConstraint(item: view, attribute: .Leading, relatedBy: .Equal, toItem: inputContainer, attribute: .Leading, multiplier: 1, constant: 0))
-        view.addConstraint(NSLayoutConstraint(item: view, attribute: .Trailing, relatedBy: .Equal, toItem: inputContainer, attribute: .Trailing, multiplier: 1, constant: 0))
-        view.addConstraint(NSLayoutConstraint(item: view, attribute: .Bottom, relatedBy: .Equal, toItem: inputContainer, attribute: .Bottom, multiplier: 1, constant: 0))
-        inputContainerHeightConstraint = NSLayoutConstraint(item: inputContainer, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .Height, multiplier: 1, constant: defaultInputContainerHeight)
+        view.addConstraint(NSLayoutConstraint(item: inputContainer, attribute: .top, relatedBy: .equal, toItem: chatItemsContainer, attribute: .bottom, multiplier: 1, constant: 0))
+        view.addConstraint(NSLayoutConstraint(item: view, attribute: .leading, relatedBy: .equal, toItem: inputContainer, attribute: .leading, multiplier: 1, constant: 0))
+        view.addConstraint(NSLayoutConstraint(item: view, attribute: .trailing, relatedBy: .equal, toItem: inputContainer, attribute: .trailing, multiplier: 1, constant: 0))
+        view.addConstraint(NSLayoutConstraint(item: view, attribute: .bottom, relatedBy: .equal, toItem: inputContainer, attribute: .bottom, multiplier: 1, constant: 0))
+        inputContainerHeightConstraint = NSLayoutConstraint(item: inputContainer, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .height, multiplier: 1, constant: defaultInputContainerHeight)
         inputContainer.addConstraint(inputContainerHeightConstraint)
         
         guard let inputView = chatInputViewController?.view else { return }
-        inputContainer.addConstraint(NSLayoutConstraint(item: inputContainer, attribute: .Top, relatedBy: .Equal, toItem: inputView, attribute: .Top, multiplier: 1, constant: 0))
-        inputContainer.addConstraint(NSLayoutConstraint(item: inputContainer, attribute: .Bottom, relatedBy: .Equal, toItem: inputView, attribute: .Bottom, multiplier: 1, constant: 0))
-        inputContainer.addConstraint(NSLayoutConstraint(item: inputContainer, attribute: .Leading, relatedBy: .Equal, toItem: inputView, attribute: .Leading, multiplier: 1, constant: 0))
-        inputContainer.addConstraint(NSLayoutConstraint(item: inputContainer, attribute: .Trailing, relatedBy: .Equal, toItem: inputView, attribute: .Trailing, multiplier: 1, constant: 0))
+        inputContainer.addConstraint(NSLayoutConstraint(item: inputContainer, attribute: .top, relatedBy: .equal, toItem: inputView, attribute: .top, multiplier: 1, constant: 0))
+        inputContainer.addConstraint(NSLayoutConstraint(item: inputContainer, attribute: .bottom, relatedBy: .equal, toItem: inputView, attribute: .bottom, multiplier: 1, constant: 0))
+        inputContainer.addConstraint(NSLayoutConstraint(item: inputContainer, attribute: .leading, relatedBy: .equal, toItem: inputView, attribute: .leading, multiplier: 1, constant: 0))
+        inputContainer.addConstraint(NSLayoutConstraint(item: inputContainer, attribute: .trailing, relatedBy: .equal, toItem: inputView, attribute: .trailing, multiplier: 1, constant: 0))
         
     }
     
-    public var isFirstLayout: Bool = true
-    override public func viewDidLayoutSubviews() {
+    open var isFirstLayout: Bool = true
+    override open func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
         if isFirstLayout {
@@ -218,9 +218,9 @@ public class ChatViewController: UIViewController {
         }
     }
     
-    func rectAtIndexPath(indexPath: NSIndexPath?) -> CGRect? {
+    func rectAtIndexPath(_ indexPath: IndexPath?) -> CGRect? {
         if let indexPath = indexPath {
-            return collectionView.collectionViewLayout.layoutAttributesForItemAtIndexPath(indexPath)?.frame
+            return collectionView.collectionViewLayout.layoutAttributesForItem(at: indexPath)?.frame
         }
         return nil
     }
@@ -228,16 +228,19 @@ public class ChatViewController: UIViewController {
     var autoLoadingEnabled: Bool = false
     var inputContainer: UIView!
     var presenterBuildersByType = [ChatItemType: [ChatItemPresenterBuilderProtocol]]()
-    let presentersByChatItem = NSMapTable(keyOptions: .WeakMemory, valueOptions: .StrongMemory)
-    let presentersByCell = NSMapTable(keyOptions: .WeakMemory, valueOptions: .WeakMemory)
+
+    
+    let presentersByChatItem = NSMapTable<AnyObject, AnyObject>(keyOptions: .weakMemory, valueOptions: .weakMemory)
+    
+    let presentersByCell = NSMapTable<UICollectionViewCell, AnyObject>(keyOptions: .weakMemory, valueOptions: .weakMemory)
     var updateQueue: SerialTaskQueueProtocol = SerialTaskQueue()
     
-    public func createPresenterBuilders() -> [ChatItemType: [ChatItemPresenterBuilderProtocol]] {
+    open func createPresenterBuilders() -> [ChatItemType: [ChatItemPresenterBuilderProtocol]] {
         assert(false, "Override in subclass")
         return [ChatItemType: [ChatItemPresenterBuilderProtocol]]()
     }
     
-    public func createChatInputViewController() -> UIViewController {
+    open func createChatInputViewController() -> UIViewController {
         assert(false, "Override in subclass")
         return UIViewController()
     }
@@ -248,9 +251,9 @@ public class ChatViewController: UIViewController {
      - Provide to your pressenters additional attributes to help them configure their cells (for instance if a bubble should show a tail)
      - You can also add new items (for instance time markers or failed cells)
      */
-    public var chatItemsDecorator: ChatItemsDecoratorProtocol?
+    open var chatItemsDecorator: ChatItemsDecoratorProtocol?
     
-    public var createCollectionViewLayout: UICollectionViewLayout {
+    open var createCollectionViewLayout: UICollectionViewLayout {
         let layout = ChatCollectionViewLayout()
         layout.delegate = self
         return layout
@@ -258,18 +261,18 @@ public class ChatViewController: UIViewController {
     
     var layoutModel = ChatCollectionViewLayoutModel.createModel(0, itemsLayoutData: [])
     
-    public var inverted: Bool = true
+    open var inverted: Bool = true
     
-    public lazy var tapBlankRecognizer: UITapGestureRecognizer = {
+    open lazy var tapBlankRecognizer: UITapGestureRecognizer = {
         let tap = UITapGestureRecognizer(target: self, action: #selector(handleTapBlank(_:)))
         return tap
     }()
     
-    public func handleTapBlank(recognizer: UITapGestureRecognizer) {
+    open func handleTapBlank(_ recognizer: UITapGestureRecognizer) {
         (chatInputViewController as? ChatInputControllerProtocol)?.endInputting(true)
     }
     
-    public func relayoutForChatInputViewHeightChange(change: HeightChange) {
+    open func relayoutForChatInputViewHeightChange(_ change: HeightChange) {
         let dH = change.newHeight - change.oldHeight
         
         if fabs(dH) > 1 {
@@ -296,12 +299,12 @@ public class ChatViewController: UIViewController {
 
 extension ChatViewController { // Rotation
     
-    public override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
-        super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
+    open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
         let shouldScrollToBottom = isScrolledAtBottom()
-        let referenceIndexPath = collectionView.indexPathsForVisibleItems().first
+        let referenceIndexPath = collectionView.indexPathsForVisibleItems.first
         let oldRect = rectAtIndexPath(referenceIndexPath)
-        coordinator.animateAlongsideTransition({ (context) -> Void in
+        coordinator.animate(alongsideTransition: { (context) -> Void in
             if shouldScrollToBottom {
                 self.scrollToBottom(animated: false)
             } else {
@@ -313,7 +316,7 @@ extension ChatViewController { // Rotation
 }
 
 extension ChatViewController: UIScrollViewDelegate { // Handler tap status bar
-    public func scrollViewShouldScrollToTop(scrollView: UIScrollView) -> Bool {
+    public func scrollViewShouldScrollToTop(_ scrollView: UIScrollView) -> Bool {
         precondition(scrollView === scrollProxy, "Other scroll views should not set `scrollsToTop` true")
         
         if inverted {

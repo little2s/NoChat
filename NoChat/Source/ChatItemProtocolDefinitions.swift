@@ -35,23 +35,23 @@ public protocol ChatItemDecorationAttributesProtocol {
 }
 
 public protocol ChatItemPresenterProtocol: class {
-    static func registerCells(collectionView: UICollectionView)
+    static func registerCells(_ collectionView: UICollectionView)
     var canCalculateHeightInBackground: Bool { get } // Default is false
     func heightForCell(maximumWidth width: CGFloat, decorationAttributes: ChatItemDecorationAttributesProtocol?) -> CGFloat
-    func dequeueCell(collectionView collectionView: UICollectionView, indexPath: NSIndexPath) -> UICollectionViewCell
-    func configureCell(cell: UICollectionViewCell, decorationAttributes: ChatItemDecorationAttributesProtocol?)
-    func cellWillBeShown(cell: UICollectionViewCell) // optional
-    func cellWasHidden(cell: UICollectionViewCell) // optional
+    func dequeueCell(collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell
+    func configureCell(_ cell: UICollectionViewCell, decorationAttributes: ChatItemDecorationAttributesProtocol?)
+    func cellWillBeShown(_ cell: UICollectionViewCell) // optional
+    func cellWasHidden(_ cell: UICollectionViewCell) // optional
 }
 
 public extension ChatItemPresenterProtocol { // Optionals
     var canCalculateHeightInBackground: Bool { return false }
-    func cellWillBeShown(cell: UICollectionViewCell) {}
-    func cellWasHidden(cell: UICollectionViewCell) {}
+    func cellWillBeShown(_ cell: UICollectionViewCell) {}
+    func cellWasHidden(_ cell: UICollectionViewCell) {}
 }
 
 public protocol ChatItemPresenterBuilderProtocol {
-    func canHandleChatItem(chatItem: ChatItemProtocol) -> Bool
-    func createPresenterWithChatItem(chatItem: ChatItemProtocol) -> ChatItemPresenterProtocol
+    func canHandleChatItem(_ chatItem: ChatItemProtocol) -> Bool
+    func createPresenterWithChatItem(_ chatItem: ChatItemProtocol) -> ChatItemPresenterProtocol
     var presenterType: ChatItemPresenterProtocol.Type { get }
 }

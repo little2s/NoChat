@@ -24,23 +24,24 @@
 
 import Foundation
 
-public typealias TaskClosure = (completion: () -> Void) -> Void
+public typealias TaskClosure = (_ completion: @escaping () -> Void) -> Void
 
 public protocol SerialTaskQueueProtocol {
-    func addTask(task: TaskClosure)
+    func addTask(_ task: @escaping TaskClosure)
     func start()
     func stop()
+    func flushQueue()
     var isEmpty: Bool { get }
 }
 
 public final class SerialTaskQueue: SerialTaskQueueProtocol {
-    private var isBusy = false
-    private var isStopped = true
-    private var tasksQueue = [TaskClosure]()
+    fileprivate var isBusy = false
+    fileprivate var isStopped = true
+    fileprivate var tasksQueue = [TaskClosure]()
     
     public init() {}
 
-    public func addTask(task: TaskClosure) {
+    public func addTask(_ task: @escaping TaskClosure) {
         self.tasksQueue.append(task)
         self.maybeExecuteNextTask()
     }
@@ -53,17 +54,21 @@ public final class SerialTaskQueue: SerialTaskQueueProtocol {
     public func stop() {
         self.isStopped = true
     }
+    
+    public func flushQueue() {
+        self.tasksQueue.removeAll()
+    }
 
     public var isEmpty: Bool {
         return self.tasksQueue.isEmpty
     }
 
-    private func maybeExecuteNextTask() {
+    fileprivate func maybeExecuteNextTask() {
         if !self.isStopped && !self.isBusy {
             if !self.isEmpty {
                 let firstTask = self.tasksQueue.removeFirst()
                 self.isBusy = true
-                firstTask(completion: { [weak self] () -> Void in
+                firstTask({ [weak self] () -> Void in
                     self?.isBusy = false
                     self?.maybeExecuteNextTask()
                 })

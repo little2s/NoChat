@@ -29,14 +29,14 @@ public protocol UniqueIdentificable {
 }
 
 public struct CollectionChangeMove: Equatable, Hashable {
-    public let indexPathOld: NSIndexPath
-    public let indexPathNew: NSIndexPath
-    public init(indexPathOld: NSIndexPath, indexPathNew: NSIndexPath) {
+    public let indexPathOld: IndexPath
+    public let indexPathNew: IndexPath
+    public init(indexPathOld: IndexPath, indexPathNew: IndexPath) {
         self.indexPathOld = indexPathOld
         self.indexPathNew = indexPathNew
     }
 
-    public var hashValue: Int { return indexPathOld.hash ^ indexPathNew.hash }
+    public var hashValue: Int { return (indexPathOld as NSIndexPath).hash ^ (indexPathNew as NSIndexPath).hash }
 }
 
 extension CollectionChangeMove: CustomStringConvertible {
@@ -50,11 +50,11 @@ public func == (lhs: CollectionChangeMove, rhs: CollectionChangeMove) -> Bool {
 }
 
 public struct CollectionChanges {
-    public let insertedIndexPaths: Set<NSIndexPath>
-    public let deletedIndexPaths: Set<NSIndexPath>
+    public let insertedIndexPaths: Set<IndexPath>
+    public let deletedIndexPaths: Set<IndexPath>
     public let movedIndexPaths: [CollectionChangeMove]
 
-    public init(insertedIndexPaths: Set<NSIndexPath>, deletedIndexPaths: Set<NSIndexPath>, movedIndexPaths: [CollectionChangeMove]) {
+    public init(insertedIndexPaths: Set<IndexPath>, deletedIndexPaths: Set<IndexPath>, movedIndexPaths: [CollectionChangeMove]) {
         self.insertedIndexPaths = insertedIndexPaths
         self.deletedIndexPaths = deletedIndexPaths
         self.movedIndexPaths = movedIndexPaths
@@ -67,10 +67,10 @@ extension CollectionChanges: CustomStringConvertible {
     }
 }
 
-public func generateChanges(oldCollection oldCollection: [UniqueIdentificable], newCollection: [UniqueIdentificable]) -> CollectionChanges {
-    func generateIndexesById(uids: [String]) -> [String: Int] {
+public func generateChanges(oldCollection: [UniqueIdentificable], newCollection: [UniqueIdentificable]) -> CollectionChanges {
+    func generateIndexesById(_ uids: [String]) -> [String: Int] {
         var map = [String: Int](minimumCapacity: uids.count)
-        for (index, uid) in uids.enumerate() {
+        for (index, uid) in uids.enumerated() {
             map[uid] = index
         }
         return map
@@ -80,25 +80,25 @@ public func generateChanges(oldCollection oldCollection: [UniqueIdentificable], 
     let newIds = newCollection.map { $0.uid }
     let oldIndexsById = generateIndexesById(oldIds)
     let newIndexsById = generateIndexesById(newIds)
-    var deletedIndexPaths = Set<NSIndexPath>()
-    var insertedIndexPaths = Set<NSIndexPath>()
+    var deletedIndexPaths = Set<IndexPath>()
+    var insertedIndexPaths = Set<IndexPath>()
     var movedIndexPaths = [CollectionChangeMove]()
 
     // Deletetions
     for oldId in oldIds {
         let isDeleted = newIndexsById[oldId] == nil
         if isDeleted {
-            deletedIndexPaths.insert(NSIndexPath(forItem: oldIndexsById[oldId]!, inSection: 0))
+            deletedIndexPaths.insert(IndexPath(item: oldIndexsById[oldId]!, section: 0))
         }
     }
 
     // Insertions and movements
     for newId in newIds {
         let newIndex = newIndexsById[newId]!
-        let newIndexPath = NSIndexPath(forItem: newIndex, inSection: 0)
+        let newIndexPath = IndexPath(item: newIndex, section: 0)
         if let oldIndex = oldIndexsById[newId] {
             if oldIndex != newIndex {
-                movedIndexPaths.append(CollectionChangeMove(indexPathOld: NSIndexPath(forItem: oldIndex, inSection: 0), indexPathNew: newIndexPath))
+                movedIndexPaths.append(CollectionChangeMove(indexPathOld: IndexPath(item: oldIndex, section: 0), indexPathNew: newIndexPath))
             }
         } else {
             // It's new

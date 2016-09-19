@@ -25,8 +25,8 @@
 import UIKit
 
 public enum CellVerticalEdge {
-    case Top
-    case Bottom
+    case top
+    case bottom
 }
 
 extension CGFloat {
@@ -36,17 +36,17 @@ extension CGFloat {
 extension ChatViewController {
 
     public func isScrolledAtBottom() -> Bool {
-        guard collectionView.numberOfSections() > 0 && collectionView.numberOfItemsInSection(0) > 0 else { return true }
-        let sectionIndex = collectionView.numberOfSections() - 1
-        let itemIndex = collectionView.numberOfItemsInSection(sectionIndex) - 1
-        let lastIndexPath = NSIndexPath(forItem: itemIndex, inSection: sectionIndex)
-        return isIndexPathVisible(lastIndexPath, atEdge: .Bottom)
+        guard collectionView.numberOfSections > 0 && collectionView.numberOfItems(inSection: 0) > 0 else { return true }
+        let sectionIndex = collectionView.numberOfSections - 1
+        let itemIndex = collectionView.numberOfItems(inSection: sectionIndex) - 1
+        let lastIndexPath = IndexPath(item: itemIndex, section: sectionIndex)
+        return isIndexPathVisible(lastIndexPath, atEdge: .bottom)
     }
 
     public func isScrolledAtTop() -> Bool {
-        guard collectionView.numberOfSections() > 0 && collectionView.numberOfItemsInSection(0) > 0 else { return true }
-        let firstIndexPath = NSIndexPath(forItem: 0, inSection: 0)
-        return isIndexPathVisible(firstIndexPath, atEdge: .Top)
+        guard collectionView.numberOfSections > 0 && collectionView.numberOfItems(inSection: 0) > 0 else { return true }
+        let firstIndexPath = IndexPath(item: 0, section: 0)
+        return isIndexPathVisible(firstIndexPath, atEdge: .top)
     }
 
     public func isCloseToBottom() -> Bool {
@@ -59,14 +59,14 @@ extension ChatViewController {
         return (visibleRect().minY / collectionView.contentSize.height) < constants.autoloadingFractionalThreshold
     }
 
-    public func isIndexPathVisible(indexPath: NSIndexPath, atEdge edge: CellVerticalEdge) -> Bool {
-        if let attributes = collectionView.collectionViewLayout.layoutAttributesForItemAtIndexPath(indexPath) {
+    public func isIndexPathVisible(_ indexPath: IndexPath, atEdge edge: CellVerticalEdge) -> Bool {
+        if let attributes = collectionView.collectionViewLayout.layoutAttributesForItem(at: indexPath) {
             let visibleRect = self.visibleRect()
-            let intersection = visibleRect.intersect(attributes.frame)
-            if edge == .Top {
-                return CGFloat.abs(intersection.minY - attributes.frame.minY) < CGFloat.bma_epsilon
+            let intersection = visibleRect.intersection(attributes.frame)
+            if edge == .top {
+                return abs(intersection.minY - attributes.frame.minY) < CGFloat.bma_epsilon
             } else {
-                return CGFloat.abs(intersection.maxY - attributes.frame.maxY) < CGFloat.bma_epsilon
+                return abs(intersection.maxY - attributes.frame.maxY) < CGFloat.bma_epsilon
             }
         }
         return false
@@ -75,12 +75,12 @@ extension ChatViewController {
     public func visibleRect() -> CGRect {
         let contentInset = collectionView.contentInset
         let collectionViewBounds = collectionView.bounds
-        let contentSize = collectionView.collectionViewLayout.collectionViewContentSize()
+        let contentSize = collectionView.collectionViewLayout.collectionViewContentSize
         return CGRect(x: CGFloat(0), y: collectionView.contentOffset.y + contentInset.top, width: collectionViewBounds.width, height: min(contentSize.height, collectionViewBounds.height - contentInset.top - contentInset.bottom))
     }
     
-    public func scrollToBottom(animated animated: Bool) {
-        let contentHeight = collectionView.collectionViewLayout.collectionViewContentSize().height
+    public func scrollToBottom(animated: Bool) {
+        let contentHeight = collectionView.collectionViewLayout.collectionViewContentSize.height
         
         let boundsHeight = collectionView.bounds.height
         
@@ -93,7 +93,7 @@ extension ChatViewController {
         // Don't use setContentOffset(:animated). If animated, contentOffset property will be updated along with the animation for each frame update
         // If a message is inserted while scrolling is happening (as in very fast typing), we want to take the "final" content offset (not the "real time" one) to check if we should scroll to bottom again
         if animated {
-            UIView.animateWithDuration(constants.updatesAnimationDuration, animations: { () -> Void in
+            UIView.animate(withDuration: constants.updatesAnimationDuration, animations: { () -> Void in
                 self.collectionView.contentOffset = CGPoint(x: 0, y: offsetY)
             })
         } else {
@@ -101,11 +101,11 @@ extension ChatViewController {
         }
     }
     
-    public func scrollToTop(animated animated: Bool) {
+    public func scrollToTop(animated: Bool) {
         let offsetY = -collectionView.contentInset.top
 
         if animated {
-            UIView.animateWithDuration(constants.updatesAnimationDuration, animations: { () -> Void in
+            UIView.animate(withDuration: constants.updatesAnimationDuration, animations: { () -> Void in
                 self.collectionView.contentOffset = CGPoint(x: 0, y: offsetY)
             })
         } else {
@@ -113,21 +113,21 @@ extension ChatViewController {
         }
     }
 
-    public func scrollToPreservePosition(oldRefRect oldRefRect: CGRect?, newRefRect: CGRect?) {
-        guard let oldRefRect = oldRefRect, newRefRect = newRefRect else {
+    public func scrollToPreservePosition(oldRefRect: CGRect?, newRefRect: CGRect?) {
+        guard let oldRefRect = oldRefRect, let newRefRect = newRefRect else {
             return
         }
         let diffY = newRefRect.minY - oldRefRect.minY
         collectionView.contentOffset = CGPoint(x: 0, y: collectionView.contentOffset.y + diffY)
     }
 
-    public func scrollViewDidScroll(scrollView: UIScrollView) {
-        if collectionView.dragging {
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if collectionView.isDragging {
             autoLoadMoreContentIfNeeded()
         }
     }
 
-    public func scrollViewDidScrollToTop(scrollView: UIScrollView) {
+    public func scrollViewDidScrollToTop(_ scrollView: UIScrollView) {
         autoLoadMoreContentIfNeeded()
     }
 
@@ -136,11 +136,11 @@ extension ChatViewController {
 
         if isCloseToTop() && dataSource.hasMorePrevious {
             dataSource.loadPrevious({ [weak self] () -> Void in
-                self?.enqueueModelUpdate(context: .Pagination)
+                self?.enqueueModelUpdate(context: .pagination)
             })
         } else if isCloseToBottom() && dataSource.hasMoreNext {
             dataSource.loadNext({ [weak self] () -> Void in
-                self?.enqueueModelUpdate(context: .Pagination)
+                self?.enqueueModelUpdate(context: .pagination)
             })
         }
     }

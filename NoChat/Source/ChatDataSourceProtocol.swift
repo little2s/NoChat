@@ -25,7 +25,7 @@
 import Foundation
 
 public protocol ChatDataSourceDelegateProtocol: class {
-    func chatDataSourceDidUpdate(chatDataSource: ChatDataSourceProtocol)
+    func chatDataSourceDidUpdate(_ chatDataSource: ChatDataSourceProtocol)
 }
 
 public protocol ChatDataSourceProtocol: class {
@@ -34,7 +34,7 @@ public protocol ChatDataSourceProtocol: class {
     var chatItems: [ChatItemProtocol] { get }
     weak var delegate: ChatDataSourceDelegateProtocol? { get set }
 
-    func loadNext(completion: () -> Void)
-    func loadPrevious(completion: () -> Void)
-    func adjustNumberOfMessages(preferredMaxCount preferredMaxCount: Int?, focusPosition: Double, completion:(didAdjust: Bool) -> Void) // If you want, implement message count contention for performance, otherwise just call completion(false)
+    func loadNext(_ completion: () -> Void)
+    func loadPrevious(_ completion: () -> Void)
+    func adjustNumberOfMessages(preferredMaxCount: Int?, focusPosition: Double, completion:(_ didAdjust: Bool) -> Void) // If you want, implement message count contention for performance, otherwise just call completion(false)
 }
