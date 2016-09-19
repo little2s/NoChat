@@ -11,15 +11,15 @@ import NoChat
 
 public struct MessageCollectionViewCellStyle {
     lazy var incomingBubble: UIImage = {
-        return imageFactory.createImage("BubbleIncomingFull")!
+        return imageFactory.createImage(name: "BubbleIncomingFull")!
     }()
     
     lazy var outgoingBubble: UIImage = {
-        return imageFactory.createImage("BubbleOutgoingFull")!
+        return imageFactory.createImage(name: "BubbleOutgoingFull")!
     }()
     
     lazy var failedIcon: UIImage = {
-        return imageFactory.createImage("MessageUnsentButton")!
+        return imageFactory.createImage(name: "MessageUnsentButton")!
     }()
 }
 
@@ -32,9 +32,9 @@ public struct MessageCelloctionViewCellLayoutConstants {
     let maxContainerWidthPercentageForBubbleViewNoAvatar: CGFloat = 0.75
 }
 
-public class MessageCollectionViewCell<BubbleViewT where
+public class MessageCollectionViewCell<BubbleViewT>: UICollectionViewCell, BackgroundSizingQueryable, UIGestureRecognizerDelegate where
     BubbleViewT: UIView,
-    BubbleViewT: BubbleViewProtocol>: UICollectionViewCell, BackgroundSizingQueryable, UIGestureRecognizerDelegate
+    BubbleViewT: BubbleViewProtocol
 {
     
     static func sizingCell() -> MessageCollectionViewCell<BubbleViewT> {
@@ -53,7 +53,7 @@ public class MessageCollectionViewCell<BubbleViewT where
     }
     
     private(set) var isUpdating: Bool = false
-    func performBatchUpdates(updateClosure: () -> Void, animated: Bool, completion: (() -> ())?) {
+    func performBatchUpdates(updateClosure: @escaping () -> Void, animated: Bool, completion: (() -> ())?) {
         self.isUpdating = true
         let updateAndRefreshViews = {
             updateClosure()
@@ -64,7 +64,7 @@ public class MessageCollectionViewCell<BubbleViewT where
             }
         }
         if animated {
-            UIView.animateWithDuration(self.animationDuration,
+            UIView.animate(withDuration: self.animationDuration,
                 animations: updateAndRefreshViews,
                 completion: { (finished) -> Void in
                     completion?()
@@ -83,7 +83,7 @@ public class MessageCollectionViewCell<BubbleViewT where
                 guard let viewModel = messageViewModel as? DecoratedMessageViewModelProtocol else {
                     return
                 }
-                viewModel.messageViewModel.status.removeObserver(self)
+                viewModel.messageViewModel.status.removeObserver(observer: self)
             }
         }
         didSet {
@@ -98,7 +98,7 @@ public class MessageCollectionViewCell<BubbleViewT where
                 return
             }
         
-            viewModel.messageViewModel.status.observe(self) { [weak self] (old, new) in
+            viewModel.messageViewModel.status.observe(observer: self) { [weak self] (old, new) in
                 guard let sSelf = self else { return }
                 if old != new {
                     sSelf.updateStatusViews()
@@ -109,16 +109,16 @@ public class MessageCollectionViewCell<BubbleViewT where
     
     var cellStyle = MessageCollectionViewCellStyle()
     
-    public override var selected: Bool {
+    public override var isSelected: Bool {
         didSet {
-            if oldValue != self.selected {
+            if oldValue != self.isSelected {
                 self.updateViews()
             }
-            bubbleView.selected = selected
+            bubbleView.selected = isSelected
         }
     }
     
-    var layoutCache: NSCache!
+    var layoutCache: NSCache<AnyObject, AnyObject>!
     
     var layoutConstants = MessageCelloctionViewCellLayoutConstants() {
         didSet {
@@ -140,7 +140,7 @@ public class MessageCollectionViewCell<BubbleViewT where
         return view
     }()
     private lazy var failedButton: UIButton = {
-        let button = UIButton(type: .Custom)
+        let button = UIButton(type: .custom)
         return button
     }()
     
@@ -163,8 +163,8 @@ public class MessageCollectionViewCell<BubbleViewT where
             contentView.addSubview(avatarImageView)
         }
         contentView.addSubview(failedButton)
-        contentView.exclusiveTouch = true // avoid multi events response
-        exclusiveTouch = true
+        contentView.isExclusiveTouch = true // avoid multi events response
+        isExclusiveTouch = true
     }
     
     // MARK: View model binding
@@ -181,7 +181,7 @@ public class MessageCollectionViewCell<BubbleViewT where
             viewModel.getAvatar { [weak self] (result) -> Void in
                 guard let sSelf = self else { return }
                 
-                if let avatar = result where avatar != sSelf.avatarImageView.image {
+                if let avatar = result, avatar != sSelf.avatarImageView.image {
                     sSelf.avatarImageView.image = avatar
                 }
             }
@@ -200,7 +200,7 @@ public class MessageCollectionViewCell<BubbleViewT where
             case .Sending, .Success:
                 failedButton.alpha = 0
             case .Failure:
-                failedButton.setImage(cellStyle.failedIcon, forState: .Normal)
+                failedButton.setImage(cellStyle.failedIcon, for: .normal)
                 failedButton.alpha = 1
             }
         }
@@ -230,11 +230,11 @@ public class MessageCollectionViewCell<BubbleViewT where
         return calculateLayout(availableWidth: size.width).size
     }
     
-    private func calculateLayout(availableWidth availableWidth: CGFloat) -> MessageLayoutModel {
+    private func calculateLayout(availableWidth: CGFloat) -> MessageLayoutModel {
         
         let cacheKey = messageViewModel.message.msgId
         
-        if let layoutModel = layoutCache.objectForKey(cacheKey) as? MessageLayoutModel where layoutModel.size.width == availableWidth {
+        if let layoutModel = layoutCache.object(forKey: cacheKey as AnyObject) as? MessageLayoutModel , layoutModel.size.width == availableWidth {
                 return layoutModel
         }
         
@@ -254,16 +254,16 @@ public class MessageCollectionViewCell<BubbleViewT where
         let layoutModel = MessageLayoutModel()
         layoutModel.calculateLayout(parameters: parameters)
         
-        layoutCache.setObject(layoutModel, forKey: cacheKey)
+        layoutCache.setObject(layoutModel, forKey: cacheKey as AnyObject)
         
         return layoutModel
     }
     
     // http://stackoverflow.com/questions/22451793/setcollectionviewlayoutanimated-causing-debug-error-snapshotting-a-view-that-h
-    public override func snapshotViewAfterScreenUpdates(afterUpdates: Bool) -> UIView {
+    public override func snapshotView(afterScreenUpdates afterUpdates: Bool) -> UIView {
         UIGraphicsBeginImageContext(bounds.size)
         
-        drawRect(bounds)
+        draw(bounds)
         
         let snapshotImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
@@ -282,7 +282,7 @@ final class MessageLayoutModel {
     private (set) var bubbleViewFrame = CGRect.zero
     private (set) var preferredMaxWidthForBubble: CGFloat = 0
     
-    func calculateLayout(parameters parameters: MessageLayoutModelParameters) {
+    func calculateLayout(parameters: MessageLayoutModelParameters) {
         let hasAvatar = parameters.isIncoming ? parameters.showAvatar : false
         let containerWidth = parameters.containerWidth
         let isIncoming = parameters.isIncoming
@@ -299,7 +299,7 @@ final class MessageLayoutModel {
             preferredWidthForBubble = containerWidth * parameters.maxContainerWidthPercentageForBubbleViewNoAvatar
         }
         
-        let bubbleSize = bubbleView.bubbleSizeThatFits(CGSize(width: preferredWidthForBubble, height: CGFloat.max))
+        let bubbleSize = bubbleView.bubbleSizeThatFits(size: CGSize(width: preferredWidthForBubble, height: CGFloat.greatestFiniteMagnitude))
         
         let bubbleHeight = max(bubbleSize.height, avatarSize.height)
         

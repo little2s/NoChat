@@ -345,6 +345,7 @@
 				TargetAttributes = {
 					E047E1FA1CE18CA00076B35E = {
 						CreatedOnToolsVersion = 7.3;
+						DevelopmentTeam = G47H383S4Y;
 					};
 				};
 			};
@@ -531,7 +532,9 @@
 		E047E2041CE18CA10076B35E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = G47H383S4Y;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -542,6 +545,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.little2s.NoChatTG;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -549,6 +553,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = G47H383S4Y;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -559,6 +564,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.little2s.NoChatTG;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};

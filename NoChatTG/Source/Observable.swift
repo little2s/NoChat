@@ -35,12 +35,12 @@ public struct Observable<T> {
         didSet {
             self.cleanDeadObservers()
             for observer in self.observers {
-                observer.closure(old: oldValue, new: self.value)
+                observer.closure(oldValue, self.value)
             }
         }
     }
 
-    public mutating func observe(observer: AnyObject, closure: (old: T, new: T) -> ()) {
+    public mutating func observe(observer: AnyObject, closure: @escaping (_ old: T, _ new: T) -> ()) {
         self.observers.append(Observer(owner: observer, closure: closure))
         self.cleanDeadObservers()
     }
@@ -58,8 +58,8 @@ public struct Observable<T> {
 
 private struct Observer<T> {
     weak var owner: AnyObject?
-    let closure: (old: T, new: T) -> ()
-    init (owner: AnyObject, closure: (old: T, new: T) -> ()) {
+    let closure: (_ old: T, _ new: T) -> ()
+    init (owner: AnyObject, closure: @escaping (_ old: T, _ new: T) -> ()) {
         self.owner = owner
         self.closure = closure
     }

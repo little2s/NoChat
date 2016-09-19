@@ -26,16 +26,16 @@ public class ColorLabel: UILabel {
     @IBInspectable
     public var vPadding: CGFloat = 0
     
-    public override func textRectForBounds(bounds: CGRect, limitedToNumberOfLines numberOfLines: Int) -> CGRect {
+    public override func textRect(forBounds bounds: CGRect, limitedToNumberOfLines numberOfLines: Int) -> CGRect {
         let textInsets = UIEdgeInsets(top: vPadding, left: hPadding, bottom: vPadding, right: hPadding)
-        var rect = textInsets.apply(bounds)
-        rect = super.textRectForBounds(rect, limitedToNumberOfLines: numberOfLines)
-        return textInsets.inverse.apply(rect)
+        var rect = textInsets.apply(rect: bounds)
+        rect = super.textRect(forBounds: rect, limitedToNumberOfLines: numberOfLines)
+        return textInsets.inverse.apply(rect: rect)
     }
     
-    public override func drawTextInRect(rect: CGRect) {
+    public override func drawText(in rect: CGRect) {
         let textInsets = UIEdgeInsets(top: vPadding, left: hPadding, bottom: vPadding, right: hPadding)
-        super.drawTextInRect(textInsets.apply(rect))
+        super.drawText(in: textInsets.apply(rect: rect))
     }
 }
 

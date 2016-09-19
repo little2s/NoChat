@@ -8,7 +8,7 @@
 
 import Foundation
 
-public func ntg_color(rgb rgb: Int, alpha: CGFloat = 1.0) -> UIColor {
+public func ntg_color(rgb: Int, alpha: CGFloat = 1.0) -> UIColor {
     return UIColor(
         red: CGFloat((rgb & 0xFF0000) >> 16) / 255.0,
         green: CGFloat((rgb & 0xFF00) >> 8) / 255.0,

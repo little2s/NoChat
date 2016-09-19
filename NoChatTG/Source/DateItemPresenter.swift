@@ -11,8 +11,8 @@ import NoChat
 
 public class DateItemPresenter: ChatItemPresenterProtocol {
     
-    static let dateFormatter: NSDateFormatter = {
-        let dateFormatter = NSDateFormatter()
+    static let dateFormatter: DateFormatter = {
+        let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MMMM dd"
         return dateFormatter
     }()
@@ -20,26 +20,26 @@ public class DateItemPresenter: ChatItemPresenterProtocol {
     let dateItem: DateItem
     
     public var dateString: String {
-        return DateItemPresenter.dateFormatter.stringFromDate(dateItem.date)
+        return DateItemPresenter.dateFormatter.string(from: dateItem.date as Date)
     }
     
     public init(dateItem: DateItem) {
         self.dateItem = dateItem
     }
     
-    public static func registerCells(collectionView: UICollectionView) {
-        collectionView.registerClass(DateItemCollectionViewCell.self, forCellWithReuseIdentifier: "DateItemCollectionViewCell")
+    public static func registerCells(_ collectionView: UICollectionView) {
+        collectionView.register(DateItemCollectionViewCell.self, forCellWithReuseIdentifier: "DateItemCollectionViewCell")
     }
     
-    public func dequeueCell(collectionView collectionView: UICollectionView, indexPath: NSIndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("DateItemCollectionViewCell", forIndexPath: indexPath)
+    public func dequeueCell(collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "DateItemCollectionViewCell", for: indexPath as IndexPath)
         UIView.performWithoutAnimation {
             cell.contentView.transform = collectionView.transform
         }
         return cell
     }
     
-    public func configureCell(cell: UICollectionViewCell, decorationAttributes: ChatItemDecorationAttributesProtocol?) {
+    public func configureCell(_ cell: UICollectionViewCell, decorationAttributes: ChatItemDecorationAttributesProtocol?) {
         guard let dateCell = cell as? DateItemCollectionViewCell else {
             fatalError("Cell type not match")
         }

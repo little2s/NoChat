@@ -9,16 +9,16 @@
 import UIKit
 import NoChat
 
-public class MessagePresenterBuilder<BubbleViewT, ViewModelBuilderT where
+public class MessagePresenterBuilder<BubbleViewT, ViewModelBuilderT>: ChatItemPresenterBuilderProtocol where
     BubbleViewT: UIView,
     BubbleViewT: BubbleViewProtocol,
-    ViewModelBuilderT: MessageViewModelBuilderProtocol>: ChatItemPresenterBuilderProtocol
+    ViewModelBuilderT: MessageViewModelBuilderProtocol
 {
     typealias ModelT = MessageProtocol
     typealias ViewModelT = MessageViewModelProtocol
     
     let viewModelBuilder: ViewModelBuilderT
-    let layoutCache: NSCache
+    let layoutCache: NSCache<AnyObject, AnyObject>
     
     lazy var sizingCell: MessageCollectionViewCell<BubbleViewT> = {
         var cell: MessageCollectionViewCell<BubbleViewT>? = nil
@@ -30,17 +30,17 @@ public class MessagePresenterBuilder<BubbleViewT, ViewModelBuilderT where
         return cell!
     }()
     
-    public init(viewModelBuilder: ViewModelBuilderT, layoutCache: NSCache) {
+    public init(viewModelBuilder: ViewModelBuilderT, layoutCache: NSCache<AnyObject, AnyObject>) {
         self.viewModelBuilder = viewModelBuilder
         self.layoutCache = layoutCache
     }
     
     // MARK: ChatItemPresenterBuilderProtocol
-    public func canHandleChatItem(chatItem: ChatItemProtocol) -> Bool {
+    public func canHandleChatItem(_ chatItem: ChatItemProtocol) -> Bool {
         return chatItem is MessageProtocol ? true : false
     }
     
-    public func createPresenterWithChatItem(chatItem: ChatItemProtocol) -> ChatItemPresenterProtocol {
+    public func createPresenterWithChatItem(_ chatItem: ChatItemProtocol) -> ChatItemPresenterProtocol {
         assert(self.canHandleChatItem(chatItem))
         return MessagePresenter<BubbleViewT, ViewModelBuilderT>(
             message: chatItem as! ModelT,

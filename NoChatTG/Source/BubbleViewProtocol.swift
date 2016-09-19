@@ -27,5 +27,5 @@ public protocol BubbleViewProtocol: MaximumLayoutWidthSpecificable, BackgroundSi
     var messageViewModel: MessageViewModelProtocol! { get set }
     var selected: Bool { get set }
     func bubbleSizeThatFits(size: CGSize) -> CGSize
-    func performBatchUpdates(updateClosure: () -> Void, animated: Bool, completion: (() -> ())?)
+    func performBatchUpdates(updateClosure: @escaping () -> Void, animated: Bool, completion: (() -> ())?)
 }

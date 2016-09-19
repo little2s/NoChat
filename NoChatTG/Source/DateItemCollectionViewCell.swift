@@ -17,14 +17,14 @@ public class DateItemCollectionViewCell: UICollectionViewCell {
         label.hPadding = 10
         label.vPadding = 2
         label.font = self.font
-        label.textColor = UIColor.whiteColor()
+        label.textColor = UIColor.white
         return label
     }()
     
     private lazy var font: UIFont = {
         let dateFont: UIFont
         if #available(iOS 8.2, *) {
-            dateFont = UIFont.systemFontOfSize(13, weight: UIFontWeightMedium)
+            dateFont = UIFont.systemFont(ofSize: 13, weight: UIFontWeightMedium)
         } else {
             dateFont = UIFont(name: "HelveticaNeue-Medium", size: 13)!
         }
@@ -42,7 +42,7 @@ public class DateItemCollectionViewCell: UICollectionViewCell {
     }
     
     private func commonInit() {
-        backgroundColor = UIColor.clearColor()
+        backgroundColor = UIColor.clear
         contentView.addSubview(dateLabel)
     }
     
@@ -51,10 +51,10 @@ public class DateItemCollectionViewCell: UICollectionViewCell {
         dateLabel.center = contentView.center
     }
     
-    public override func snapshotViewAfterScreenUpdates(afterUpdates: Bool) -> UIView {
+    public override func snapshotView(afterScreenUpdates afterUpdates: Bool) -> UIView {
         UIGraphicsBeginImageContext(bounds.size)
         
-        drawRect(bounds)
+        draw(bounds)
         
         let snapshotImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()

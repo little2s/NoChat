@@ -20,13 +20,13 @@ public class TextMessageViewModel: TextMessageViewModelProtocol {
     
     public init(text: String, messageViewModel: MessageViewModelProtocol) {
         let textFont = TextMessageViewModel.style.font
-        let textColor = TextMessageViewModel.style.textColor(messageViewModel.isIncoming)
+        let textColor = TextMessageViewModel.style.textColor(isIncoming: messageViewModel.isIncoming)
         let attributes = [
             NSFontAttributeName: textFont,
             NSForegroundColorAttributeName: textColor
         ]
         
-        self.attributedText = createAttributedText(text, attributes: attributes)
+        self.attributedText = createAttributedText(text: text, attributes: attributes)
         self.messageViewModel = messageViewModel
     }
     
@@ -40,7 +40,7 @@ public class TextMessageViewModelBuilder: MessageViewModelBuilderProtocol {
     
     private let messageViewModelBuilder = MessageViewModelBuilder()
     
-    public func createMessageViewModel(message message: MessageProtocol) -> MessageViewModelProtocol {
+    public func createMessageViewModel(message: MessageProtocol) -> MessageViewModelProtocol {
         let messageViewModel = messageViewModelBuilder.createMessageViewModel(message: message)
         let textMessageViewModel = TextMessageViewModel(text: message.content, messageViewModel: messageViewModel)
         return textMessageViewModel

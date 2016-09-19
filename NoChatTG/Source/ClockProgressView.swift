@@ -10,11 +10,11 @@ import UIKit
 
 public class ClockProgressView: UIView {
     public struct Constant {
-        static let progressFrameImage = imageFactory.createImage("ClockFrame")!
-        static let progressMinImage = imageFactory.createImage("ClockMin")!
-        static let progressHourImage = imageFactory.createImage("ClockHour")!
-        static let minuteDuration: NSTimeInterval = 0.3
-        static let hourDuration: NSTimeInterval = 1.8
+        static let progressFrameImage = imageFactory.createImage(name: "ClockFrame")!
+        static let progressMinImage = imageFactory.createImage(name: "ClockMin")!
+        static let progressHourImage = imageFactory.createImage(name: "ClockHour")!
+        static let minuteDuration: TimeInterval = 0.3
+        static let hourDuration: TimeInterval = 1.8
     }
 
     var frameView = UIImageView()
@@ -59,7 +59,7 @@ public class ClockProgressView: UIView {
     }
     
     private func commonInit() {
-        backgroundColor = UIColor.clearColor()
+        backgroundColor = UIColor.clear
         
         frameView.image = Constant.progressFrameImage
         addSubview(frameView)
@@ -79,8 +79,8 @@ public class ClockProgressView: UIView {
     }
     
     private func animateHourView() {
-        UIView.animateWithDuration(Constant.hourDuration, delay: 0.0, options: .CurveLinear, animations: { () -> Void in
-            self.hourView.transform = CGAffineTransformRotate(self.hourView.transform, CGFloat(M_2_PI))
+        UIView.animate(withDuration: Constant.hourDuration, delay: 0.0, options: .curveLinear, animations: { () -> Void in
+            self.hourView.transform = self.hourView.transform.rotated(by: CGFloat(M_2_PI))
         }, completion: { finished -> Void in
             if finished {
                 self.animateHourView()
@@ -91,8 +91,8 @@ public class ClockProgressView: UIView {
     }
     
     private func animateMinView() {
-        UIView.animateWithDuration(Constant.minuteDuration, delay: 0.0, options: .CurveLinear, animations: { () -> Void in
-            self.minView.transform = CGAffineTransformRotate(self.minView.transform, CGFloat(M_2_PI))
+        UIView.animate(withDuration: Constant.minuteDuration, delay: 0.0, options: .curveLinear, animations: { () -> Void in
+            self.minView.transform = self.minView.transform.rotated(by: CGFloat(M_2_PI))
         }, completion: { finished -> Void in
             if finished {
                 self.animateMinView()

@@ -53,7 +53,7 @@ public class GrowTextView: UITextView {
         placeholder.frame = self.bounds
     }
     
-    public override func scrollRectToVisible(rect: CGRect, animated: Bool) {
+    public override func scrollRectToVisible(_ rect: CGRect, animated: Bool) {
     }
     
     private func scrollRectToVisible(rect: CGRect) {
@@ -75,8 +75,8 @@ public class GrowTextView: UITextView {
         placeholder.font = font
     }
     
-    private func updatePlaceholderVisibility() {
-        if !hasText() {
+    func updatePlaceholderVisibility() {
+        if !hasText {
             showPlaceholder()
         } else {
             hidePlaceholder()
@@ -87,20 +87,20 @@ public class GrowTextView: UITextView {
         addSubview(placeholder)
     }
     
-    private func hidePlaceholder() {
+    func hidePlaceholder() {
         placeholder.removeFromSuperview()
     }
     
     private func configurePlaceholder() {
         placeholder.translatesAutoresizingMaskIntoConstraints = false
-        placeholder.editable = false
-        placeholder.selectable = false
-        placeholder.userInteractionEnabled = false
+        placeholder.isEditable = false
+        placeholder.isSelectable = false
+        placeholder.isUserInteractionEnabled = false
         placeholder.textContainerInset = self.textContainerInset
         placeholder.textContainer.lineFragmentPadding = 0
         placeholder.layoutManager.allowsNonContiguousLayout = false
         placeholder.scrollsToTop = false
-        placeholder.backgroundColor = UIColor.clearColor()
+        placeholder.backgroundColor = UIColor.clear
     }
 }
 
@@ -108,20 +108,20 @@ public class GrowTextView: UITextView {
 
 extension GrowTextView: UITextViewDelegate {
     
-    public func textView(textView: UITextView, shouldChangeTextInRange range: NSRange, replacementText text: String) -> Bool {
+    public func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         return true
     }
     
-    public func textViewDidChange(textView: UITextView) {
+    public func textViewDidChange(_ textView: UITextView) {
         resetContentSizeAndOffset()
     }
     
-    public func textViewDidBeginEditing(textView: UITextView) {
+    public func textViewDidBeginEditing(_ textView: UITextView) {
         hidePlaceholder()
-        growTextViewDelegate?.growTextViewDidBeginEditing(self)
+        growTextViewDelegate?.growTextViewDidBeginEditing(textView: self)
     }
     
-    public func textViewDidEndEditing(textView: UITextView) {
+    public func textViewDidEndEditing(_ textView: UITextView) {
         updatePlaceholderVisibility()
     }
     
@@ -134,11 +134,11 @@ extension GrowTextView {
     public func resetContentSizeAndOffset() {
         layoutIfNeeded()
         let textViewHeight = max(min(contentSize.height, Constant.maxHeight), Constant.minHeight)
-        growTextViewDelegate?.growTextViewDidChange(self, height: textViewHeight)
+        growTextViewDelegate?.growTextViewDidChange(textView: self, height: textViewHeight)
         if let selectedTextRange = self.selectedTextRange {
-            let caretRect = self.caretRectForPosition(selectedTextRange.end);
+            let caretRect = self.caretRect(for: selectedTextRange.end)
             let height = textContainerInset.bottom + caretRect.size.height
-            self.scrollRectToVisible(CGRectMake(caretRect.origin.x, caretRect.origin.y, caretRect.size.width, height))
+            self.scrollRectToVisible(CGRect(x:caretRect.origin.x, y:caretRect.origin.y, width: caretRect.size.width, height: height), animated: true)
         }
     }
     

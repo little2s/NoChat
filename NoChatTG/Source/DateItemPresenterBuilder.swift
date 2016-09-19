@@ -16,11 +16,11 @@ public class DateItemPresenterBuider: ChatItemPresenterBuilderProtocol {
         return DateItemPresenter.self
     }
     
-    public func canHandleChatItem(chatItem: ChatItemProtocol) -> Bool {
+    public func canHandleChatItem(_ chatItem: ChatItemProtocol) -> Bool {
         return chatItem is DateItem ? true : false
     }
     
-    public func createPresenterWithChatItem(chatItem: ChatItemProtocol) -> ChatItemPresenterProtocol {
+    public func createPresenterWithChatItem(_ chatItem: ChatItemProtocol) -> ChatItemPresenterProtocol {
         guard let dateItem = chatItem as? DateItem else {
             fatalError("Chat item not match")
         }
