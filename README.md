@@ -1,6 +1,6 @@
 <img src="https://raw.githubusercontent.com/little2s/NoChat/master/Assets/icon.png" width="100" height="100" />
 
-# NoChat
+# NoChat - Now on Swift 3 ! 
 NoChat is a Swift lightweight chat framework base on [Chatto](https://github.com/badoo/Chatto).    
 Along with NoChat, there are three companion frameworks: NoChatTG, NoChatMM, NoChatSLK.    
 These companion frameworks are just different user interface, you can custom your own with NoChat :].        
@@ -20,7 +20,8 @@ These companion frameworks are just different user interface, you can custom you
 
 ## Requirements
 - iOS 8.0+
-- Xcode 7.3 or above
+- Xcode 8.0 or above
+- Swift 3
 
 ## Install
 ### CocoaPods
