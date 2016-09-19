@@ -89,7 +89,7 @@ open class ChatCollectionViewLayout: UICollectionViewLayout {
         guard let delegate = self.delegate else { return }
         var oldLayoutModel = self.layoutModel
         self.layoutModel = delegate.chatCollectionViewLayoutModel()
-        DispatchQueue.global(priority: DispatchQueue.GlobalQueuePriority.default).async { () -> Void in
+        DispatchQueue.global(qos: .default).async { () -> Void in
             // Dealloc of layout with 5000 items take 25 ms on tests on iPhone 4s
             // This moves dealloc out of main thread
             if oldLayoutModel != nil {
