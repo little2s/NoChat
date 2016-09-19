@@ -9,20 +9,20 @@
 import Foundation
 
 // MARK: MessageViewModel
-public class MessageViewModel: NSObject, MessageViewModelProtocol {
-    public var isIncoming: Bool {
+open class MessageViewModel: NSObject, MessageViewModelProtocol {
+    open var isIncoming: Bool {
         return message.isIncoming
     }
     
-    public var status: Observable<MessageViewModelStatus>
+    open var status: Observable<MessageViewModelStatus>
     
-    public lazy var date: String = {
+    open lazy var date: String = {
         return self.dateFormatter.string(from: self.message.date as Date)
     }()
     
-    public private(set) var message: MessageProtocol
+    open fileprivate(set) var message: MessageProtocol
     
-    private let dateFormatter: DateFormatter
+    fileprivate let dateFormatter: DateFormatter
     
     deinit {
         guard let msg = message as? Message else { return }
@@ -41,7 +41,7 @@ public class MessageViewModel: NSObject, MessageViewModelProtocol {
     }
     
     
-    public override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+    open override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         
         if let msg = object as? Message,
             let keyPath = keyPath, keyPath == "deliveryStatus" {
@@ -54,15 +54,15 @@ public class MessageViewModel: NSObject, MessageViewModelProtocol {
         super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
     }
     
-    public func getAvatar(completionHandler: ((UIImage?) -> Void)?) {
+    open func getAvatar(_ completionHandler: ((UIImage?) -> Void)?) {
 
     }
     
 }
 
 // MARK: MessageViewModelBuilder
-public class MessageViewModelBuilder: MessageViewModelBuilderProtocol {
-    public static let dateFormatter: DateFormatter = {
+open class MessageViewModelBuilder: MessageViewModelBuilderProtocol {
+    open static let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"
         return formatter
@@ -70,7 +70,7 @@ public class MessageViewModelBuilder: MessageViewModelBuilderProtocol {
     
     public init() {}
     
-    public func createMessageViewModel(message: MessageProtocol) -> MessageViewModelProtocol {
+    open func createMessageViewModel(_ message: MessageProtocol) -> MessageViewModelProtocol {
         return MessageViewModel(dateFormatter: MessageViewModelBuilder.dateFormatter, message: message)
     }
 }

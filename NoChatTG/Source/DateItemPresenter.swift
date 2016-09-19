@@ -9,7 +9,7 @@
 import Foundation
 import NoChat
 
-public class DateItemPresenter: ChatItemPresenterProtocol {
+open class DateItemPresenter: ChatItemPresenterProtocol {
     
     static let dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
@@ -19,7 +19,7 @@ public class DateItemPresenter: ChatItemPresenterProtocol {
     
     let dateItem: DateItem
     
-    public var dateString: String {
+    open var dateString: String {
         return DateItemPresenter.dateFormatter.string(from: dateItem.date as Date)
     }
     
@@ -27,11 +27,11 @@ public class DateItemPresenter: ChatItemPresenterProtocol {
         self.dateItem = dateItem
     }
     
-    public static func registerCells(_ collectionView: UICollectionView) {
+    open static func registerCells(_ collectionView: UICollectionView) {
         collectionView.register(DateItemCollectionViewCell.self, forCellWithReuseIdentifier: "DateItemCollectionViewCell")
     }
     
-    public func dequeueCell(collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell {
+    open func dequeueCell(collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "DateItemCollectionViewCell", for: indexPath as IndexPath)
         UIView.performWithoutAnimation {
             cell.contentView.transform = collectionView.transform
@@ -39,7 +39,7 @@ public class DateItemPresenter: ChatItemPresenterProtocol {
         return cell
     }
     
-    public func configureCell(_ cell: UICollectionViewCell, decorationAttributes: ChatItemDecorationAttributesProtocol?) {
+    open func configureCell(_ cell: UICollectionViewCell, decorationAttributes: ChatItemDecorationAttributesProtocol?) {
         guard let dateCell = cell as? DateItemCollectionViewCell else {
             fatalError("Cell type not match")
         }
@@ -48,11 +48,11 @@ public class DateItemPresenter: ChatItemPresenterProtocol {
         dateCell.dateLabel.sizeToFit()
     }
     
-    public var canCalculateHeightInBackground: Bool {
+    open var canCalculateHeightInBackground: Bool {
         return true
     }
     
-    public func heightForCell(maximumWidth width: CGFloat, decorationAttributes: ChatItemDecorationAttributesProtocol?) -> CGFloat {
+    open func heightForCell(maximumWidth width: CGFloat, decorationAttributes: ChatItemDecorationAttributesProtocol?) -> CGFloat {
         return 24
     }
     

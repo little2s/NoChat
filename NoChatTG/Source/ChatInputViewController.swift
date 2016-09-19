@@ -9,81 +9,81 @@
 import UIKit
 import NoChat
 
-public class ChatInputViewController: UIViewController, ChatInputControllerProtocol {
+open class ChatInputViewController: UIViewController, ChatInputControllerProtocol {
     
     public struct Constant {
         static let animationDuration: TimeInterval = 0.25
     }
     
-    public var sendButtonTitle: String?
-    public var textPlaceholder: String?
+    open var sendButtonTitle: String?
+    open var textPlaceholder: String?
     
-    public var inputBar: UIView!
-    public var backgroundView: UIToolbar!
-    public var growTextView: GrowTextView!
-    public var sendButton: UIButton!
-    public var micButton: UIButton!
-    public var attachButton: UIButton!
+    open var inputBar: UIView!
+    open var backgroundView: UIToolbar!
+    open var growTextView: GrowTextView!
+    open var sendButton: UIButton!
+    open var micButton: UIButton!
+    open var attachButton: UIButton!
     
-    public var growTextViewHeightConstraint: NSLayoutConstraint!
-    public var growTextViewTopConstraint: NSLayoutConstraint!
-    public var growTextViewBottomConstraint: NSLayoutConstraint!
-    public var growTextViewLeadingConstraint: NSLayoutConstraint!
-    public var growTextViewTrailingConstraint: NSLayoutConstraint!
+    open var growTextViewHeightConstraint: NSLayoutConstraint!
+    open var growTextViewTopConstraint: NSLayoutConstraint!
+    open var growTextViewBottomConstraint: NSLayoutConstraint!
+    open var growTextViewLeadingConstraint: NSLayoutConstraint!
+    open var growTextViewTrailingConstraint: NSLayoutConstraint!
     
-    public var textViewHeight: CGFloat = GrowTextView.Constant.minHeight
-    public var inputViewHeight: CGFloat = 45
-    public var inputBarHeight: CGFloat {
+    open var textViewHeight: CGFloat = GrowTextView.Constant.minHeight
+    open var inputViewHeight: CGFloat = 45
+    open var inputBarHeight: CGFloat {
         return textViewHeight + growTextViewTopConstraint.constant + growTextViewBottomConstraint.constant
     }
     
-    public var onHeightChange: ((HeightChange) -> Void)?
-    public var onSendText: ((String) -> Void)?
-    public var onChooseAttach: (() -> Void)?
+    open var onHeightChange: ((HeightChange) -> Void)?
+    open var onSendText: ((String) -> Void)?
+    open var onChooseAttach: (() -> Void)?
     
-    public override func loadView() {
+    open override func loadView() {
         view = UIView()
         addInputBar()
         addInputViews()
         addConstraints()
     }
     
-    private let keyboardMan = KeyboardMan()
-    public override func viewDidLoad() {
+    fileprivate let keyboardMan = KeyboardMan()
+    open override func viewDidLoad() {
         super.viewDidLoad()
         setupKeyboardAnimation()
         
         growTextView.growTextViewDelegate = self
     }
     
-    public override func viewWillAppear(_ animated: Bool) {
+    open override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         keyboardMan.keyboardObserveEnabled = true
     }
     
-    public override func viewWillDisappear(_ animated: Bool) {
+    open override func viewWillDisappear(_ animated: Bool) {
         keyboardMan.keyboardObserveEnabled = false
         super.viewWillDisappear(animated)
     }
     
-    public func toggleSendButtonEnabled() {
+    open func toggleSendButtonEnabled() {
         let hasText = growTextView.hasText
         sendButton.isEnabled = hasText
         sendButton.isHidden = !hasText
         micButton.isHidden = hasText
     }
     
-    public func clearInputText() {
+    open func clearInputText() {
         growTextView.clear()
         toggleSendButtonEnabled()
     }
     
-    public func endInputting(_ animated: Bool) {
+    open func endInputting(_ animated: Bool) {
         view.endEditing(animated)
     }
     
     @objc
-    public func didTapSendButton(sender: UIButton) {
+    open func didTapSendButton(_ sender: UIButton) {
         guard let text = growTextView.text else { return }
         
         let str = text.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -95,12 +95,12 @@ public class ChatInputViewController: UIViewController, ChatInputControllerProto
     }
     
     @objc
-    public func didTapAttachButton(sender: UIButton) {
+    open func didTapAttachButton(_ sender: UIButton) {
         endInputting(true)
         onChooseAttach?()
     }
     
-    private func addInputBar() {
+    fileprivate func addInputBar() {
         inputBar = UIView()
         view.addSubview(inputBar)
         
@@ -108,7 +108,7 @@ public class ChatInputViewController: UIViewController, ChatInputControllerProto
         inputBar.addSubview(backgroundView)
     }
     
-    private func addInputViews() {
+    fileprivate func addInputViews() {
         let placeholder = textPlaceholder ?? "Message"
         let textFont = UIFont.systemFont(ofSize: 16)
         
@@ -118,9 +118,9 @@ public class ChatInputViewController: UIViewController, ChatInputControllerProto
         growTextView.layer.cornerRadius = 5
         growTextView.layer.masksToBounds = true
         growTextView.font = textFont
-        growTextView.setTextPlaceholder(textPlaceholder: placeholder)
-        growTextView.setTextPlaceholderColor(color: UIColor.lightGray)
-        growTextView.setTextPlaceholderFont(font: textFont)
+        growTextView.setTextPlaceholder(placeholder)
+        growTextView.setTextPlaceholderColor(UIColor.lightGray)
+        growTextView.setTextPlaceholderFont(textFont)
         inputBar.addSubview(growTextView)
         
         
@@ -142,16 +142,16 @@ public class ChatInputViewController: UIViewController, ChatInputControllerProto
         inputBar.addSubview(sendButton)
         
         micButton = UIButton(type: .system)
-        micButton.setImage(imageFactory.createImage(name: "MicButton"), for: .normal)
+        micButton.setImage(imageFactory.createImage("MicButton"), for: .normal)
         inputBar.addSubview(micButton)
         
         attachButton = UIButton(type: .system)
-        attachButton.setImage(imageFactory.createImage(name: "AttachButton"), for: .normal)
+        attachButton.setImage(imageFactory.createImage("AttachButton"), for: .normal)
         attachButton.addTarget(self, action: #selector(didTapAttachButton), for: .touchUpInside)
         inputBar.addSubview(attachButton)
     }
     
-    private func addConstraints() {
+    fileprivate func addConstraints() {
         inputBar.translatesAutoresizingMaskIntoConstraints = false
         backgroundView.translatesAutoresizingMaskIntoConstraints = false
         growTextView.translatesAutoresizingMaskIntoConstraints = false
@@ -203,7 +203,7 @@ public class ChatInputViewController: UIViewController, ChatInputControllerProto
         
     }
     
-    private func setupKeyboardAnimation() {
+    fileprivate func setupKeyboardAnimation() {
         keyboardMan.postKeyboardInfo = { [unowned self] _, info in
             let oldH = self.inputViewHeight
             let newH = info.action == .Hide ? self.inputBarHeight :  self.inputBarHeight + info.height
@@ -216,7 +216,7 @@ public class ChatInputViewController: UIViewController, ChatInputControllerProto
     
     
     
-    public override func viewWillTransition(to: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+    open override func viewWillTransition(to: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         
         let oldH = inputViewHeight
         let newH = inputBarHeight
@@ -229,7 +229,7 @@ public class ChatInputViewController: UIViewController, ChatInputControllerProto
 }
 
 extension ChatInputViewController: GrowTextViewDelegate {
-    public func growTextViewDidChange(textView: GrowTextView, height: CGFloat) {
+    public func growTextViewDidChange(_ textView: GrowTextView, height: CGFloat) {
         let oldH = inputViewHeight
         let newH = inputViewHeight + (height - textViewHeight)
         self.textViewHeight = height
@@ -244,7 +244,7 @@ extension ChatInputViewController: GrowTextViewDelegate {
         toggleSendButtonEnabled()
     }
     
-    public func growTextViewDidBeginEditing(textView: GrowTextView) {
+    public func growTextViewDidBeginEditing(_ textView: GrowTextView) {
         
     }
 }

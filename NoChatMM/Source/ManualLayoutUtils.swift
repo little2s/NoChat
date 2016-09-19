@@ -24,26 +24,26 @@
 
 import UIKit
 
-private let scale = UIScreen.mainScreen().scale
+private let scale = UIScreen.main.scale
 
 public enum HorizontalAlignment {
-    case Left
-    case Center
-    case Right
+    case left
+    case center
+    case right
 }
 
 public enum VerticalAlignment {
-    case Top
-    case Center
-    case Bottom
+    case top
+    case center
+    case bottom
 }
 
 public extension CGSize {
-    func ntg_insetBy(dx dx: CGFloat, dy: CGFloat) -> CGSize {
+    func ntg_insetBy(dx: CGFloat, dy: CGFloat) -> CGSize {
         return CGSize(width: self.width - dx, height: self.height - dy)
     }
 
-    func ntg_outsetBy(dx dx: CGFloat, dy: CGFloat) -> CGSize {
+    func ntg_outsetBy(dx: CGFloat, dy: CGFloat) -> CGSize {
         return self.ntg_insetBy(dx: -dx, dy: -dy)
     }
 }
@@ -58,21 +58,21 @@ public extension CGSize {
 
         // Horizontal alignment
         switch xAlignament {
-        case .Left:
+        case .left:
             originX = 0
-        case .Center:
+        case .center:
             originX = containerRect.midX - self.width / 2.0
-        case .Right:
+        case .right:
             originX = containerRect.maxY - self.width
         }
 
         // Vertical alignment
         switch yAlignment {
-        case .Top:
+        case .top:
             originY = 0
-        case .Center:
+        case .center:
             originY = containerRect.midY - self.height / 2.0
-        case .Bottom:
+        case .bottom:
             originY = containerRect.maxY - self.height
         }
 
@@ -106,7 +106,7 @@ public extension CGRect {
 
 
 public extension CGPoint {
-    func ntg_offsetBy(dx dx: CGFloat, dy: CGFloat) -> CGPoint {
+    func ntg_offsetBy(dx: CGFloat, dy: CGFloat) -> CGPoint {
         return CGPoint(x: self.x + dx, y: self.y + dy)
     }
 }

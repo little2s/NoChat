@@ -9,20 +9,20 @@
 import UIKit
 
 public protocol GrowTextViewDelegate: class {
-    func growTextViewDidBeginEditing(textView: GrowTextView)
-    func growTextViewDidChange(textView: GrowTextView, height: CGFloat)
+    func growTextViewDidBeginEditing(_ textView: GrowTextView)
+    func growTextViewDidChange(_ textView: GrowTextView, height: CGFloat)
 }
 
-public class GrowTextView: UITextView {
+open class GrowTextView: UITextView {
     public struct Constant {
         static let maxHeight: CGFloat = 100
         static let minHeight: CGFloat = 28
         static let textInsets = UIEdgeInsets(top: 4.5, left: 4.0, bottom: 3.5, right: 4.0)
     }
     
-    public weak var growTextViewDelegate: GrowTextViewDelegate?
+    open weak var growTextViewDelegate: GrowTextViewDelegate?
     
-    private let placeholder: UITextView = UITextView()
+    fileprivate let placeholder: UITextView = UITextView()
     
     public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -38,7 +38,7 @@ public class GrowTextView: UITextView {
         self.init(frame: CGRect.zero, textContainer: nil)
     }
     
-    private func commonInit() {
+    fileprivate func commonInit() {
         self.textContainerInset = Constant.textInsets
         self.textContainer.lineFragmentPadding = 0
         self.layoutManager.allowsNonContiguousLayout = false
@@ -48,30 +48,30 @@ public class GrowTextView: UITextView {
         updatePlaceholderVisibility()
     }
     
-    public override func layoutSubviews() {
+    open override func layoutSubviews() {
         super.layoutSubviews()
         placeholder.frame = self.bounds
     }
     
-    public override func scrollRectToVisible(_ rect: CGRect, animated: Bool) {
+    open override func scrollRectToVisible(_ rect: CGRect, animated: Bool) {
     }
     
-    private func scrollRectToVisible(rect: CGRect) {
+    fileprivate func scrollRectToVisible(_ rect: CGRect) {
         if contentSize.height < Constant.maxHeight {
             return
         }
         super.scrollRectToVisible(rect, animated: true)
     }
     
-    public func setTextPlaceholder(textPlaceholder: String) {
+    open func setTextPlaceholder(_ textPlaceholder: String) {
         placeholder.text = textPlaceholder
     }
     
-    public func setTextPlaceholderColor(color: UIColor) {
+    open func setTextPlaceholderColor(_ color: UIColor) {
         placeholder.textColor = color
     }
     
-    public func setTextPlaceholderFont(font: UIFont) {
+    open func setTextPlaceholderFont(_ font: UIFont) {
         placeholder.font = font
     }
     
@@ -83,7 +83,7 @@ public class GrowTextView: UITextView {
         }
     }
     
-    private func showPlaceholder() {
+    fileprivate func showPlaceholder() {
         addSubview(placeholder)
     }
     
@@ -91,7 +91,7 @@ public class GrowTextView: UITextView {
         placeholder.removeFromSuperview()
     }
     
-    private func configurePlaceholder() {
+    fileprivate func configurePlaceholder() {
         placeholder.translatesAutoresizingMaskIntoConstraints = false
         placeholder.isEditable = false
         placeholder.isSelectable = false
@@ -118,7 +118,7 @@ extension GrowTextView: UITextViewDelegate {
     
     public func textViewDidBeginEditing(_ textView: UITextView) {
         hidePlaceholder()
-        growTextViewDelegate?.growTextViewDidBeginEditing(textView: self)
+        growTextViewDelegate?.growTextViewDidBeginEditing(self)
     }
     
     public func textViewDidEndEditing(_ textView: UITextView) {
@@ -134,7 +134,7 @@ extension GrowTextView {
     public func resetContentSizeAndOffset() {
         layoutIfNeeded()
         let textViewHeight = max(min(contentSize.height, Constant.maxHeight), Constant.minHeight)
-        growTextViewDelegate?.growTextViewDidChange(textView: self, height: textViewHeight)
+        growTextViewDelegate?.growTextViewDidChange(self, height: textViewHeight)
         if let selectedTextRange = self.selectedTextRange {
             let caretRect = self.caretRect(for: selectedTextRange.end)
             let height = textContainerInset.bottom + caretRect.size.height

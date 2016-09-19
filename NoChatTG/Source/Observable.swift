@@ -40,20 +40,20 @@ public struct Observable<T> {
         }
     }
 
-    public mutating func observe(observer: AnyObject, closure: @escaping (_ old: T, _ new: T) -> ()) {
+    public mutating func observe(_ observer: AnyObject, closure: @escaping (_ old: T, _ new: T) -> ()) {
         self.observers.append(Observer(owner: observer, closure: closure))
         self.cleanDeadObservers()
     }
     
-    public mutating func removeObserver(observer: AnyObject) {
+    public mutating func removeObserver(_ observer: AnyObject) {
         self.observers = self.observers.filter { $0.owner !== observer }
     }
 
-    private mutating func cleanDeadObservers() {
+    fileprivate mutating func cleanDeadObservers() {
         self.observers = self.observers.filter { $0.owner != nil }
     }
 
-    private lazy var observers = [Observer<T>]()
+    fileprivate lazy var observers = [Observer<T>]()
 }
 
 private struct Observer<T> {

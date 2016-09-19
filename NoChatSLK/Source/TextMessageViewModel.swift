@@ -12,11 +12,11 @@ public protocol TextMessageViewModelProtocol: DecoratedMessageViewModelProtocol 
     var attributedText: NSAttributedString { get } // To encapsulate links
 }
 
-public class TextMessageViewModel: TextMessageViewModelProtocol {
-    public let attributedText: NSAttributedString
-    public let messageViewModel: MessageViewModelProtocol
+open class TextMessageViewModel: TextMessageViewModelProtocol {
+    open let attributedText: NSAttributedString
+    open let messageViewModel: MessageViewModelProtocol
     
-    private static let style = TextBubbleViewStyle()
+    fileprivate static let style = TextBubbleViewStyle()
     
     public init(text: String, messageViewModel: MessageViewModelProtocol) {
         let textFont = TextMessageViewModel.style.font
@@ -30,21 +30,21 @@ public class TextMessageViewModel: TextMessageViewModelProtocol {
         self.messageViewModel = messageViewModel
     }
     
-    public func didTapURL(url: NSURL, bubbleView: TextBubbleView) {
+    open func didTapURL(_ url: URL, bubbleView: TextBubbleView) {
         
     }
     
-    public func getAvatar(completionHandler completionHandler: (UIImage? -> Void)?) {
+    open func getAvatar(completionHandler: ((UIImage?) -> Void)?) {
         
     }
 }
 
-public class TextMessageViewModelBuilder: MessageViewModelBuilderProtocol {
+open class TextMessageViewModelBuilder: MessageViewModelBuilderProtocol {
     public init() {}
     
-    private let messageViewModelBuilder = MessageViewModelBuilder()
+    fileprivate let messageViewModelBuilder = MessageViewModelBuilder()
     
-    public func createMessageViewModel(message message: MessageProtocol) -> MessageViewModelProtocol {
+    open func createMessageViewModel(message: MessageProtocol) -> MessageViewModelProtocol {
         let messageViewModel = messageViewModelBuilder.createMessageViewModel(message: message)
         let textMessageViewModel = TextMessageViewModel(text: message.content, messageViewModel: messageViewModel)
         return textMessageViewModel
@@ -52,7 +52,7 @@ public class TextMessageViewModelBuilder: MessageViewModelBuilderProtocol {
 }
 
 // MARK: Convenience methods
-private func createAttributedText(text: String, attributes: [String: NSObject]) -> NSAttributedString {
+private func createAttributedText(_ text: String, attributes: [String: NSObject]) -> NSAttributedString {
 
     let attributedText = NSMutableAttributedString(string: text, attributes: attributes)
     

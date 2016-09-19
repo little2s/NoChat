@@ -8,9 +8,9 @@
 
 import UIKit
 
-public class ColorLabel: UILabel {
+open class ColorLabel: UILabel {
     @IBInspectable
-    public var cornerRadius: CGFloat {
+    open var cornerRadius: CGFloat {
         get {
             return layer.cornerRadius
         }
@@ -21,21 +21,21 @@ public class ColorLabel: UILabel {
     }
     
     @IBInspectable
-    public var hPadding: CGFloat = 0
+    open var hPadding: CGFloat = 0
     
     @IBInspectable
-    public var vPadding: CGFloat = 0
+    open var vPadding: CGFloat = 0
     
-    public override func textRect(forBounds bounds: CGRect, limitedToNumberOfLines numberOfLines: Int) -> CGRect {
+    open override func textRect(forBounds bounds: CGRect, limitedToNumberOfLines numberOfLines: Int) -> CGRect {
         let textInsets = UIEdgeInsets(top: vPadding, left: hPadding, bottom: vPadding, right: hPadding)
-        var rect = textInsets.apply(rect: bounds)
+        var rect = textInsets.apply(bounds)
         rect = super.textRect(forBounds: rect, limitedToNumberOfLines: numberOfLines)
-        return textInsets.inverse.apply(rect: rect)
+        return textInsets.inverse.apply(rect)
     }
     
-    public override func drawText(in rect: CGRect) {
+    open override func drawText(in rect: CGRect) {
         let textInsets = UIEdgeInsets(top: vPadding, left: hPadding, bottom: vPadding, right: hPadding)
-        super.drawText(in: textInsets.apply(rect: rect))
+        super.drawText(in: textInsets.apply(rect))
     }
 }
 
@@ -44,7 +44,7 @@ private extension UIEdgeInsets {
         return UIEdgeInsets(top: -top, left: -left, bottom: -bottom, right: -right)
     }
     
-    func apply(rect: CGRect) -> CGRect {
+    func apply(_ rect: CGRect) -> CGRect {
         return UIEdgeInsetsInsetRect(rect, self)
     }
 }

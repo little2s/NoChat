@@ -1,11 +1,11 @@
 PODS:
-  - NoChat (0.2.1)
-  - NoChatMM (0.2.1):
-    - NoChat (~> 0.1)
-  - NoChatSLK (0.2.1):
-    - NoChat (~> 0.1)
-  - NoChatTG (0.2.1):
-    - NoChat (~> 0.1)
+  - NoChat (0.2.2)
+  - NoChatMM (0.2.2):
+    - NoChat (~> 0.2)
+  - NoChatSLK (0.2.2):
+    - NoChat (~> 0.2)
+  - NoChatTG (0.2.2):
+    - NoChat (~> 0.2)
 
 DEPENDENCIES:
   - NoChat (from `../`)
@@ -15,18 +15,20 @@ DEPENDENCIES:
 
 EXTERNAL SOURCES:
   NoChat:
-    :path: ../
+    :path: "../"
   NoChatMM:
-    :path: ../
+    :path: "../"
   NoChatSLK:
-    :path: ../
+    :path: "../"
   NoChatTG:
-    :path: ../
+    :path: "../"
 
 SPEC CHECKSUMS:
-  NoChat: 7b25f4af971dd454b76eda972aaa7fa06dffe3a3
-  NoChatMM: 3024440c78ef8baa0d61643b19c21528810d5412
-  NoChatSLK: 07e3cd81433439f140c7731af621698bca4c653b
-  NoChatTG: ddb65bdbb258880271693e7229013821c89aea4d
+  NoChat: 3d8421b3587319266bd225c18540b4382a8b1eae
+  NoChatMM: 91de227ce9d4581815da09df1d65201f35646e06
+  NoChatSLK: c6456e1ad74261f585ff685f5d85f72bdc782774
+  NoChatTG: 755148d4f7513b13b24643ef81e9efdd6830279f
 
-COCOAPODS: 0.39.0
+PODFILE CHECKSUM: addc9519515471cb9e6b37cfa6f371d3a17d08d3
+
+COCOAPODS: 1.1.0.rc.2

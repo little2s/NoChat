@@ -9,16 +9,16 @@
 import Foundation
 import NoChat
 
-public class DateItem: ChatItemProtocol {
-    public static let itemType: ChatItemType = "DateItem"
+open class DateItem: ChatItemProtocol {
+    open static let itemType: ChatItemType = "DateItem"
     
-    public let uid: String
-    public let date: NSDate
-    public var type: String {
+    open let uid: String
+    open let date: Date
+    open var type: String {
         return DateItem.itemType
     }
     
-    public init(uid: String, date: NSDate) {
+    public init(uid: String, date: Date) {
         self.uid = uid
         self.date = date
     }

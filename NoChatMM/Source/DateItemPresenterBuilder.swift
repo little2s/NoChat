@@ -9,18 +9,18 @@
 import Foundation
 import NoChat
 
-public class DateItemPresenterBuider: ChatItemPresenterBuilderProtocol {
+open class DateItemPresenterBuider: ChatItemPresenterBuilderProtocol {
     public init() {}
     
-    public var presenterType: ChatItemPresenterProtocol.Type {
+    open var presenterType: ChatItemPresenterProtocol.Type {
         return DateItemPresenter.self
     }
     
-    public func canHandleChatItem(chatItem: ChatItemProtocol) -> Bool {
+    open func canHandleChatItem(_ chatItem: ChatItemProtocol) -> Bool {
         return chatItem is DateItem ? true : false
     }
     
-    public func createPresenterWithChatItem(chatItem: ChatItemProtocol) -> ChatItemPresenterProtocol {
+    open func createPresenterWithChatItem(_ chatItem: ChatItemProtocol) -> ChatItemPresenterProtocol {
         guard let dateItem = chatItem as? DateItem else {
             fatalError("Chat item not match")
         }

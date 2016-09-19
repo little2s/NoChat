@@ -9,15 +9,15 @@
 import UIKit
 
 /// UITextView with hacks to avoid selection, loupe, define...
-public class ChatTextView: UITextView {
+open class ChatTextView: UITextView {
     
 
     
-    public override var canBecomeFirstResponder : Bool {
+    open override var canBecomeFirstResponder : Bool {
         return false
     }
     
-    public override func addGestureRecognizer(_ gestureRecognizer: UIGestureRecognizer) {
+    open override func addGestureRecognizer(_ gestureRecognizer: UIGestureRecognizer) {
         if let longPressGestureRecognizer = gestureRecognizer as? UILongPressGestureRecognizer {
             if longPressGestureRecognizer.minimumPressDuration == 0.5 {
                 return
@@ -27,7 +27,7 @@ public class ChatTextView: UITextView {
         super.addGestureRecognizer(gestureRecognizer)
     }
     
-     public override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
+     open override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
         return false
     }
     

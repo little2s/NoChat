@@ -9,7 +9,7 @@
 import UIKit
 import NoChat
 
-public class MessagePresenterBuilder<BubbleViewT, ViewModelBuilderT>: ChatItemPresenterBuilderProtocol where
+open class MessagePresenterBuilder<BubbleViewT, ViewModelBuilderT>: ChatItemPresenterBuilderProtocol where
     BubbleViewT: UIView,
     BubbleViewT: BubbleViewProtocol,
     ViewModelBuilderT: MessageViewModelBuilderProtocol

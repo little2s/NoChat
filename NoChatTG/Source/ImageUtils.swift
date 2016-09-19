@@ -26,7 +26,7 @@ import UIKit
 
 extension UIImage {
     
-    public func ntg_tintWithColor(color: UIColor) -> UIImage {
+    public func ntg_tintWithColor(_ color: UIColor) -> UIImage {
         let rect = CGRect(origin: CGPoint.zero, size: self.size)
         UIGraphicsBeginImageContextWithOptions(rect.size, false, self.scale)
         let context = UIGraphicsGetCurrentContext()
@@ -38,7 +38,7 @@ extension UIImage {
         return image!.resizableImage(withCapInsets: self.capInsets)
     }
     
-    public func ntg_blendWithColor(color: UIColor) -> UIImage {
+    public func ntg_blendWithColor(_ color: UIColor) -> UIImage {
         let rect = CGRect(origin: CGPoint.zero, size: self.size)
         UIGraphicsBeginImageContextWithOptions(rect.size, false, UIScreen.main.scale)
         let context = UIGraphicsGetCurrentContext()
@@ -55,7 +55,7 @@ extension UIImage {
         return image!.resizableImage(withCapInsets: self.capInsets)
     }
     
-    public static func ntg_imageWithColor(color: UIColor, size: CGSize) -> UIImage {
+    public static func ntg_imageWithColor(_ color: UIColor, size: CGSize) -> UIImage {
         let rect = CGRect(origin: CGPoint.zero, size: size)
         UIGraphicsBeginImageContextWithOptions(size, false, 0)
         color.setFill()
@@ -67,7 +67,7 @@ extension UIImage {
 }
 
 extension UIColor {
-    public func ntg_blendWithColor(color: UIColor) -> UIColor {
+    public func ntg_blendWithColor(_ color: UIColor) -> UIColor {
         var r1: CGFloat = 0, r2: CGFloat = 0
         var g1: CGFloat = 0, g2: CGFloat = 0
         var b1: CGFloat = 0, b2: CGFloat = 0

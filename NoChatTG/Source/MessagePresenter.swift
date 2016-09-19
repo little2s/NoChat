@@ -9,7 +9,7 @@
 import UIKit
 import NoChat
 
-public class MessagePresenter<BubbleViewT, ViewModelBuilderT>: BaseChatItemPresenter<MessageCollectionViewCell<BubbleViewT>> where
+open class MessagePresenter<BubbleViewT, ViewModelBuilderT>: BaseChatItemPresenter<MessageCollectionViewCell<BubbleViewT>> where
     BubbleViewT: UIView,
     BubbleViewT: BubbleViewProtocol,
     ViewModelBuilderT: MessageViewModelBuilderProtocol
@@ -25,7 +25,7 @@ public class MessagePresenter<BubbleViewT, ViewModelBuilderT>: BaseChatItemPrese
     let viewModelBuilder: ViewModelBuilderT
     let layoutCache: NSCache<AnyObject, AnyObject>
     
-    private(set) final lazy var messageViewModel: ViewModelT = {
+    fileprivate(set) final lazy var messageViewModel: ViewModelT = {
         return self.createViewModel()
     }()
     
@@ -60,12 +60,12 @@ public class MessagePresenter<BubbleViewT, ViewModelBuilderT>: BaseChatItemPrese
     }
     
     // MARK: Override
-    public override static func registerCells(_ collectionView: UICollectionView) {
+    open override static func registerCells(_ collectionView: UICollectionView) {
         collectionView.register(CellT.self, forCellWithReuseIdentifier: incomingCellIdentifier)
         collectionView.register(CellT.self, forCellWithReuseIdentifier: outgoingCellIdentifier)
     }
     
-    public override func dequeueCell(collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell {
+    open override func dequeueCell(collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell {
         let identifier = messageViewModel.isIncoming ? incomingCellIdentifier : outgoingCellIdentifier
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: identifier, for: indexPath as IndexPath)
         UIView.performWithoutAnimation {
@@ -86,34 +86,34 @@ public class MessagePresenter<BubbleViewT, ViewModelBuilderT>: BaseChatItemPrese
         }
         
         self.decorationAttributes = decorationAttributes
-        self.configureCell(cell: cell, decorationAttributes: decorationAttributes, animated: false, additionConfiguration: nil)
+        self.configureCell(cell, decorationAttributes: decorationAttributes, animated: false, additionConfiguration: nil)
     }
     
-    public override func heightForCell(maximumWidth width: CGFloat, decorationAttributes: ChatItemDecorationAttributesProtocol?) -> CGFloat {
+    open override func heightForCell(maximumWidth width: CGFloat, decorationAttributes: ChatItemDecorationAttributesProtocol?) -> CGFloat {
         guard let attr = decorationAttributes as? ChatItemDecorationAttributes else {
             assert(false, "Expecting decoration attributes")
             return 0
         }
-        configureCell(cell: sizingCell, decorationAttributes: attr, animated: false, additionConfiguration: nil)
-        return sizingCell.cellSizeThatFits(size: CGSize(width: width, height: CGFloat.greatestFiniteMagnitude)).height
+        configureCell(sizingCell, decorationAttributes: attr, animated: false, additionConfiguration: nil)
+        return sizingCell.cellSizeThatFits(CGSize(width: width, height: CGFloat.greatestFiniteMagnitude)).height
     }
     
-    public override var canCalculateHeightInBackground: Bool {
+    open override var canCalculateHeightInBackground: Bool {
         return sizingCell.canCalculateSizeInBackground
     }
     
-    public override func shouldShowMenu() -> Bool {
+    open override func shouldShowMenu() -> Bool {
         return false
     }
     
     // MARK: Convenience
     func createViewModel() -> ViewModelT {
-        let viewModel = viewModelBuilder.createMessageViewModel(message: message)
+        let viewModel = viewModelBuilder.createMessageViewModel(message)
         return viewModel
     }
     
-    func configureCell(cell: CellT, decorationAttributes: ChatItemDecorationAttributes, animated: Bool, additionConfiguration: (() -> Void)?) {
-        cell.performBatchUpdates(updateClosure: { () -> Void in
+    func configureCell(_ cell: CellT, decorationAttributes: ChatItemDecorationAttributes, animated: Bool, additionConfiguration: (() -> Void)?) {
+        cell.performBatchUpdates({ () -> Void in
             cell.layoutCache = self.layoutCache
             cell.messageViewModel = self.messageViewModel
             

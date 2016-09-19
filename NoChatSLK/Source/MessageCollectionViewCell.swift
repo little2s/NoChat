@@ -17,26 +17,26 @@ public struct MessageCelloctionViewCellLayoutConstants {
     let avatarSize = CGSize(width: 38, height: 38)
 }
 
-public class MessageCollectionViewCell<BubbleViewT where
+open class MessageCollectionViewCell<BubbleViewT>: UICollectionViewCell, BackgroundSizingQueryable, UIGestureRecognizerDelegate where
     BubbleViewT: UIView,
-    BubbleViewT: BubbleViewProtocol>: UICollectionViewCell, BackgroundSizingQueryable, UIGestureRecognizerDelegate
+    BubbleViewT: BubbleViewProtocol
 {
     
     static func sizingCell() -> MessageCollectionViewCell<BubbleViewT> {
         let cell = MessageCollectionViewCell<BubbleViewT>(frame: CGRect.zero)
-        cell.viewContext = .Sizing
+        cell.viewContext = .sizing
         return cell
     }
     
     var animationDuration: CFTimeInterval = 0.33
-    var viewContext: ViewContext = .Normal {
+    var viewContext: ViewContext = .normal {
         didSet {
             bubbleView.viewContext = viewContext
         }
     }
     
-    private(set) var isUpdating: Bool = false
-    func performBatchUpdates(updateClosure: () -> Void, animated: Bool, completion: (() -> ())?) {
+    fileprivate(set) var isUpdating: Bool = false
+    func performBatchUpdates(_ updateClosure: @escaping () -> Void, animated: Bool, completion: (() -> ())?) {
         self.isUpdating = true
         let updateAndRefreshViews = {
             updateClosure()
@@ -47,7 +47,7 @@ public class MessageCollectionViewCell<BubbleViewT where
             }
         }
         if animated {
-            UIView.animateWithDuration(self.animationDuration,
+            UIView.animate(withDuration: self.animationDuration,
                 animations: updateAndRefreshViews,
                 completion: { (finished) -> Void in
                     completion?()
@@ -68,16 +68,16 @@ public class MessageCollectionViewCell<BubbleViewT where
         }
     }
     
-    public override var selected: Bool {
+    open override var isSelected: Bool {
         didSet {
-            if oldValue != self.selected {
+            if oldValue != self.isSelected {
                 self.updateViews()
             }
-            bubbleView.selected = selected
+            bubbleView.selected = isSelected
         }
     }
     
-    var layoutCache: NSCache!
+    var layoutCache: NSCache<AnyObject, AnyObject>!
     
     var layoutConstants = MessageCelloctionViewCellLayoutConstants() {
         didSet {
@@ -85,40 +85,40 @@ public class MessageCollectionViewCell<BubbleViewT where
         }
     }
     
-    public var canCalculateSizeInBackground: Bool {
+    open var canCalculateSizeInBackground: Bool {
         return self.bubbleView.canCalculateSizeInBackground
     }
     
-    private(set) var bubbleView: BubbleViewT!
+    fileprivate(set) var bubbleView: BubbleViewT!
     func createBubbleView() -> BubbleViewT! {
         return BubbleViewT()
     }
     
-    private lazy var avatarImageView: UIImageView = {
+    fileprivate lazy var avatarImageView: UIImageView = {
         let view = UIImageView()
         return view
     }()
     
-    private lazy var nameLabel: UILabel = {
+    fileprivate lazy var nameLabel: UILabel = {
         let label = UILabel()
         
         let font: UIFont
         if #available(iOS 8.2, *) {
-            font = UIFont.systemFontOfSize(16, weight: UIFontWeightMedium)
+            font = UIFont.systemFont(ofSize: 16, weight: UIFontWeightMedium)
         } else {
             font = UIFont(name: "HelveticaNeue-Medium", size: 16)!
         }
         
         label.font = font
-        label.textColor = UIColor.blackColor()
+        label.textColor = UIColor.black
         
         return label
     }()
     
-    private lazy var dateLabel: UILabel = {
+    fileprivate lazy var dateLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFontOfSize(13)
-        label.textColor = UIColor.lightGrayColor()
+        label.font = UIFont.systemFont(ofSize: 13)
+        label.textColor = UIColor.lightGray
         return label
     }()
     
@@ -140,13 +140,13 @@ public class MessageCollectionViewCell<BubbleViewT where
         contentView.addSubview(nameLabel)
         contentView.addSubview(dateLabel)
         contentView.addSubview(bubbleView)
-        contentView.exclusiveTouch = true // avoid multi events response
-        exclusiveTouch = true
+        contentView.isExclusiveTouch = true // avoid multi events response
+        isExclusiveTouch = true
     }
     
     // MARK: View model binding
-    final private func updateViews() {
-        if viewContext == .Sizing { return }
+    final fileprivate func updateViews() {
+        if viewContext == .sizing { return }
         if isUpdating { return }
         guard let viewModel = messageViewModel else { return }
         
@@ -154,7 +154,7 @@ public class MessageCollectionViewCell<BubbleViewT where
         viewModel.getAvatar { [weak self] (result) -> Void in
             guard let sSelf = self else { return }
             
-            if let avatar = result where avatar != sSelf.avatarImageView.image {
+            if let avatar = result , avatar != sSelf.avatarImageView.image {
                 sSelf.avatarImageView.image = avatar
             }
         }
@@ -162,7 +162,7 @@ public class MessageCollectionViewCell<BubbleViewT where
         setNeedsLayout()
     }
     
-    public override func layoutSubviews() {
+    open override func layoutSubviews() {
         super.layoutSubviews()
         
         let layoutModel = calculateLayout(availableWidth: contentView.bounds.width)
@@ -177,7 +177,7 @@ public class MessageCollectionViewCell<BubbleViewT where
         }
     }
     
-    public func cellSizeThatFits(size: CGSize) -> CGSize {
+    open func cellSizeThatFits(_ size: CGSize) -> CGSize {
         if size.width == 0 { // TODO: find out why
             return size
         }
@@ -185,11 +185,11 @@ public class MessageCollectionViewCell<BubbleViewT where
         return calculateLayout(availableWidth: size.width).size
     }
     
-    private func calculateLayout(availableWidth availableWidth: CGFloat) -> MessageLayoutModel {
+    fileprivate func calculateLayout(availableWidth: CGFloat) -> MessageLayoutModel {
         
         let cacheKey = messageViewModel.message.msgId
         
-        if let layoutModel = layoutCache.objectForKey(cacheKey) as? MessageLayoutModel where layoutModel.size.width == availableWidth {
+        if let layoutModel = layoutCache.object(forKey: cacheKey as AnyObject) as? MessageLayoutModel , layoutModel.size.width == availableWidth {
             return layoutModel
         }
         
@@ -208,16 +208,16 @@ public class MessageCollectionViewCell<BubbleViewT where
         let layoutModel = MessageLayoutModel()
         layoutModel.calculateLayout(parameters: parameters)
         
-        layoutCache.setObject(layoutModel, forKey: cacheKey)
+        layoutCache.setObject(layoutModel, forKey: cacheKey as AnyObject)
         
         return layoutModel
     }
     
     // http://stackoverflow.com/questions/22451793/setcollectionviewlayoutanimated-causing-debug-error-snapshotting-a-view-that-h
-    public override func snapshotViewAfterScreenUpdates(afterUpdates: Bool) -> UIView {
+    open override func snapshotView(afterScreenUpdates afterUpdates: Bool) -> UIView? {
         UIGraphicsBeginImageContext(bounds.size)
         
-        drawRect(bounds)
+        draw(bounds)
         
         let snapshotImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
@@ -230,14 +230,14 @@ public class MessageCollectionViewCell<BubbleViewT where
 }
 
 final class MessageLayoutModel {
-    private (set) var size = CGSize.zero
-    private (set) var avatarViewFrame = CGRect.zero
-    private (set) var nameLabelFrame = CGRect.zero
-    private (set) var dateLabelFrame = CGRect.zero
-    private (set) var bubbleViewFrame = CGRect.zero
-    private (set) var preferredMaxWidthForBubble: CGFloat = 0
+    fileprivate (set) var size = CGSize.zero
+    fileprivate (set) var avatarViewFrame = CGRect.zero
+    fileprivate (set) var nameLabelFrame = CGRect.zero
+    fileprivate (set) var dateLabelFrame = CGRect.zero
+    fileprivate (set) var bubbleViewFrame = CGRect.zero
+    fileprivate (set) var preferredMaxWidthForBubble: CGFloat = 0
     
-    func calculateLayout(parameters parameters: MessageLayoutModelParameters) {
+    func calculateLayout(parameters: MessageLayoutModelParameters) {
         let containerWidth = parameters.containerWidth
         let avatarSize = parameters.avatarImageViewSize
         let bubbleView = parameters.bubbleView
@@ -250,7 +250,7 @@ final class MessageLayoutModel {
         
         let preferredWidthForBubble: CGFloat = containerWidth - horizontalMargin * 2 - horizontalInterspacing - avatarSize.width
         
-        let bubbleSize = bubbleView.bubbleSizeThatFits(CGSize(width: preferredWidthForBubble, height: CGFloat.max))
+        let bubbleSize = bubbleView.bubbleSizeThatFits(CGSize(width: preferredWidthForBubble, height: CGFloat.greatestFiniteMagnitude))
         
         let nameSize = nameLabel.sizeThatFits(CGSize(width: preferredWidthForBubble, height: 21))
         

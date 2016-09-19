@@ -8,11 +8,11 @@
 
 import UIKit
 
-public class ClockProgressView: UIView {
+open class ClockProgressView: UIView {
     public struct Constant {
-        static let progressFrameImage = imageFactory.createImage(name: "ClockFrame")!
-        static let progressMinImage = imageFactory.createImage(name: "ClockMin")!
-        static let progressHourImage = imageFactory.createImage(name: "ClockHour")!
+        static let progressFrameImage = imageFactory.createImage("ClockFrame")!
+        static let progressMinImage = imageFactory.createImage("ClockMin")!
+        static let progressHourImage = imageFactory.createImage("ClockHour")!
         static let minuteDuration: TimeInterval = 0.3
         static let hourDuration: TimeInterval = 1.8
     }
@@ -21,7 +21,7 @@ public class ClockProgressView: UIView {
     var minView = UIImageView()
     var hourView = UIImageView()
     
-    public var isAnimating = false
+    open var isAnimating = false
     
     public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -33,7 +33,7 @@ public class ClockProgressView: UIView {
         commonInit()
     }
     
-    public func startAnimating() {
+    open func startAnimating() {
         if isAnimating {
             return
         }
@@ -47,7 +47,7 @@ public class ClockProgressView: UIView {
         animateMinView()
     }
     
-    public func stopAnimating() {
+    open func stopAnimating() {
         if !isAnimating {
             return;
         }
@@ -58,7 +58,7 @@ public class ClockProgressView: UIView {
         minView.layer.removeAllAnimations()
     }
     
-    private func commonInit() {
+    fileprivate func commonInit() {
         backgroundColor = UIColor.clear
         
         frameView.image = Constant.progressFrameImage
@@ -71,14 +71,14 @@ public class ClockProgressView: UIView {
         addSubview(hourView)
     }
     
-    public override func layoutSubviews() {
+    open override func layoutSubviews() {
         super.layoutSubviews()
         frameView.frame = bounds
         minView.frame = bounds
         hourView.frame = bounds
     }
     
-    private func animateHourView() {
+    fileprivate func animateHourView() {
         UIView.animate(withDuration: Constant.hourDuration, delay: 0.0, options: .curveLinear, animations: { () -> Void in
             self.hourView.transform = self.hourView.transform.rotated(by: CGFloat(M_2_PI))
         }, completion: { finished -> Void in
@@ -90,7 +90,7 @@ public class ClockProgressView: UIView {
         })
     }
     
-    private func animateMinView() {
+    fileprivate func animateMinView() {
         UIView.animate(withDuration: Constant.minuteDuration, delay: 0.0, options: .curveLinear, animations: { () -> Void in
             self.minView.transform = self.minView.transform.rotated(by: CGFloat(M_2_PI))
         }, completion: { finished -> Void in

@@ -12,22 +12,22 @@ public enum MessageType: String {
     case Text = "Text"
 }
 
-public class Message: NSObject, MessageProtocol {
-    public var msgId: String
-    public var msgType: String
-    public var senderId: String
-    public var isIncoming: Bool
-    public var date: NSDate
-    public dynamic var deliveryStatus: MessageDeliveryStatus
-    public var attachments: [MessageAttachmentProtocol]
-    public var content: String
+open class Message: NSObject, MessageProtocol {
+    open var msgId: String
+    open var msgType: String
+    open var senderId: String
+    open var isIncoming: Bool
+    open var date: Date
+    open dynamic var deliveryStatus: MessageDeliveryStatus
+    open var attachments: [MessageAttachmentProtocol]
+    open var content: String
     
     public init(
         msgId: String,
         msgType: String,
         senderId: String,
         isIncoming: Bool,
-        date: NSDate,
+        date: Date,
         deliveryStatus: MessageDeliveryStatus,
         attachments: [MessageAttachmentProtocol] = [],
         content: String

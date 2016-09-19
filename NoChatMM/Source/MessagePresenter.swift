@@ -9,10 +9,10 @@
 import UIKit
 import NoChat
 
-public class MessagePresenter<BubbleViewT, ViewModelBuilderT where
+open class MessagePresenter<BubbleViewT, ViewModelBuilderT>: BaseChatItemPresenter<MessageCollectionViewCell<BubbleViewT>> where
     BubbleViewT: UIView,
     BubbleViewT: BubbleViewProtocol,
-    ViewModelBuilderT: MessageViewModelBuilderProtocol>: BaseChatItemPresenter<MessageCollectionViewCell<BubbleViewT>>
+    ViewModelBuilderT: MessageViewModelBuilderProtocol
 {
     // MARK: Types
     typealias ModelT = MessageProtocol
@@ -23,9 +23,9 @@ public class MessagePresenter<BubbleViewT, ViewModelBuilderT where
     let message: ModelT
     let sizingCell: MessageCollectionViewCell<BubbleViewT>
     let viewModelBuilder: ViewModelBuilderT
-    let layoutCache: NSCache
+    let layoutCache: NSCache<AnyObject, AnyObject>
     
-    private(set) final lazy var messageViewModel: ViewModelT = {
+    fileprivate(set) final lazy var messageViewModel: ViewModelT = {
         return self.createViewModel()
     }()
     
@@ -52,7 +52,7 @@ public class MessagePresenter<BubbleViewT, ViewModelBuilderT where
     }
     
     // MARK: Initialization
-    init(message: ModelT, sizingCell: CellT, viewModelBuilder: ViewModelBuilderT, layoutCache: NSCache) {
+    init(message: ModelT, sizingCell: CellT, viewModelBuilder: ViewModelBuilderT, layoutCache: NSCache<AnyObject, AnyObject>) {
         self.message = message
         self.sizingCell = sizingCell
         self.viewModelBuilder = viewModelBuilder
@@ -60,21 +60,21 @@ public class MessagePresenter<BubbleViewT, ViewModelBuilderT where
     }
     
     // MARK: Override
-    public override static func registerCells(collectionView: UICollectionView) {
-        collectionView.registerClass(CellT.self, forCellWithReuseIdentifier: incomingCellIdentifier)
-        collectionView.registerClass(CellT.self, forCellWithReuseIdentifier: outgoingCellIdentifier)
+    open override static func registerCells(_ collectionView: UICollectionView) {
+        collectionView.register(CellT.self, forCellWithReuseIdentifier: incomingCellIdentifier)
+        collectionView.register(CellT.self, forCellWithReuseIdentifier: outgoingCellIdentifier)
     }
     
-    public override func dequeueCell(collectionView collectionView: UICollectionView, indexPath: NSIndexPath) -> UICollectionViewCell {
+    open override func dequeueCell(collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell {
         let identifier = messageViewModel.isIncoming ? incomingCellIdentifier : outgoingCellIdentifier
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier(identifier, forIndexPath: indexPath)
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: identifier, for: indexPath)
         UIView.performWithoutAnimation {
             cell.contentView.transform = collectionView.transform
         }
         return cell
     }
     
-    public final override func configureCell(cell: UICollectionViewCell, decorationAttributes: ChatItemDecorationAttributesProtocol?) {
+    public final override func configureCell(_ cell: UICollectionViewCell, decorationAttributes: ChatItemDecorationAttributesProtocol?) {
         guard let cell = cell as? CellT else {
             assert(false, "Invalid cell given to presenter")
             return
@@ -89,20 +89,20 @@ public class MessagePresenter<BubbleViewT, ViewModelBuilderT where
         self.configureCell(cell, decorationAttributes: decorationAttributes, animated: false, additionConfiguration: nil)
     }
     
-    public override func heightForCell(maximumWidth width: CGFloat, decorationAttributes: ChatItemDecorationAttributesProtocol?) -> CGFloat {
+    open override func heightForCell(maximumWidth width: CGFloat, decorationAttributes: ChatItemDecorationAttributesProtocol?) -> CGFloat {
         guard let attr = decorationAttributes as? ChatItemDecorationAttributes else {
             assert(false, "Expecting decoration attributes")
             return 0
         }
         configureCell(sizingCell, decorationAttributes: attr, animated: false, additionConfiguration: nil)
-        return sizingCell.cellSizeThatFits(CGSize(width: width, height: CGFloat.max)).height
+        return sizingCell.cellSizeThatFits(CGSize(width: width, height: CGFloat.greatestFiniteMagnitude)).height
     }
     
-    public override var canCalculateHeightInBackground: Bool {
+    open override var canCalculateHeightInBackground: Bool {
         return sizingCell.canCalculateSizeInBackground
     }
     
-    public override func shouldShowMenu() -> Bool {
+    open override func shouldShowMenu() -> Bool {
         return false
     }
     
@@ -112,7 +112,7 @@ public class MessagePresenter<BubbleViewT, ViewModelBuilderT where
         return viewModel
     }
     
-    func configureCell(cell: CellT, decorationAttributes: ChatItemDecorationAttributes, animated: Bool, additionConfiguration: (() -> Void)?) {
+    func configureCell(_ cell: CellT, decorationAttributes: ChatItemDecorationAttributes, animated: Bool, additionConfiguration: (() -> Void)?) {
         cell.performBatchUpdates({ () -> Void in
             cell.layoutCache = self.layoutCache
             cell.messageViewModel = self.messageViewModel

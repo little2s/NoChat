@@ -8,9 +8,9 @@
 
 import UIKit
 
-public class DateItemCollectionViewCell: UICollectionViewCell {
+open class DateItemCollectionViewCell: UICollectionViewCell {
     
-    public lazy var dateLabel: ColorLabel! = {
+    open lazy var dateLabel: ColorLabel! = {
         let label = ColorLabel()
         label.backgroundColor = UIColor(white: 0.2, alpha: 0.25)
         label.cornerRadius = 8
@@ -21,7 +21,7 @@ public class DateItemCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
-    private lazy var font: UIFont = {
+    fileprivate lazy var font: UIFont = {
         let dateFont: UIFont
         if #available(iOS 8.2, *) {
             dateFont = UIFont.systemFont(ofSize: 13, weight: UIFontWeightMedium)
@@ -41,17 +41,17 @@ public class DateItemCollectionViewCell: UICollectionViewCell {
         commonInit()
     }
     
-    private func commonInit() {
+    fileprivate func commonInit() {
         backgroundColor = UIColor.clear
         contentView.addSubview(dateLabel)
     }
     
-    public override func layoutSubviews() {
+    open override func layoutSubviews() {
         super.layoutSubviews()
         dateLabel.center = contentView.center
     }
     
-    public override func snapshotView(afterScreenUpdates afterUpdates: Bool) -> UIView {
+    open override func snapshotView(afterScreenUpdates afterUpdates: Bool) -> UIView {
         UIGraphicsBeginImageContext(bounds.size)
         
         draw(bounds)

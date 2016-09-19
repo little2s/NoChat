@@ -14,13 +14,14 @@ class KeyboardMan: NSObject {
         didSet {
             oldValue?.removeObserver(self)
             
-            keyboardObserver?.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: .UIKeyboardWillShow, object: nil)
             
-            keyboardObserver?.addObserver(self, selector: #selector(keyboardWillChangeFrame(notification:)), name: .UIKeyboardWillChangeFrame, object: nil)
+            keyboardObserver?.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: .UIKeyboardWillShow, object: nil)
             
-            keyboardObserver?.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: .UIKeyboardWillHide, object: nil)
+            keyboardObserver?.addObserver(self, selector: #selector(keyboardWillChangeFrame(_:)), name: .UIKeyboardWillChangeFrame, object: nil)
             
-            keyboardObserver?.addObserver(self, selector: #selector(keyboardDidHide(notification:)), name: .UIKeyboardDidHide, object: nil)
+            keyboardObserver?.addObserver(self, selector: #selector(keyboardWillHide(_:)), name: .UIKeyboardWillHide, object: nil)
+            
+            keyboardObserver?.addObserver(self, selector: #selector(keyboardDidHide(_:)), name: .UIKeyboardDidHide, object: nil)
         }
     }
 
@@ -119,9 +120,9 @@ class KeyboardMan: NSObject {
 
     // MARK: - Actions
 
-    private func handleKeyboard(notification: NSNotification, _ action: KeyboardInfo.Action) {
+     func handleKeyboard(_ notification: Notification, _ action: KeyboardInfo.Action) {
 
-        if let userInfo = notification.userInfo {
+        if let userInfo = (notification as NSNotification).userInfo {
 
             let animationDuration: TimeInterval = (userInfo[UIKeyboardAnimationDurationUserInfoKey] as! NSNumber).doubleValue
             let animationCurve = (userInfo[UIKeyboardAnimationCurveUserInfoKey] as! NSNumber).uintValue
@@ -151,16 +152,16 @@ class KeyboardMan: NSObject {
         }
     }
 
-    func keyboardWillShow(notification: NSNotification) {
+    func keyboardWillShow(_ notification: Notification) {
 
         guard UIApplication.shared.applicationState != .background else {
             return
         }
 
-        handleKeyboard(notification: notification, .Show)
+        handleKeyboard(notification, .Show)
     }
     
-    func keyboardWillChangeFrame(notification: NSNotification) {
+    func keyboardWillChangeFrame(_ notification: Notification) {
 
         guard UIApplication.shared.applicationState != .background else {
             return
@@ -169,21 +170,21 @@ class KeyboardMan: NSObject {
         if let keyboardInfo = keyboardInfo {
 
             if keyboardInfo.action == .Show {
-                handleKeyboard(notification: notification, .Show)
+                handleKeyboard(notification, .Show)
             }
         }
     }
 
-    func keyboardWillHide(notification: NSNotification) {
+    func keyboardWillHide(_ notification: Notification) {
 
         guard UIApplication.shared.applicationState != .background else {
             return
         }
 
-        handleKeyboard(notification: notification, .Hide)
+        handleKeyboard(notification, .Hide)
     }
 
-    func keyboardDidHide(notification: NSNotification) {
+    func keyboardDidHide(_ notification: Notification) {
 
         guard UIApplication.shared.applicationState != .background else {
             return

@@ -26,14 +26,14 @@
 
 import Foundation
 
-func dispatch_async_safely_to_main_queue(block: @escaping ()->()) {
-    dispatch_async_safely_to_queue(queue: DispatchQueue.main, block)
+func dispatch_async_safely_to_main_queue(_ block: @escaping ()->()) {
+    dispatch_async_safely_to_queue(DispatchQueue.main, block)
 }
 
 // This method will dispatch the `block` to a specified `queue`.
 // If the `queue` is the main queue, and current thread is main thread, the block 
 // will be invoked immediately instead of being dispatched.
-func dispatch_async_safely_to_queue(queue: DispatchQueue, _ block: @escaping ()->()) {
+func dispatch_async_safely_to_queue(_ queue: DispatchQueue, _ block: @escaping ()->()) {
     if queue === DispatchQueue.main && Thread.isMainThread {
         block()
     } else {
@@ -43,11 +43,11 @@ func dispatch_async_safely_to_queue(queue: DispatchQueue, _ block: @escaping ()-
     }
 }
 
-func dispatch_sync_safely_to_main_queue(block: @escaping ()->()) {
-    dispatch_sync_safely_to_queue(queue: DispatchQueue.main, block)
+func dispatch_sync_safely_to_main_queue(_ block: @escaping ()->()) {
+    dispatch_sync_safely_to_queue(DispatchQueue.main, block)
 }
 
-func dispatch_sync_safely_to_queue(queue: DispatchQueue, _ block: @escaping ()->()) {
+func dispatch_sync_safely_to_queue(_ queue: DispatchQueue, _ block: @escaping ()->()) {
     if queue === DispatchQueue.main && Thread.isMainThread {
         block()
     } else {

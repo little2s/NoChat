@@ -11,7 +11,7 @@ import UIKit
 let imageFactory = ImageFactoryTG()
 
 class ImageFactoryTG {
-    func createImage(name: String) -> UIImage? {
+    func createImage(_ name: String) -> UIImage? {
         return UIImage(named: name, in: Bundle(for: type(of: self)), compatibleWith: nil)
     }
 }

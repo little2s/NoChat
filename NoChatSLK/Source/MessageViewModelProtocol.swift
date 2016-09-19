@@ -10,20 +10,20 @@ import Foundation
 
 // MARK: Enumerate
 public enum MessageViewModelStatus {
-    case Sending
-    case Success
-    case Failure
+    case sending
+    case success
+    case failure
 }
 
 extension MessageDeliveryStatus {
     public func viewModelStatus() -> MessageViewModelStatus {
         switch self {
-        case .Delivered:
-            return .Success
-        case .Failure:
-            return .Failure
-        case .Delivering:
-            return .Sending
+        case .delivered:
+            return .success
+        case .failure:
+            return .failure
+        case .delivering:
+            return .sending
         }
     }
 }
@@ -38,7 +38,7 @@ public protocol MessageViewModelProtocol: class {
     var message: MessageProtocol { get }
     
     // Always asynchronous get avatar
-    func getAvatar(completionHandler completionHandler: (UIImage? -> Void)?)
+    func getAvatar(completionHandler: ((UIImage?) -> Void)?)
 }
 
 // Use DecoratedMessageViewModelProtocol for extension MessageViewModel
@@ -76,5 +76,5 @@ extension DecoratedMessageViewModelProtocol {
 }
 
 public protocol MessageViewModelBuilderProtocol {
-    func createMessageViewModel(message message: MessageProtocol) -> MessageViewModelProtocol
+    func createMessageViewModel(message: MessageProtocol) -> MessageViewModelProtocol
 }
