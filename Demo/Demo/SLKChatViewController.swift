@@ -12,31 +12,31 @@ import NoChatSLK
 
 class SLKChatViewController: ChatViewController {
     
-    let messageLayoutCache = NSCache()
+    let messageLayoutCache = NSCache<AnyObject, AnyObject>()
     
     override func viewDidLoad() {
         inverted = true
         super.viewDidLoad()
         
         
-        let icon = UIBarButtonItem(image: UIImage(named: "SLKIcon")!, style: .Plain, target: self, action: #selector(didTapIcon))
+        let icon = UIBarButtonItem(image: UIImage(named: "SLKIcon")!, style: .plain, target: self, action: #selector(didTapIcon))
         
         let titleFont: UIFont
         if #available(iOS 8.2, *) {
-            titleFont = UIFont.systemFontOfSize(15, weight: UIFontWeightMedium)
+            titleFont = UIFont.systemFont(ofSize: 15, weight: UIFontWeightMedium)
         } else {
             titleFont = UIFont(name: "HelveticaNeue-Medium", size: 15)!
         }
         
-        let title = UIBarButtonItem(title: self.title, style: .Plain, target: nil, action: nil)
-        title.setTitleTextAttributes([NSForegroundColorAttributeName: UIColor.blackColor(), NSFontAttributeName: titleFont], forState: .Normal)
-        title.tintColor = UIColor.blackColor()
+        let title = UIBarButtonItem(title: self.title, style: .plain, target: nil, action: nil)
+        title.setTitleTextAttributes([NSForegroundColorAttributeName: UIColor.black, NSFontAttributeName: titleFont], for: .normal)
+        title.tintColor = UIColor.black
         
-        let search = UIBarButtonItem(image: UIImage(named: "SLKSearch")!, style: .Plain, target: nil, action: nil)
-        search.tintColor = UIColor.darkGrayColor()
+        let search = UIBarButtonItem(image: UIImage(named: "SLKSearch")!, style: .plain, target: nil, action: nil)
+        search.tintColor = UIColor.darkGray
         
-        let more = UIBarButtonItem(image: UIImage(named: "SLKMore")!, style: .Plain, target: nil, action: nil)
-        more.tintColor = UIColor.darkGrayColor()
+        let more = UIBarButtonItem(image: UIImage(named: "SLKMore")!, style: .plain, target: nil, action: nil)
+        more.tintColor = UIColor.darkGray
         
         navigationItem.leftBarButtonItems = [icon, title]
         navigationItem.rightBarButtonItems = [more, search]
@@ -45,10 +45,10 @@ class SLKChatViewController: ChatViewController {
 
     @objc
     func didTapIcon() {
-        navigationController?.popViewControllerAnimated(true)
+        navigationController?.popViewController(animated: true)
     }
     
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.interactivePopGestureRecognizer?.delegate = self
     }
@@ -70,7 +70,7 @@ class SLKChatViewController: ChatViewController {
         let inputController = NoChatSLK.ChatInputViewController()
         
         inputController.onSendText = { [weak self] text in
-            self?.sendText(text)
+            self?.sendText(text: text)
         }
         
         return inputController
@@ -79,27 +79,27 @@ class SLKChatViewController: ChatViewController {
 }
 
 extension SLKChatViewController: UIGestureRecognizerDelegate {
-    func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool {
+    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
     }
 }
 
 extension SLKChatViewController {
-    override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+    override func viewWillTransition(to: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         messageLayoutCache.removeAllObjects()
-        super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
+        super.viewWillTransition(to: to, with: coordinator)
     }
 }
 
 extension SLKChatViewController {
     func sendText(text: String) {
         let message = SLKMessageFactory.createTextMessage(text: text, senderId: "outgoing", isIncoming: false)
-        (self.chatDataSource as! SLKChatDataSource).addMessages([message])
+        (self.chatDataSource as! SLKChatDataSource).addMessages(messages: [message])
     }
 }
 
 class SLKTextMessageViewModel: TextMessageViewModel {
-    override func getAvatar(completionHandler completionHandler: (UIImage? -> Void)?) {
+    override func getAvatar(completionHandler: ((UIImage?) -> Void)?) {
         if message.senderId == "incoming" {
             let image = UIImage(named: "SLKAvatarIncoming")
             completionHandler?(image)
@@ -114,7 +114,7 @@ class SLKTextMessageViewModelBuilder: MessageViewModelBuilderProtocol {
     
     private let messageViewModelBuilder = MessageViewModelBuilder()
     
-    func createMessageViewModel(message message: MessageProtocol) -> MessageViewModelProtocol {
+    func createMessageViewModel(message: MessageProtocol) -> MessageViewModelProtocol {
         let messageViewModel = messageViewModelBuilder.createMessageViewModel(message: message)
         let textMessageViewModel = SLKTextMessageViewModel(text: message.content, messageViewModel: messageViewModel)
         return textMessageViewModel

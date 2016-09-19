@@ -20,12 +20,12 @@ typealias TGMessageType = NoChatTG.MessageType
 struct TGMessageFactory {
     static func createMessage(senderId: String, isIncoming: Bool, msgType: String) -> TGMessage {
         let message = TGMessage(
-            msgId: NSUUID().UUIDString,
+            msgId: NSUUID().uuidString,
             msgType: msgType,
             senderId: senderId,
             isIncoming: isIncoming,
-            date: NSDate(),
-            deliveryStatus: .Delivering,
+            date: Date(),
+            deliveryStatus: .delivering,
             attachments: [],
             content: ""
         )
@@ -33,8 +33,8 @@ struct TGMessageFactory {
         return message
     }
     
-    static func createTextMessage(text text: String, senderId: String, isIncoming: Bool) -> TGMessage {
-        let message = createMessage(senderId, isIncoming: isIncoming, msgType: TGMessageType.Text.rawValue)
+    static func createTextMessage(text: String, senderId: String, isIncoming: Bool) -> TGMessage {
+        let message = createMessage(senderId: senderId, isIncoming: isIncoming, msgType: TGMessageType.Text.rawValue)
         message.content = text
         return message
     }
@@ -48,12 +48,12 @@ typealias MMMessageType = NoChatMM.MessageType
 struct MMMessageFactory {
     static func createMessage(senderId: String, isIncoming: Bool, msgType: String) -> MMMessage {
         let message = MMMessage(
-            msgId: NSUUID().UUIDString,
+            msgId: NSUUID().uuidString,
             msgType: msgType,
             senderId: senderId,
             isIncoming: isIncoming,
-            date: NSDate(),
-            deliveryStatus: .Delivering,
+            date: NSDate() as Date,
+            deliveryStatus: .delivering,
             attachments: [],
             content: ""
         )
@@ -61,8 +61,8 @@ struct MMMessageFactory {
         return message
     }
     
-    static func createTextMessage(text text: String, senderId: String, isIncoming: Bool) -> MMMessage {
-        let message = createMessage(senderId, isIncoming: isIncoming, msgType: MMMessageType.Text.rawValue)
+    static func createTextMessage(text: String, senderId: String, isIncoming: Bool) -> MMMessage {
+        let message = createMessage(senderId: senderId, isIncoming: isIncoming, msgType: MMMessageType.Text.rawValue)
         message.content = text
         return message
     }
@@ -76,12 +76,12 @@ typealias SLKMessageType = NoChatSLK.MessageType
 struct SLKMessageFactory {
     static func createMessage(senderId: String, isIncoming: Bool, msgType: String) -> SLKMessage {
         let message = SLKMessage(
-            msgId: NSUUID().UUIDString,
+            msgId: NSUUID().uuidString,
             msgType: msgType,
             senderId: senderId,
             isIncoming: isIncoming,
-            date: NSDate(),
-            deliveryStatus: .Delivering,
+            date: Date(),
+            deliveryStatus: .delivering,
             attachments: [],
             content: ""
         )
@@ -89,8 +89,8 @@ struct SLKMessageFactory {
         return message
     }
     
-    static func createTextMessage(text text: String, senderId: String, isIncoming: Bool) -> SLKMessage {
-        let message = createMessage(senderId, isIncoming: isIncoming, msgType: SLKMessageType.Text.rawValue)
+    static func createTextMessage(text: String, senderId: String, isIncoming: Bool) -> SLKMessage {
+        let message = createMessage(senderId: senderId, isIncoming: isIncoming, msgType: SLKMessageType.Text.rawValue)
         message.content = text
         return message
     }
@@ -110,13 +110,13 @@ class DemoChatItemFactory {
         
         for _ in 0..<1 {
         
-            for (index, item) in items.enumerate() {
+            for (index, item) in items.enumerated() {
                 if item.0 == "text" {
                     let senderId = (index % 2 == 0) ? "incoming" : "outgoing"
                     let isIncomming = (senderId == "incoming")
                     
                     let chatItem = TGMessageFactory.createTextMessage(text: item.1, senderId: senderId, isIncoming: isIncomming)
-                    result.insert(chatItem, atIndex: 0)
+                    result.insert(chatItem, at: 0)
                 }
             }
             
@@ -130,7 +130,7 @@ class DemoChatItemFactory {
         
         for _ in 0..<1 {
             
-            for (index, item) in items.enumerate() {
+            for (index, item) in items.enumerated() {
                 if item.0 == "text" {
                     let senderId = (index % 2 == 0) ? "incoming" : "outgoing"
                     let isIncomming = (senderId == "incoming")
@@ -150,13 +150,13 @@ class DemoChatItemFactory {
         
         for _ in 0..<1 {
             
-            for (index, item) in items.enumerate() {
+            for (index, item) in items.enumerated() {
                 if item.0 == "text" {
                     let senderId = (index % 2 == 0) ? "incoming" : "outgoing"
                     let isIncomming = (senderId == "incoming")
                     
                     let chatItem = SLKMessageFactory.createTextMessage(text: item.1, senderId: senderId, isIncoming: isIncomming)
-                    result.insert(chatItem, atIndex: 0)
+                    result.insert(chatItem, at: 0)
                 }
             }
             

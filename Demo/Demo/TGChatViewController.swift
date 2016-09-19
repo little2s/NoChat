@@ -31,7 +31,7 @@ class TGChatViewController: ChatViewController {
         }
     }
     
-    let messageLayoutCache = NSCache()
+    let messageLayoutCache = NSCache<AnyObject, AnyObject>()
     
     override func viewDidLoad() {
         inverted = true
@@ -41,7 +41,7 @@ class TGChatViewController: ChatViewController {
         
         navigationItem.titleView = titleView
         
-        let spacer = UIBarButtonItem(barButtonSystemItem: .FixedSpace, target: nil, action: nil)
+        let spacer = UIBarButtonItem(barButtonSystemItem: .fixedSpace, target: nil, action: nil)
         spacer.width = -12
         
         let right = UIBarButtonItem(customView: avatarButton)
@@ -70,7 +70,7 @@ class TGChatViewController: ChatViewController {
         let inputController = NoChatTG.ChatInputViewController()
         
         inputController.onSendText = { [weak self] text in
-            self?.sendText(text)
+            self?.sendText(text: text)
         }
         
         inputController.onChooseAttach = { [weak self] in
@@ -83,11 +83,11 @@ class TGChatViewController: ChatViewController {
 }
 
 extension TGChatViewController {
-    override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+    override func viewWillTransition(to: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         
         messageLayoutCache.removeAllObjects()
         
-        if size.width > size.height {
+        if to.width > to.height {
             titleView.horizontalLayout()
             avatarButton.horizontalLayout()
         } else {
@@ -95,28 +95,28 @@ extension TGChatViewController {
             avatarButton.verticalLayout()
         }
         
-        super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
+        super.viewWillTransition(to: to, with: coordinator)
     }
 }
 
 extension TGChatViewController {
     func sendText(text: String) {
         let message = TGMessageFactory.createTextMessage(text: text, senderId: "outgoing", isIncoming: false)
-        (self.chatDataSource as! TGChatDataSource).addMessages([message])
+        (self.chatDataSource as! TGChatDataSource).addMessages(messages: [message])
     }
     
     func showAttachSheet() {
-        let sheet = UIAlertController(title: "Choose attchment", message: "", preferredStyle: .ActionSheet)
+        let sheet = UIAlertController(title: "Choose attchment", message: "", preferredStyle: .actionSheet)
         
-        sheet.addAction(UIAlertAction(title: "Camera", style: .Default, handler: { _ in
+        sheet.addAction(UIAlertAction(title: "Camera", style: .default, handler: { _ in
         }))
         
-        sheet.addAction(UIAlertAction(title: "Photos", style: .Default, handler: { _ in
+        sheet.addAction(UIAlertAction(title: "Photos", style: .default, handler: { _ in
         }))
         
-        sheet.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
+        sheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         
-        presentViewController(sheet, animated: true, completion: nil)
+        present(sheet, animated: true, completion: nil)
     }
 }
 
@@ -130,21 +130,22 @@ class TitleView: UIView {
         
         let titleFont: UIFont
         if #available(iOS 8.2, *) {
-            titleFont = UIFont.systemFontOfSize(16, weight: UIFontWeightMedium)
+            titleFont = UIFont.systemFont(ofSize: 16, weight: UIFontWeightMedium)
         } else {
             titleFont = UIFont(name: "HelveticaNeue-Medium", size: 16)!
         }
         
         titleLabel = UILabel()
         titleLabel.font = titleFont
-        titleLabel.textColor = UIColor.blackColor()
-        titleLabel.textAlignment = .Center
+        titleLabel.textColor = UIColor.black
+        titleLabel.textAlignment = .center
         addSubview(titleLabel)
         
+        
         detailLabel = UILabel()
-        detailLabel.font = UIFont.systemFontOfSize(12)
-        detailLabel.textColor = UIColor.grayColor()
-        detailLabel.textAlignment = .Center
+        detailLabel.font = UIFont.systemFont(ofSize: 12)
+        detailLabel.textColor = UIColor.gray
+        detailLabel.textAlignment = .center
         addSubview(detailLabel)
         
         detailLabel.text = "last seen yesterday at 5:56 PM"
@@ -166,8 +167,8 @@ class TitleView: UIView {
     func horizontalLayout() {
         frame = CGRect(x: 0, y: 0, width: 300, height: 40)
         
-        let titleSize = titleLabel.sizeThatFits(CGSize(width: CGFloat.max, height: 21))
-        let detailSize = detailLabel.sizeThatFits(CGSize(width: CGFloat.max, height: 15))
+        let titleSize = titleLabel.sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude, height: 21))
+        let detailSize = detailLabel.sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude, height: 15))
         
         let contentWidth = titleSize.width + 6 + detailSize.width
         
@@ -187,7 +188,7 @@ class AvatarButton: UIButton {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        setImage(UIImage(named: "TGUserInfo")!, forState: .Normal)
+        setImage(UIImage(named: "TGUserInfo")!, for: .normal)
         
         verticalLayout()
     }
@@ -214,9 +215,9 @@ class TGTextMessageViewModelBuilder: MessageViewModelBuilderProtocol {
     
     private let messageViewModelBuilder = MessageViewModelBuilder()
     
-    func createMessageViewModel(message message: MessageProtocol) -> MessageViewModelProtocol {
-        let messageViewModel = messageViewModelBuilder.createMessageViewModel(message: message)
-        messageViewModel.status.value = .Success
+    func createMessageViewModel(_ message: MessageProtocol) -> MessageViewModelProtocol {
+        let messageViewModel = messageViewModelBuilder.createMessageViewModel(message)
+        messageViewModel.status.value = .success
         let textMessageViewModel = TGTextMessageViewModel(text: message.content, messageViewModel: messageViewModel)
         return textMessageViewModel
     }

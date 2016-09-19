@@ -19,11 +19,11 @@ typealias TGChatItemDecorationAttributes = NoChatTG.ChatItemDecorationAttributes
 
 class TGChatItemsDecorator: ChatItemsDecoratorProtocol {
     lazy var dateItem: TGDateItem = {
-        let dateUid = NSUUID().UUIDString
-        return TGDateItem(uid: dateUid, date: NSDate())
+        let dateUid = NSUUID().uuidString
+        return TGDateItem(uid: dateUid, date: Date())
     }()
     
-    func decorateItems(chatItems: [ChatItemProtocol], inverted: Bool) -> [DecoratedChatItem] {
+    func decorateItems(_ chatItems: [ChatItemProtocol], inverted: Bool) -> [DecoratedChatItem] {
         let bottomMargin: CGFloat = 2
         
         var decoratedChatItems = [DecoratedChatItem]()
@@ -56,11 +56,11 @@ typealias MMChatItemDecorationAttributes = NoChatMM.ChatItemDecorationAttributes
 
 class MMChatItemsDecorator: ChatItemsDecoratorProtocol {
     lazy var dateItem: MMDateItem = {
-        let dateUid = NSUUID().UUIDString
-        return MMDateItem(uid: dateUid, date: NSDate())
+        let dateUid = NSUUID().uuidString
+        return MMDateItem(uid: dateUid, date: Date())
     }()
     
-    func decorateItems(chatItems: [ChatItemProtocol], inverted: Bool) -> [DecoratedChatItem] {
+    func decorateItems(_ chatItems: [ChatItemProtocol], inverted: Bool) -> [DecoratedChatItem] {
         let bottomMargin: CGFloat = 8
         
         var decoratedChatItems = [DecoratedChatItem]()
@@ -92,7 +92,7 @@ typealias SLKChatItemDecorationAttributes = NoChatSLK.ChatItemDecorationAttribut
 
 class SLKChatItemsDecorator: ChatItemsDecoratorProtocol {
     
-    func decorateItems(chatItems: [ChatItemProtocol], inverted: Bool) -> [DecoratedChatItem] {
+    func decorateItems(_ chatItems: [ChatItemProtocol], inverted: Bool) -> [DecoratedChatItem] {
         let bottomMargin: CGFloat = 8
         
         var decoratedChatItems = [DecoratedChatItem]()
