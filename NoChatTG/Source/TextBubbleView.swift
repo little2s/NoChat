@@ -354,7 +354,7 @@ public class TextBubbleView: UIView, BubbleViewProtocol, UITextViewDelegate {
     }
     
     // MARK: UITextViewDelegate
-    public func textView(textView: UITextView, shouldInteractWithURL URL: NSURL, inRange characterRange: NSRange) -> Bool {
+    public func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange) -> Bool {
         guard let viewModel = messageViewModel as? TextMessageViewModel else {
             fatalError("View model not match!")
         }

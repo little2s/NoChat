@@ -30,7 +30,7 @@ public class TextMessageViewModel: TextMessageViewModelProtocol {
         self.messageViewModel = messageViewModel
     }
     
-    public func didTapURL(url: NSURL, bubbleView: TextBubbleView) {
+    public func didTapURL(url: URL, bubbleView: TextBubbleView) {
         
     }
 }
