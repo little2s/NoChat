@@ -40,18 +40,24 @@ extension ChatViewController: ChatDataSourceDelegateProtocol {
     public func chatDataSourceDidUpdate(_ chatDataSource: ChatDataSourceProtocol) {
         self.enqueueModelUpdate(context: .normal)
     }
+    
+    public func chatDataSourceDidUpdate(_ chatDataSource: ChatDataSourceProtocol, updateType: UpdateContext) {
+        self.enqueueModelUpdate(context: updateType)
+    }
+}
+
+public enum UpdateContext {
+    case normal
+    case firstLoad
+    case pagination
+    case reload
+    case messageCountReduction
 }
 
 // MARK: Methods for change
 extension ChatViewController {
 
-    public enum UpdateContext {
-        case normal
-        case firstLoad
-        case pagination
-        case reload
-        case messageCountReduction
-    }
+    
 
     public func enqueueModelUpdate(context: UpdateContext) {
         let newItems = self.chatDataSource?.chatItems ?? []
