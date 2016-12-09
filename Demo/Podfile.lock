@@ -1,5 +1,7 @@
 PODS:
-  - NoChat (0.2.2)
+  - BTree (4.0.1)
+  - NoChat (0.2.2):
+    - BTree (~> 4.0.1)
   - NoChatMM (0.2.2):
     - NoChat (~> 0.2)
   - NoChatSLK (0.2.2):
@@ -15,20 +17,21 @@ DEPENDENCIES:
 
 EXTERNAL SOURCES:
   NoChat:
-    :path: "../"
+    :path: ../
   NoChatMM:
-    :path: "../"
+    :path: ../
   NoChatSLK:
-    :path: "../"
+    :path: ../
   NoChatTG:
-    :path: "../"
+    :path: ../
 
 SPEC CHECKSUMS:
-  NoChat: 3d8421b3587319266bd225c18540b4382a8b1eae
+  BTree: f6636bd634bb8c9aeb4746ef79df1afb3c196c2e
+  NoChat: d346c1f4ad986584c8ee59686f275b76858c25a3
   NoChatMM: 91de227ce9d4581815da09df1d65201f35646e06
   NoChatSLK: c6456e1ad74261f585ff685f5d85f72bdc782774
   NoChatTG: 755148d4f7513b13b24643ef81e9efdd6830279f
 
 PODFILE CHECKSUM: addc9519515471cb9e6b37cfa6f371d3a17d08d3
 
-COCOAPODS: 1.1.0.rc.2
+COCOAPODS: 1.1.1

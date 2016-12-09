@@ -9,4 +9,5 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/little2s/NoChat.git", :tag => s.version }
   s.source_files = "NoChat/Source/*.{h,swift}"
   s.public_header_files = "NoChat/Source/*.h"
+  s.dependency 'BTree', '~> 4.0.1'
 end
