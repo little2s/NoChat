@@ -36,7 +36,7 @@ public protocol MessageViewModelProtocol: class {
     var status: Observable<MessageViewModelStatus> { get set }
     var date: String { get }
     var message: MessageProtocol { get }
-    
+    var showAvatar : Bool { get }
     // Always asynchronous get avatar
     func getAvatar(_ completionHandler: ((UIImage?) -> Void)?)
 }

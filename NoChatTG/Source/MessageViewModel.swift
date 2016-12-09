@@ -10,6 +10,9 @@ import Foundation
 
 // MARK: MessageViewModel
 open class MessageViewModel: NSObject, MessageViewModelProtocol {
+
+    public var showAvatar: Bool
+
     open var isIncoming: Bool {
         return message.isIncoming
     }
@@ -33,7 +36,7 @@ open class MessageViewModel: NSObject, MessageViewModelProtocol {
         self.dateFormatter = dateFormatter
         self.message = message
         self.status = Observable(message.deliveryStatus.viewModelStatus())
-        
+        self.showAvatar = message.showAvatar
         super.init()
         
         guard let msg = message as? Message else { return }
@@ -55,7 +58,7 @@ open class MessageViewModel: NSObject, MessageViewModelProtocol {
     }
     
     open func getAvatar(_ completionHandler: ((UIImage?) -> Void)?) {
-
+        
     }
     
 }

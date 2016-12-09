@@ -9,7 +9,7 @@
 import UIKit
 import NoChat
 
-public struct MessageCelloctionViewCellLayoutConstants {
+public struct MessageCellCollectionViewCellLayoutConstants {
     let horizontalMargin: CGFloat = 16
     let horizontalInterspacing: CGFloat = 16
     let verticalMargin: CGFloat = 2
@@ -79,7 +79,7 @@ open class MessageCollectionViewCell<BubbleViewT>: UICollectionViewCell, Backgro
     
     var layoutCache: NSCache<AnyObject, AnyObject>!
     
-    var layoutConstants = MessageCelloctionViewCellLayoutConstants() {
+    var layoutConstants = MessageCellCollectionViewCellLayoutConstants() {
         didSet {
             self.setNeedsLayout()
         }
@@ -178,10 +178,6 @@ open class MessageCollectionViewCell<BubbleViewT>: UICollectionViewCell, Backgro
     }
     
     open func cellSizeThatFits(_ size: CGSize) -> CGSize {
-        if size.width == 0 { // TODO: find out why
-            return size
-        }
-        
         return calculateLayout(availableWidth: size.width).size
     }
     

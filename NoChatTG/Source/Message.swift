@@ -14,6 +14,7 @@ public enum MessageType: String {
 }
 
 open class Message: NSObject, MessageProtocol {
+    public var showAvatar: Bool
     open var msgId: String
     open var msgType: String
     open var senderId: String
@@ -31,7 +32,8 @@ open class Message: NSObject, MessageProtocol {
         date: Date,
         deliveryStatus: MessageDeliveryStatus,
         attachments: [MessageAttachmentProtocol] = [],
-        content: String
+        content: String,
+        showAvatar: Bool
         )
     {
         self.msgId = msgId
@@ -42,7 +44,7 @@ open class Message: NSObject, MessageProtocol {
         self.deliveryStatus = deliveryStatus
         self.attachments = attachments
         self.content = content
-        
+        self.showAvatar = showAvatar
         super.init()
     }
 }

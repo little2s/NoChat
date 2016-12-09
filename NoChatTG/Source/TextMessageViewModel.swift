@@ -13,6 +13,7 @@ public protocol TextMessageViewModelProtocol: DecoratedMessageViewModelProtocol 
 }
 
 open class TextMessageViewModel: TextMessageViewModelProtocol {
+    public var showAvatar: Bool
     open let attributedText: NSAttributedString
     open let messageViewModel: MessageViewModelProtocol
     
@@ -28,6 +29,7 @@ open class TextMessageViewModel: TextMessageViewModelProtocol {
         
         self.attributedText = createAttributedText(text, attributes: attributes)
         self.messageViewModel = messageViewModel
+        self.showAvatar = messageViewModel.showAvatar
     }
     
     open func didTapURL(_ url: URL, bubbleView: TextBubbleView) {
@@ -49,8 +51,6 @@ open class TextMessageViewModelBuilder: MessageViewModelBuilderProtocol {
 
 // MARK: Convenience methods
 private func createAttributedText(_ text: String, attributes: [String: NSObject]) -> NSAttributedString {
-
     let attributedText = NSMutableAttributedString(string: text, attributes: attributes)
-    
     return attributedText
 }

@@ -112,15 +112,7 @@ open class TextBubbleViewStyle: TextBubbleViewStyleProtocol {
 
 // MARK: TextBubbleView
 open class TextBubbleView: UIView, BubbleViewProtocol, UITextViewDelegate {
-    
-    
-    
 
-    
-    
-
-
-    
     open static var bubbleIdentifier: String {
         return "TextBubble"
     }
@@ -286,9 +278,6 @@ open class TextBubbleView: UIView, BubbleViewProtocol, UITextViewDelegate {
     
     final fileprivate func updateStatusViews() {
         guard let viewModel = messageViewModel else { return }
-        
-        
-        
         if viewModel.isIncoming {
             deliveringView.alpha = 0
             deliveredView.alpha = 0
@@ -339,7 +328,7 @@ open class TextBubbleView: UIView, BubbleViewProtocol, UITextViewDelegate {
             textInsets: style.textInsets(viewModel, isSelected: selected),
             preferredMaxLayoutWidth: preferredMaxLayoutWidth,
             timeLabelSize: CGSize(width: 32, height: 14),
-            deliveringViewSize: CGSize(width: 15, height: 15),
+            deliveringViewSize: CGSize(width: 11, height: 11),
             isIncoming: viewModel.isIncoming
         )
         

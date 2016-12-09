@@ -81,6 +81,7 @@ public protocol MessageProtocol: ChatItemProtocol {
     var deliveryStatus: MessageDeliveryStatus { get set }
     var attachments: [MessageAttachmentProtocol] { get }
     var content: String { get }
+    var showAvatar: Bool { get }
 }
 
 // MARK: Default implemtation for ChatItemProtocol

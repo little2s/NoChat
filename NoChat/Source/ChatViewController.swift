@@ -57,7 +57,7 @@ open class ChatViewController: UIViewController {
     open var chatDataSource: ChatDataSourceProtocol? {
         didSet {
             self.chatDataSource?.delegate = self
-            self.enqueueModelUpdate(context: .reload)
+            self.enqueueModelUpdate(context: .normal)
         }
     }
     

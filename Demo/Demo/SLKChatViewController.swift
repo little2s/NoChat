@@ -45,7 +45,7 @@ class SLKChatViewController: ChatViewController {
 
     @objc
     func didTapIcon() {
-        navigationController?.popViewController(animated: true)
+        _ = navigationController?.popViewController(animated: true)
     }
     
     override func viewWillAppear(_ animated: Bool) {

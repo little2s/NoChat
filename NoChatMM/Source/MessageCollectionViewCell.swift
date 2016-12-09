@@ -23,7 +23,7 @@ public struct MessageCollectionViewCellStyle {
     }()
 }
 
-public struct MessageCelloctionViewCellLayoutConstants {
+public struct MessageCellCollectionViewCellLayoutConstants {
     let horizontalMargin: CGFloat = 8
     let horizontalInterspacing: CGFloat = 4
     let avatarSize = CGSize(width: 40, height: 40)
@@ -111,7 +111,7 @@ open class MessageCollectionViewCell<BubbleViewT>: UICollectionViewCell, Backgro
     
     var layoutCache: NSCache<AnyObject, AnyObject>!
     
-    var layoutConstants = MessageCelloctionViewCellLayoutConstants() {
+    var layoutConstants = MessageCellCollectionViewCellLayoutConstants() {
         didSet {
             self.setNeedsLayout()
         }
@@ -206,10 +206,6 @@ open class MessageCollectionViewCell<BubbleViewT>: UICollectionViewCell, Backgro
     }
     
     open func cellSizeThatFits(_ size: CGSize) -> CGSize {
-        if size.width == 0 { // TODO: find out why
-            return size
-        }
-        
         return calculateLayout(availableWidth: size.width).size
     }
     

@@ -36,16 +36,11 @@ class TGChatViewController: ChatViewController {
     override func viewDidLoad() {
         inverted = true
         super.viewDidLoad()
-        
         wallpaperView.image = UIImage(named: "TGWallpaper")!
-        
         navigationItem.titleView = titleView
-        
         let spacer = UIBarButtonItem(barButtonSystemItem: .fixedSpace, target: nil, action: nil)
         spacer.width = -12
-        
         let right = UIBarButtonItem(customView: avatarButton)
-        
         navigationItem.rightBarButtonItems = [spacer, right]
     }
 
@@ -101,7 +96,7 @@ extension TGChatViewController {
 
 extension TGChatViewController {
     func sendText(text: String) {
-        let message = TGMessageFactory.createTextMessage(text: text, senderId: "outgoing", isIncoming: false)
+        let message = TGMessageFactory.createTextMessage(text: text, senderId: "outgoing", isIncoming: false, showAvatar: false)
         (self.chatDataSource as! TGChatDataSource).addMessages(messages: [message])
     }
     

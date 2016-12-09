@@ -23,7 +23,7 @@ public struct MessageCollectionViewCellStyle {
     }()
 }
 
-public struct MessageCelloctionViewCellLayoutConstants {
+public struct MessageCellCollectionViewCellLayoutConstants {
     let horizontalMargin: CGFloat = 2
     let horizontalInterspacing: CGFloat = 4
     let avatarSize = CGSize(width: 34, height: 34)
@@ -76,9 +76,6 @@ open class MessageCollectionViewCell<BubbleViewT>: UICollectionViewCell, Backgro
     
     var messageViewModel: MessageViewModelProtocol! {
         willSet {
-            
-//            print("wll set. message view model=\(newValue?.message.content), cell=\(self)")
-            
             if messageViewModel !== newValue {
                 guard let viewModel = messageViewModel as? DecoratedMessageViewModelProtocol else {
                     return
@@ -87,17 +84,11 @@ open class MessageCollectionViewCell<BubbleViewT>: UICollectionViewCell, Backgro
             }
         }
         didSet {
-            
-//            print("did set message view model=\(messageViewModel?.message.content), cell=\(self)")
-            
             updateViews()
             bubbleView.messageViewModel = messageViewModel
-            
-            // bind status property
             guard let viewModel = messageViewModel as? DecoratedMessageViewModelProtocol else {
                 return
             }
-        
             viewModel.messageViewModel.status.observe(self) { [weak self] (old, new) in
                 guard let sSelf = self else { return }
                 if old != new {
@@ -120,7 +111,7 @@ open class MessageCollectionViewCell<BubbleViewT>: UICollectionViewCell, Backgro
     
     var layoutCache: NSCache<AnyObject, AnyObject>!
     
-    var layoutConstants = MessageCelloctionViewCellLayoutConstants() {
+    var layoutConstants = MessageCellCollectionViewCellLayoutConstants() {
         didSet {
             self.setNeedsLayout()
         }
@@ -223,17 +214,13 @@ open class MessageCollectionViewCell<BubbleViewT>: UICollectionViewCell, Backgro
     }
     
     public func cellSizeThatFits(_ size: CGSize) -> CGSize {
-        if size.width == 0 { // TODO: find out why
-            return size
-        }
-        
         return calculateLayout(size.width).size
     }
     
     fileprivate func calculateLayout(_ availableWidth: CGFloat) -> MessageLayoutModel {
         
         let cacheKey = messageViewModel.message.msgId
-        
+        assert(layoutCache != nil, "layoutcache must not be nil")
         if let layoutModel = layoutCache.object(forKey: cacheKey as AnyObject) as? MessageLayoutModel , layoutModel.size.width == availableWidth {
                 return layoutModel
         }
@@ -283,7 +270,7 @@ final class MessageLayoutModel {
     fileprivate (set) var preferredMaxWidthForBubble: CGFloat = 0
     
     func calculateLayout(_ parameters: MessageLayoutModelParameters) {
-        let hasAvatar = parameters.isIncoming ? parameters.showAvatar : false
+        let hasAvatar = parameters.showAvatar
         let containerWidth = parameters.containerWidth
         let isIncoming = parameters.isIncoming
         let avatarSize = parameters.avatarImageViewSize

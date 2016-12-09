@@ -116,7 +116,6 @@ open class MessagePresenter<BubbleViewT, ViewModelBuilderT>: BaseChatItemPresent
         cell.performBatchUpdates({ () -> Void in
             cell.layoutCache = self.layoutCache
             cell.messageViewModel = self.messageViewModel
-            
             additionConfiguration?()
         }, animated: false, completion: nil)
     }

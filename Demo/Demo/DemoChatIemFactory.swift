@@ -12,13 +12,15 @@ import NoChatTG
 import NoChatMM
 import NoChatSLK
 
+import LoremIpsum
+
 // MARK: Telegram
 
 typealias TGMessage = NoChatTG.Message
 typealias TGMessageType = NoChatTG.MessageType
 
 struct TGMessageFactory {
-    static func createMessage(senderId: String, isIncoming: Bool, msgType: String) -> TGMessage {
+    static func createMessage(senderId: String, isIncoming: Bool, msgType: String, showAvatar: Bool) -> TGMessage {
         let message = TGMessage(
             msgId: NSUUID().uuidString,
             msgType: msgType,
@@ -27,14 +29,14 @@ struct TGMessageFactory {
             date: Date(),
             deliveryStatus: .delivering,
             attachments: [],
-            content: ""
+            content: "",
+            showAvatar: showAvatar
         )
-        
         return message
     }
-    
-    static func createTextMessage(text: String, senderId: String, isIncoming: Bool) -> TGMessage {
-        let message = createMessage(senderId: senderId, isIncoming: isIncoming, msgType: TGMessageType.Text.rawValue)
+
+    static func createTextMessage(text: String, senderId: String, isIncoming: Bool, showAvatar: Bool) -> TGMessage {
+        let message = createMessage(senderId: senderId, isIncoming: isIncoming, msgType: TGMessageType.Text.rawValue, showAvatar: showAvatar)
         message.content = text
         return message
     }
@@ -57,10 +59,10 @@ struct MMMessageFactory {
             attachments: [],
             content: ""
         )
-        
+
         return message
     }
-    
+
     static func createTextMessage(text: String, senderId: String, isIncoming: Bool) -> MMMessage {
         let message = createMessage(senderId: senderId, isIncoming: isIncoming, msgType: MMMessageType.Text.rawValue)
         message.content = text
@@ -85,10 +87,10 @@ struct SLKMessageFactory {
             attachments: [],
             content: ""
         )
-        
+
         return message
     }
-    
+
     static func createTextMessage(text: String, senderId: String, isIncoming: Bool) -> SLKMessage {
         let message = createMessage(senderId: senderId, isIncoming: isIncoming, msgType: SLKMessageType.Text.rawValue)
         message.content = text
@@ -98,70 +100,68 @@ struct SLKMessageFactory {
 
 // MARK: Demo Factory
 
+extension Bool {
+    static func random() -> Bool {
+        return arc4random_uniform(2) == 0
+    }
+}
+
+extension Int {
+    static func random(lower: Int, upper:Int ) -> Int {
+        let difference = upper - lower
+        return Int(Float(arc4random())/Float(RAND_MAX) * Float(difference + 1)) + lower
+    }
+}
+
 class DemoChatItemFactory {
-    private static let items = [
-        ("text", "NoChat is a lightweight framework base on Chatto https://github.com/little2s/NoChat"),
-        ("text", "Supports custom message bubble and toolbar"),
-        ("text", "Invert mode is inside"),
-    ]
-    
+
+    private struct Item {
+        var isIncoming = Bool.random()
+        var text = LoremIpsum.words(withNumber: Int.random(lower: 1, upper: 20)) ?? ""
+        var type: String = "text"
+    }
+
+    private static func bootstrapRandomItems() -> [Item] {
+        var items = [Item]()
+        for _ in 0...100 {
+            items.append(Item())
+        }
+        return items
+    }
+
     static func createChatItemsTG() -> [ChatItemProtocol] {
         var result = [ChatItemProtocol]()
-        
-        for _ in 0..<1 {
-        
-            for (index, item) in items.enumerated() {
-                if item.0 == "text" {
-                    let senderId = (index % 2 == 0) ? "incoming" : "outgoing"
-                    let isIncomming = (senderId == "incoming")
-                    
-                    let chatItem = TGMessageFactory.createTextMessage(text: item.1, senderId: senderId, isIncoming: isIncomming)
-                    result.insert(chatItem, at: 0)
-                }
+        for (_, item) in bootstrapRandomItems().enumerated() {
+            if item.type == "text" {
+                let senderId = item.isIncoming ? "incoming" : "outgoing"
+                let chatItem = TGMessageFactory.createTextMessage(text: item.text, senderId: senderId, isIncoming: item.isIncoming, showAvatar: false)
+                result.insert(chatItem, at: 0)
             }
-            
         }
-        
         return result
     }
-    
+
     static func createChatItemsMM() -> [ChatItemProtocol] {
         var result = [ChatItemProtocol]()
-        
-        for _ in 0..<1 {
-            
-            for (index, item) in items.enumerated() {
-                if item.0 == "text" {
-                    let senderId = (index % 2 == 0) ? "incoming" : "outgoing"
-                    let isIncomming = (senderId == "incoming")
-                    
-                    let chatItem = MMMessageFactory.createTextMessage(text: item.1, senderId: senderId, isIncoming: isIncomming)
-                    result.append(chatItem)
-                }
+        for (_, item) in bootstrapRandomItems().enumerated() {
+            if item.type == "text" {
+                let senderId = item.isIncoming ? "incoming" : "outgoing"
+                let chatItem = MMMessageFactory.createTextMessage(text: item.text, senderId: senderId, isIncoming: item.isIncoming)
+                result.append(chatItem)
             }
-            
         }
-        
         return result
     }
-    
+
     static func createChatItemsSLK() -> [ChatItemProtocol] {
         var result = [ChatItemProtocol]()
-        
-        for _ in 0..<1 {
-            
-            for (index, item) in items.enumerated() {
-                if item.0 == "text" {
-                    let senderId = (index % 2 == 0) ? "incoming" : "outgoing"
-                    let isIncomming = (senderId == "incoming")
-                    
-                    let chatItem = SLKMessageFactory.createTextMessage(text: item.1, senderId: senderId, isIncoming: isIncomming)
-                    result.insert(chatItem, at: 0)
-                }
+        for (_, item) in bootstrapRandomItems().enumerated() {
+            if item.type == "text" {
+                let senderId = item.isIncoming ? "incoming" : "outgoing"
+                let chatItem = SLKMessageFactory.createTextMessage(text: item.text, senderId: senderId, isIncoming: item.isIncoming)
+                result.insert(chatItem, at: 0)
             }
-            
         }
-        
         return result
     }
 }
