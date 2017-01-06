@@ -338,7 +338,6 @@
         Class layoutClass = [[self class] cellLayoutClassForItemType:chatItem.type];
         if (layoutClass) {
             id<NOCChatItemCellLayout> layout = [[layoutClass alloc] initWithChatItem:chatItem cellWidth:self.cellWidth];
-            
             if (self.inverted) {
                 [self.layouts insertObject:layout atIndex:0];
             } else {
@@ -352,24 +351,120 @@
 
 @implementation NOCChatViewController (NOCScroll)
 
+typedef NS_ENUM(NSUInteger, NOCChatCellVerticalEdge) {
+    NOCChatCellVerticalEdgeTop,
+    NOCChatCellVerticalEdgeBottom
+};
+
 - (BOOL)isScrolledAtTop
 {
-    return NO;
+    return self.isInverted ? [self isScrolledAtCollectionViewBottom] : [self isScrolledAtCollectionViewTop];
 }
 
 - (void)scrollToTop:(BOOL)animated
 {
-    
+    if (self.isInverted) {
+        [self scrollToCollectionViewBottom:animated];
+    } else {
+        [self scrollToCollectionViewTop:animated];
+    }
 }
 
 - (BOOL)isScrolledAtBottom
 {
-    return NO;
+    return self.isInverted ? [self isScrolledAtCollectionViewTop] : [self isScrolledAtCollectionViewBottom];
 }
 
 - (void)scrollToBottom:(BOOL)animated
 {
+    if (self.isInverted) {
+        [self scrollToCollectionViewTop:animated];
+    } else {
+        [self scrollToCollectionViewBottom:animated];
+    }
+}
+
+- (BOOL)isScrolledAtCollectionViewTop
+{
+    NOCChatCollectionView *collectionView = self.collectionView;
+    if (collectionView.numberOfSections > 0 && [collectionView numberOfItemsInSection:0] > 0) {
+        NSIndexPath *firstIndexPath = [NSIndexPath indexPathForItem:0 inSection:0];
+        return [self isIndexPathOfCollectionViewVisible:firstIndexPath atEdge:NOCChatCellVerticalEdgeTop];
+    } else {
+        return YES;
+    }
+}
+
+- (void)scrollToCollectionViewTop:(BOOL)animated
+{
+    NOCChatCollectionView *collectionView = self.collectionView;
+    NSIndexPath *firstIndexPath = [NSIndexPath indexPathForItem:0 inSection:0];
+    [collectionView scrollToItemAtIndexPath:firstIndexPath atScrollPosition:UICollectionViewScrollPositionTop animated:animated];
+}
+
+- (BOOL)isScrolledAtCollectionViewBottom
+{
+    NOCChatCollectionView *collectionView = self.collectionView;
+    if (collectionView.numberOfSections > 0 && [collectionView numberOfItemsInSection:0] > 0) {
+        NSInteger sectionIndex = [collectionView numberOfSections] - 1;
+        NSInteger itemIndex = [collectionView numberOfItemsInSection:sectionIndex] - 1;
+        NSIndexPath *lastIndexPath = [NSIndexPath indexPathForItem:itemIndex inSection:sectionIndex];
+        return [self isIndexPathOfCollectionViewVisible:lastIndexPath atEdge:NOCChatCellVerticalEdgeBottom];
+    } else {
+        return YES;
+    }
+}
+
+- (void)scrollToCollectionViewBottom:(BOOL)animated
+{
+    NOCChatCollectionView *collectionView = self.collectionView;
+    CGFloat contentHeight = collectionView.collectionViewLayout.collectionViewContentSize.height;
+    CGFloat boundsHeight = collectionView.bounds.size.height;
     
+    if (!(contentHeight >= 0 && contentHeight < CGFLOAT_MAX && boundsHeight >= 0)) {
+        return;
+    }
+    
+    NSInteger sectionIndex = [collectionView numberOfSections] - 1;
+    NSInteger itemIndex = [collectionView numberOfItemsInSection:sectionIndex] - 1;
+    NSIndexPath *lastIndexPath = [NSIndexPath indexPathForItem:itemIndex inSection:sectionIndex];
+    [collectionView scrollToItemAtIndexPath:lastIndexPath atScrollPosition:UICollectionViewScrollPositionBottom animated:animated];
+}
+
+- (BOOL)isIndexPathOfCollectionViewVisible:(NSIndexPath *)indexPath atEdge:(NOCChatCellVerticalEdge)edge
+{
+    UICollectionViewLayoutAttributes *layoutAttributes = [self.collectionView.collectionViewLayout layoutAttributesForItemAtIndexPath:indexPath];
+    if (layoutAttributes) {
+        CGRect visibleRect = [self collectionViewVisibleRect];
+        CGRect cellRect = layoutAttributes.frame;
+        CGRect intersection = CGRectIntersection(visibleRect, cellRect);
+        BOOL result;
+        switch (edge) {
+            case NOCChatCellVerticalEdgeTop: {
+                result = fabs(CGRectGetMinY(intersection) - CGRectGetMinY(cellRect)) < 0.001;
+                break;
+            }
+            case NOCChatCellVerticalEdgeBottom: {
+                result = fabs(CGRectGetMaxY(intersection) - CGRectGetMaxY(cellRect)) < 0.001;
+                break;
+            }
+        }
+        return result;
+    } else {
+        return NO;
+    }
+}
+
+- (CGRect)collectionViewVisibleRect
+{
+    NOCChatCollectionView *collectionView = self.collectionView;
+    UIEdgeInsets contentInset = collectionView.contentInset;
+    CGRect bounds = collectionView.bounds;
+    CGSize contentSize = collectionView.collectionViewLayout.collectionViewContentSize;
+    CGFloat y = collectionView.contentOffset.y + contentInset.top;
+    CGFloat width = bounds.size.width;
+    CGFloat height = MIN(contentSize.height, bounds.size.height - contentInset.top - contentInset.bottom);
+    return CGRectMake(0, y, width, height);
 }
 
 @end
