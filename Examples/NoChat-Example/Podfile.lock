@@ -1,0 +1,25 @@
+PODS:
+  - LoremIpsum (1.0.0)
+  - Minimal (0.3.0):
+    - NoChat (~> 0.3)
+  - NoChat (0.3.0)
+
+DEPENDENCIES:
+  - LoremIpsum
+  - Minimal (from `../`)
+  - NoChat (from `../`)
+
+EXTERNAL SOURCES:
+  Minimal:
+    :path: "../"
+  NoChat:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  LoremIpsum: 9029c55d36501b2ee0b05cc9ecda11d3a0479160
+  Minimal: '028f6ab16ea069ea5df8f0c69c6c9f6b523d4088'
+  NoChat: dcf284bca854ff105335ef652f55706a57e31671
+
+PODFILE CHECKSUM: 7fbfc417747097382988b805144ff26115a3c265
+
+COCOAPODS: 1.2.0.beta.1
