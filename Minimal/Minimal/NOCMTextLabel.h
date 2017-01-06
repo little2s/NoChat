@@ -11,6 +11,7 @@
 @class NOCMTextLayout;
 @class NOCMTextContainer;
 @class NOCMTextRange;
+@class NOCMTextAttachment;
 
 typedef void(^NOCMTextAction)(UIView *containerView, NSAttributedString *text, NSRange range, CGRect rect);
 
@@ -27,12 +28,16 @@ typedef void(^NOCMTextAction)(UIView *containerView, NSAttributedString *text, N
 
 @property (nonatomic, strong) NOCMTextContainer *container;
 @property (nonatomic, strong, readonly) NSAttributedString *text;
+@property (nonatomic, strong, readonly) NSArray<NOCMTextAttachment *> *attachments;
+@property (nonatomic, strong, readonly) NSSet *attachmentContentsSet;
 @property (nonatomic, readonly) CGSize textBoundingSize;
 
 + (instancetype)layoutWithContainer:(NOCMTextContainer *)container text:(NSAttributedString *)text;
 
 - (NOCMTextRange *)textRangeAtPoint:(CGPoint)point;
 - (CGRect)rectForRange:(NOCMTextRange *)range;
+
+- (void)drawInContext:(CGContextRef)context size:(CGSize)size point:(CGPoint)point view:(UIView *)view layer:(CALayer *)layer cancel:(BOOL (^)(void))cancel;
 
 @end
 
@@ -81,5 +86,11 @@ typedef NS_ENUM(NSInteger, NOCMTextAffinity) {
 + (instancetype)rangeWithStart:(NOCMTextPosition *)start end:(NOCMTextPosition *)end;
 
 - (NSRange)asRange;
+
+@end
+
+@interface NOCMTextAttachment : NSObject
+
+@property (nonnull, strong) id content;
 
 @end

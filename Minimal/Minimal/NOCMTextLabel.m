@@ -7,10 +7,62 @@
 //
 
 #import "NOCMTextLabel.h"
+#import <libkern/OSAtomic.h>
 #import <QuartzCore/QuartzCore.h>
 #import <CoreText/CoreText.h>
 
+#pragma mark - NOCMSentinel
+
+@interface NOCMSentinel : NSObject
+@property (nonatomic, assign, readonly) int32_t value;
+- (int32_t)increase;
+@end
+
+@implementation NOCMSentinel {
+    int32_t _value;
+}
+
+- (int32_t)value
+{
+    return _value;
+}
+
+- (int32_t)increase
+{
+    return OSAtomicIncrement32(&_value);
+}
+
+@end
+
 #pragma mark - NOCMAsyncLayer
+
+static dispatch_queue_t NOCMAsyncLayerDisplayQueue()
+{
+#define MAX_QUEUE_COUNT 16
+    static int queueCount;
+    static dispatch_queue_t queues[MAX_QUEUE_COUNT];
+    static dispatch_once_t onceToken;
+    static int32_t counter = 0;
+    dispatch_once(&onceToken, ^{
+        queueCount = (int)[NSProcessInfo processInfo].activeProcessorCount;
+        queueCount = queueCount < 1 ? 1 : queueCount > MAX_QUEUE_COUNT ? MAX_QUEUE_COUNT : queueCount;
+        for (NSUInteger i = 0; i < queueCount; i++) {
+            dispatch_queue_attr_t attr = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INITIATED, 0);
+            queues[i] = dispatch_queue_create("com.little2s.minimal.render", attr);
+        }
+    });
+    int32_t cur = OSAtomicIncrement32(&counter);
+    if (cur < 0) {
+        cur = -cur;
+    }
+    return queues[(cur) % queueCount];
+#undef MAX_QUEUE_COUNT
+}
+
+static dispatch_queue_t NOCMAsyncLayerReleaseQueue()
+{
+    return dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0);
+}
 
 @interface NOCMAsyncLayerDisplayTask : NSObject
 
@@ -35,7 +87,149 @@
 
 @end
 
-@implementation NOCMAsyncLayer
+@implementation NOCMAsyncLayer {
+    NOCMSentinel *_sentinel;
+}
+
+- (void)dealloc
+{
+    [_sentinel increase];
+}
+
+- (instancetype)init
+{
+    self = [super init];
+    
+    static CGFloat scale;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        scale = [UIScreen mainScreen].scale;
+    });
+    
+    if (self) {
+        self.contentsScale = scale;
+        _sentinel = [[NOCMSentinel alloc] init];
+    }
+    return self;
+}
+
+- (void)setNeedsDisplay
+{
+    [self cancelAsyncDisplay];
+    [super setNeedsDisplay];
+}
+
+- (void)display
+{
+    super.contents = super.contents;
+    [self displayAsync];
+}
+
+- (void)displayAsync
+{
+    __strong id<NOCMAsyncLayerDelegate> delegate = (id<NOCMAsyncLayerDelegate>)self.delegate;
+    NOCMAsyncLayerDisplayTask *task = [delegate newAsyncDisplayTask];
+    if (!task.display) {
+        if (task.willDisplay) {
+            task.willDisplay(self);
+        }
+        self.contents = nil;
+        if (task.didDisplay) {
+            task.didDisplay(self, YES);
+        }
+        return;
+    }
+    
+    if (task.willDisplay) {
+        task.willDisplay(self);
+    }
+    NOCMSentinel *sentinel = _sentinel;
+    int32_t value = sentinel.value;
+    BOOL (^isCancelled)() = ^BOOL() {
+        return value != sentinel.value;
+    };
+    CGSize size = self.bounds.size;
+    BOOL opaque = self.opaque;
+    CGFloat scale = self.contentsScale;
+    CGColorRef backgroundColor = (opaque && self.backgroundColor) ? CGColorRetain(self.backgroundColor) : NULL;
+    if (size.width < 1 || size.height < 1) {
+        CGImageRef image = (__bridge_retained CGImageRef)(self.contents);
+        self.contents = nil;
+        if (image) {
+            dispatch_async(NOCMAsyncLayerReleaseQueue(), ^{
+                CFRelease(image);
+            });
+        }
+        if (task.didDisplay) {
+            task.didDisplay(self, YES);
+        }
+        CGColorRelease(backgroundColor);
+        return;
+    }
+    
+    dispatch_async(NOCMAsyncLayerDisplayQueue(), ^{
+        if (isCancelled()) {
+            CGColorRelease(backgroundColor);
+            return;
+        }
+        UIGraphicsBeginImageContextWithOptions(size, opaque, scale);
+        CGContextRef context = UIGraphicsGetCurrentContext();
+        if (opaque) {
+            CGContextSaveGState(context);
+            {
+                if (!backgroundColor || CGColorGetAlpha(backgroundColor) < 1) {
+                    CGContextSetFillColorWithColor(context, [UIColor whiteColor].CGColor);
+                    CGContextAddRect(context, CGRectMake(0, 0, size.width * scale, size.height * scale));
+                    CGContextFillPath(context);
+                }
+                if (backgroundColor) {
+                    CGContextSetFillColorWithColor(context, backgroundColor);
+                    CGContextAddRect(context, CGRectMake(0, 0, size.width * scale, size.height * scale));
+                    CGContextFillPath(context);
+                }
+            }
+            CGContextRestoreGState(context);
+            CGColorRelease(backgroundColor);
+        }
+        task.display(context, size, isCancelled);
+        if (isCancelled()) {
+            UIGraphicsEndImageContext();
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (task.didDisplay) {
+                    task.didDisplay(self, NO);
+                }
+            });
+            return;
+        }
+        UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+        if (isCancelled()) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (task.didDisplay) {
+                    task.didDisplay(self, NO);
+                }
+            });
+            return;
+        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (isCancelled()) {
+                if (task.didDisplay) {
+                    task.didDisplay(self, NO);
+                }
+            } else {
+                self.contents = (__bridge id)(image.CGImage);
+                if (task.didDisplay) {
+                    task.didDisplay(self, YES);
+                }
+            }
+        });
+    });
+}
+
+- (void)cancelAsyncDisplay
+{
+    [_sentinel increase];
+}
 
 @end
 
@@ -44,7 +238,7 @@
 #define kLongPressMinimumDuration 0.5
 #define kLongPressAllowableMovement 9.0
 
-static dispatch_queue_t NOCMTextLabelGetReleaseQueue()
+static dispatch_queue_t NOCMTextLabelReleaseQueue()
 {
     return dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0);
 }
@@ -143,7 +337,7 @@ static dispatch_queue_t NOCMTextLabelGetReleaseQueue()
     UITouch *touch = touches.anyObject;
     CGPoint point = [touch locationInView:self];
     
-    _highlight = [self getHighlightAtPoint:point range:&_highlightRange];
+    _highlight = [self highlightAtPoint:point range:&_highlightRange];
     _highlightLayout = nil;
     
     if (_highlight || _tapAction || _longPressAction) {
@@ -191,7 +385,7 @@ static dispatch_queue_t NOCMTextLabelGetReleaseQueue()
             }
         }
         if (_state.touchMoved && _highlight) {
-            NOCMTextHighlight *highlight = [self getHighlightAtPoint:point range:nil];
+            NOCMTextHighlight *highlight = [self highlightAtPoint:point range:nil];
             if (highlight == _highlight) {
                 [self showHighlightAnimated:NO];
             } else {
@@ -226,7 +420,7 @@ static dispatch_queue_t NOCMTextLabelGetReleaseQueue()
             _tapAction(self, _innerText, range, rect);
         }
         if (_highlight) {
-            if (!_state.touchMoved || [self getHighlightAtPoint:point range:nil] == _highlight) {
+            if (!_state.touchMoved || [self highlightAtPoint:point range:nil] == _highlight) {
                 NOCMTextAction tapAction = _tapAction;
                 if (tapAction) {
                     NOCMTextPosition *start = [NOCMTextPosition positionWithOffset:_highlightRange.location];
@@ -258,7 +452,108 @@ static dispatch_queue_t NOCMTextLabelGetReleaseQueue()
 
 - (NOCMAsyncLayerDisplayTask *)newAsyncDisplayTask
 {
-    return nil;
+    NSAttributedString *text = _innerText;
+    NOCMTextContainer *container = _innerContainer;
+    NSMutableArray *attachmentViews = _attachmentViews;
+    NSMutableArray *attachmentLayers = _attachmentLayers;
+    BOOL layoutNeedUpdate = _state.layoutNeedUpdate;
+    __block NOCMTextLayout *layout = (_state.showingHighlight && _highlightLayout) ? _highlightLayout : _innerLayout;
+    __block BOOL layoutUpdated = NO;
+    if (layoutNeedUpdate) {
+        text = text.copy;
+        container = container.copy;
+    }
+    
+    NOCMAsyncLayerDisplayTask *task = [[NOCMAsyncLayerDisplayTask alloc] init];
+    
+    task.willDisplay = ^(CALayer *layer) {
+        [layer removeAnimationForKey:@"contents"];
+        
+        for (UIView *view in attachmentViews) {
+            if (layoutNeedUpdate || ![layout.attachmentContentsSet containsObject:view]) {
+                if (view.superview == self) {
+                    [view removeFromSuperview];
+                }
+            }
+        }
+        for (CALayer *layer in attachmentLayers) {
+            if (layoutNeedUpdate || ![layout.attachmentContentsSet containsObject:layer]) {
+                if (layer.superlayer == self.layer) {
+                    [layer removeFromSuperlayer];
+                }
+            }
+        }
+        [attachmentViews removeAllObjects];
+        [attachmentLayers removeAllObjects];
+    };
+    
+    task.display = ^(CGContextRef context, CGSize size, BOOL (^isCancelled)(void)) {
+        if (isCancelled() || text.length == 0) {
+            return;
+        }
+        
+        NOCMTextLayout *drawLayout = layout;
+        if (layoutNeedUpdate) {
+            layout = [NOCMTextLayout layoutWithContainer:container text:text];
+            if (isCancelled()) {
+                return;
+            }
+            layoutUpdated = YES;
+            drawLayout = layout;
+        }
+        
+        CGSize boundingSize = drawLayout.textBoundingSize;
+        CGPoint point = CGPointZero;
+        [drawLayout drawInContext:context size:size point:point view:nil layer:nil cancel:isCancelled];
+    };
+    
+    task.didDisplay = ^(CALayer *layer, BOOL finished) {
+        NOCMTextLayout *drawLayout = layout;
+        if (!finished) {
+            for (NOCMTextAttachment *attachment in drawLayout.attachments) {
+                id content = attachment.content;
+                if ([content isKindOfClass:[UIView class]]) {
+                    UIView *aView = (UIView *)content;
+                    if (aView.superview == layer.delegate) {
+                        [aView removeFromSuperview];
+                    }
+                } else if ([content isKindOfClass:[CALayer class]]) {
+                    CALayer *aLayer = (CALayer *)content;
+                    if (aLayer.superlayer == layer) {
+                        [aLayer removeFromSuperlayer];
+                    }
+                }
+            }
+            return;
+        }
+        [layer removeAnimationForKey:@"contents"];
+        
+        __strong NOCMTextLabel *view = (NOCMTextLabel *)layer.delegate;
+        if (!view) {
+            return;
+        }
+        if (view->_state.layoutNeedUpdate && layoutUpdated) {
+            view->_innerLayout = layout;
+            view->_state.layoutNeedUpdate = NO;
+        }
+        
+        CGSize size = layer.bounds.size;
+        CGSize boundingSize = drawLayout.textBoundingSize;
+        CGPoint point = CGPointZero;
+        
+        [drawLayout drawInContext:nil size:size point:point view:view layer:layer cancel:nil];
+        for (NOCMTextAttachment *attachment in drawLayout.attachments) {
+            id content = attachment.content;
+            if ([content isKindOfClass:[UIView class]]) {
+                [attachmentViews addObject:content];
+            } else if ([content isKindOfClass:[CALayer class]]) {
+                [attachmentLayers addObject:content];
+            }
+        }
+        
+    };
+    
+    return task;
 }
 
 #pragma mark - Setters & Getters
@@ -308,7 +603,7 @@ static dispatch_queue_t NOCMTextLabelGetReleaseQueue()
     
 }
 
-- (NOCMTextHighlight *)getHighlightAtPoint:(CGPoint)point range:(NSRangePointer)range
+- (NOCMTextHighlight *)highlightAtPoint:(CGPoint)point range:(NSRangePointer)range
 {
     return nil;
 }
@@ -368,6 +663,11 @@ static dispatch_queue_t NOCMTextLabelGetReleaseQueue()
 - (CGRect)rectForRange:(NOCMTextRange *)range
 {
     return CGRectZero;
+}
+
+- (void)drawInContext:(CGContextRef)context size:(CGSize)size point:(CGPoint)point view:(UIView *)view layer:(CALayer *)layer cancel:(BOOL (^)(void))cancel
+{
+    
 }
 
 - (id)copyWithZone:(NSZone *)zone
