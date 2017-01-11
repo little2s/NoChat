@@ -263,6 +263,15 @@
 
 #pragma mark - Getters
 
+- (NSArray *)chatItems
+{
+    NSMutableArray *items = [[NSMutableArray alloc] init];
+    [self.layouts enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL * stop) {
+        [items addObject:((id<NOCChatItemCellLayout>)obj).chatItem];
+    }];
+    return [items copy];
+}
+
 - (NSMutableArray *)layouts
 {
     if (!_layouts) {
@@ -300,51 +309,96 @@
 
 @implementation NOCChatViewController (NOCUpdates)
 
-- (void)reloadChatItems:(NSArray *)chatItems
+- (void)reloadWithChatItems:(NSArray *)chatItems
 {
     dispatch_async(self.serialQueue, ^{
         [self.layouts removeAllObjects];
-        [self addLayoutsWithChatItems:chatItems];
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.collectionView reloadData];
-        });
-    });
-}
-
-- (void)addChatItems:(NSArray *)chatItems
-{
-    dispatch_async(self.serialQueue, ^{
-        [self addLayoutsWithChatItems:chatItems];
-        
-        NSMutableArray *indexPaths = [[NSMutableArray alloc] init];
-        for (NSInteger index = 0; index < chatItems.count; index++) {
-            NSInteger item = self.isInverted ? (chatItems.count - 1 - index) : (index + self.layouts.count);
-            [indexPaths addObject:[NSIndexPath indexPathForItem:item inSection:0]];
-        }
-        if (indexPaths.count > 0) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self.collectionView insertItemsAtIndexPaths:indexPaths];
-            });
-        }
-    });
-}
-
-#pragma mark - Private
-
-- (void)addLayoutsWithChatItems:(NSArray *)chatItems
-{
-    for (id<NOCChatItem> chatItem in chatItems) {
-        Class layoutClass = [[self class] cellLayoutClassForItemType:chatItem.type];
-        if (layoutClass) {
+        [chatItems enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+            id<NOCChatItem> chatItem = (id<NOCChatItem>)obj;
+            Class layoutClass = [[self class] cellLayoutClassForItemType:chatItem.type];
             id<NOCChatItemCellLayout> layout = [[layoutClass alloc] initWithChatItem:chatItem cellWidth:self.cellWidth];
             if (self.inverted) {
                 [self.layouts insertObject:layout atIndex:0];
             } else {
                 [self.layouts addObject:layout];
             }
+        }];
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.collectionView reloadData];
+        });
+    });
+}
+
+- (NSUInteger)indexOfChatItem:(id<NOCChatItem>)chatItem
+{
+    __block NSUInteger result = NSNotFound;
+    [self.layouts enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        id<NOCChatItemCellLayout> layout = (id<NOCChatItemCellLayout>)obj;
+        if ([layout.chatItem.uniqueIdentifier isEqualToString:chatItem.uniqueIdentifier]) {
+            result = idx;
+            *stop = YES;
         }
-    }
+    }];
+    return result;
+}
+
+- (void)appendChatItems:(NSArray *)chatItems
+{
+    dispatch_async(self.serialQueue, ^{
+        NSMutableArray *indexPaths = [[NSMutableArray alloc] init];
+        [chatItems enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+            id<NOCChatItem> chatItem = (id<NOCChatItem>)obj;
+            Class layoutClass = [[self class] cellLayoutClassForItemType:chatItem.type];
+            id<NOCChatItemCellLayout> layout = [[layoutClass alloc] initWithChatItem:chatItem cellWidth:self.cellWidth];
+            if (self.inverted) {
+                [self.layouts insertObject:layout atIndex:0];
+            } else {
+                [self.layouts addObject:layout];
+            }
+            
+            NSInteger item = self.isInverted ? (chatItems.count - 1 - idx) : (idx + self.layouts.count);
+            [indexPaths addObject:[NSIndexPath indexPathForItem:item inSection:0]];
+        }];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.collectionView insertItemsAtIndexPaths:indexPaths];
+        });
+    });
+}
+
+- (void)deleteChatItemsAtIndices:(NSIndexSet *)indices
+{
+    dispatch_async(self.serialQueue, ^{
+        NSMutableArray *indexPaths = [[NSMutableArray alloc] init];
+        [indices enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+            NSUInteger index = self.isInverted ? self.layouts.count - 1 - idx : idx;
+            [self.layouts removeObjectAtIndex:index];
+            [indexPaths addObject:[NSIndexPath indexPathForItem:index inSection:0]];
+        }];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.collectionView deleteItemsAtIndexPaths:indexPaths];
+        });
+    });
+}
+
+- (void)updateChatItemsAtIndices:(NSIndexSet *)indices
+{
+    dispatch_async(self.serialQueue, ^{
+        NSMutableArray *indexPaths = [[NSMutableArray alloc] init];
+        [indices enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+            NSUInteger index = self.isInverted ? self.layouts.count - 1 - idx : idx;
+            id<NOCChatItemCellLayout> layout = self.layouts[index];
+            layout.width = self.cellWidth;
+            [layout calculateLayout];
+            [indexPaths addObject:[NSIndexPath indexPathForItem:index inSection:0]];
+        }];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.collectionView reloadItemsAtIndexPaths:indexPaths];
+        });
+    });
 }
 
 @end

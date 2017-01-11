@@ -21,6 +21,7 @@
 @property (nonatomic, weak) UIView *chatInputContainerView;
 @property (nonatomic, weak) NOCChatInputView *chatInputView;
 
+@property (nonatomic, strong, readonly) NSArray *chatItems;
 @property (nonatomic, strong) NSMutableArray *layouts;
 @property (nonatomic, strong) dispatch_queue_t serialQueue;
 
@@ -39,8 +40,13 @@
 
 @interface NOCChatViewController (NOCUpdates)
 
-- (void)reloadChatItems:(NSArray *)chatItems;
-- (void)addChatItems:(NSArray *)chatItems;
+- (void)reloadWithChatItems:(NSArray *)chatItems;
+
+- (NSUInteger)indexOfChatItem:(id<NOCChatItem>)chatItem;
+
+- (void)appendChatItems:(NSArray *)chatItems;
+- (void)deleteChatItemsAtIndices:(NSIndexSet *)indices;
+- (void)updateChatItemsAtIndices:(NSIndexSet *)indices;
 
 @end
 
