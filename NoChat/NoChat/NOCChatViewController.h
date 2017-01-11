@@ -21,8 +21,8 @@
 @property (nonatomic, weak) UIView *chatInputContainerView;
 @property (nonatomic, weak) NOCChatInputView *chatInputView;
 
-@property (nonatomic, strong, readonly) NSArray *chatItems;
-@property (nonatomic, strong) NSMutableArray *layouts;
+@property (nonatomic, strong, readonly) NSArray<id<NOCChatItem>> *chatItems;
+@property (nonatomic, strong) NSMutableArray<id<NOCChatItemCellLayout>> *layouts;
 @property (nonatomic, strong) dispatch_queue_t serialQueue;
 
 @property (nonatomic, assign, readonly, getter=isInverted) BOOL inverted;
@@ -40,13 +40,14 @@
 
 @interface NOCChatViewController (NOCUpdates)
 
-- (void)reloadWithChatItems:(NSArray *)chatItems;
+- (void)reloadWithChatItems:(NSArray<id<NOCChatItem>> *)chatItems;
+- (void)appendChatItems:(NSArray<id<NOCChatItem>> *)chatItems;
 
 - (NSUInteger)indexOfChatItem:(id<NOCChatItem>)chatItem;
 
-- (void)appendChatItems:(NSArray *)chatItems;
-- (void)deleteChatItemsAtIndices:(NSIndexSet *)indices;
-- (void)updateChatItemsAtIndices:(NSIndexSet *)indices;
+- (void)insertChatItems:(NSArray<id<NOCChatItem>> *)chatItems atIndexes:(NSIndexSet *)indexes;
+- (void)deleteChatItemsAtIndexes:(NSIndexSet *)indexes;
+- (void)updateChatItemsAtIndexes:(NSIndexSet *)indexes;
 
 @end
 
