@@ -169,9 +169,14 @@
         CGFloat oldHeight = strongSelf.height;
         CGFloat newHeight = (keyboardInfo.action == NOCMKeyboardHide) ? strongSelf.inputBarHeight : (strongSelf.inputBarHeight + keyboardInfo.height);
         
-        if ([strongSelf.delegate respondsToSelector:@selector(chatInputView:didUpdateHeight:oldHeight:)]) {
-            [strongSelf.delegate chatInputView:strongSelf didUpdateHeight:newHeight oldHeight:oldHeight];
-        }
+        NSTimeInterval duration = keyboardInfo.animationDuration;
+        NSUInteger curve = keyboardInfo.animationCurve;
+        UIViewAnimationOptions options = curve << 16 | UIViewAnimationOptionBeginFromCurrentState;
+        [UIView animateWithDuration:duration delay:0 options:options animations:^{
+            if ([strongSelf.delegate respondsToSelector:@selector(chatInputView:didUpdateHeight:oldHeight:)]) {
+                [strongSelf.delegate chatInputView:strongSelf didUpdateHeight:newHeight oldHeight:oldHeight];
+            }
+        } completion:nil];
         
         strongSelf.height = newHeight;
     };
