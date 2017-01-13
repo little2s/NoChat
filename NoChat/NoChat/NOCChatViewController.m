@@ -328,11 +328,11 @@
 
 @end
 
-#pragma mark - Updates
+#pragma mark - Changes
 
-@implementation NOCChatViewController (NOCUpdates)
+@implementation NOCChatViewController (NOCChanges)
 
-- (void)reloadWithChatItems:(NSArray<id<NOCChatItem>> *)chatItems
+- (void)reloadChatItems:(NSArray<id<NOCChatItem>> *)chatItems
 {
     dispatch_async(self.serialQueue, ^{
         if (self.isUpdating) {
@@ -494,9 +494,9 @@
 
 @end
 
-#pragma mark - Scroll
+#pragma mark - Scrolling
 
-@implementation NOCChatViewController (NOCScroll)
+@implementation NOCChatViewController (NOCScrolling)
 
 typedef NS_ENUM(NSUInteger, NOCChatCellVerticalEdge) {
     NOCChatCellVerticalEdgeTop,

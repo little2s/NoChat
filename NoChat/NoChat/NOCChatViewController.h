@@ -44,9 +44,9 @@
 
 @end
 
-@interface NOCChatViewController (NOCUpdates)
+@interface NOCChatViewController (NOCChanges)
 
-- (void)reloadWithChatItems:(NSArray<id<NOCChatItem>> *)chatItems;
+- (void)reloadChatItems:(NSArray<id<NOCChatItem>> *)chatItems;
 - (void)appendChatItems:(NSArray<id<NOCChatItem>> *)chatItems;
 
 - (NSUInteger)indexOfChatItem:(id<NOCChatItem>)chatItem;
@@ -57,7 +57,7 @@
 
 @end
 
-@interface NOCChatViewController (NOCScroll)
+@interface NOCChatViewController (NOCScrolling)
 
 - (BOOL)isCloseToTop;
 - (BOOL)isScrolledAtTop;

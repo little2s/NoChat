@@ -32,7 +32,7 @@
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSArray *chatItems = [NOCChatItemsFactory fetchMinimalChatItemsWithNumber:20];
-        [self reloadWithChatItems:chatItems];
+        [self reloadChatItems:chatItems];
     });
 }
 
