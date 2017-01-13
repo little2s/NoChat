@@ -22,22 +22,28 @@
 
 @implementation NOCChatViewController
 
-+ (Class)cellLayoutClassForItemType:(NSString *)type
-{
-    return nil;
-}
+#pragma mark - Override
 
-+ (Class)chatInputViewClass
+- (instancetype)init
 {
-    return [NOCChatInputView class];
+    self = [super init];
+    if (self) {
+        self.inverted = YES;
+        self.chatCollectionViewContentInset = UIEdgeInsetsMake(8, 0, 8, 0);
+        self.chatCollectionViewScrollIndicatorInsets = UIEdgeInsetsZero;
+        self.chatInputContainerViewDefaultHeight = 45;
+        self.autoScrollToBottomEnable = YES;
+        self.autoLoadingEnable = YES;
+        self.autoLoadingFractionalThreshold = 0.05;
+    }
+    return self;
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor whiteColor];
-    // use `chatCollectionContainerView` and `topLayoutGuide` instead
-    self.automaticallyAdjustsScrollViewInsets = NO;
+    self.automaticallyAdjustsScrollViewInsets = NO; // use `chatCollectionContainerView` and `topLayoutGuide` instead
     self.serialQueue = dispatch_queue_create("com.little2s.nochat.chatvc", DISPATCH_QUEUE_SERIAL);
     [self setupSubviews];
     [self setupLayoutConstraints];
@@ -61,6 +67,18 @@
             });
         }
     });
+}
+
+#pragma mark - Public
+
++ (Class)cellLayoutClassForItemType:(NSString *)type
+{
+    return nil;
+}
+
++ (Class)chatInputViewClass
+{
+    return [NOCChatInputView class];
 }
 
 - (void)registerChatItemCells
@@ -131,8 +149,14 @@
     if (shouldScrollToTop) {
         [self scrollToTop:YES];
     }
-    
     return NO;
+}
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+    if (scrollView.isDragging) {
+        [self autoLoadMoreContentIfNeeded];
+    }
 }
 
 #pragma mark - Private
@@ -140,6 +164,21 @@
 - (void)didTapChatCollectionContainerView:(UITapGestureRecognizer *)recognizer
 {
     [self.chatInputView endInputting:YES];
+}
+
+- (void)autoLoadMoreContentIfNeeded
+{
+    if (!self.isAutoLoadingEnable) {
+        return;
+    }
+    
+    if ([self isCloseToTop] && self.loadPreviousChatItems) {
+        dispatch_async(self.serialQueue, ^{
+            if (!self.isUpdating) {
+                self.loadPreviousChatItems();
+            }
+        });
+    }
 }
 
 - (void)setupSubviews
@@ -280,26 +319,6 @@
     return _layouts;
 }
 
-- (BOOL)isInverted
-{
-    return YES;
-}
-
-- (UIEdgeInsets)chatCollectionViewContentInset
-{
-    return UIEdgeInsetsMake(8, 0, 8, 0);
-}
-
-- (UIEdgeInsets)chatCollectionViewScrollIndicatorInsets
-{
-    return UIEdgeInsetsZero;
-}
-
-- (CGFloat)chatInputContainerViewDefaultHeight
-{
-    return 45;
-}
-
 - (CGFloat)cellWidth
 {
     return self.view.bounds.size.width - self.collectionView.contentInset.left - self.collectionView.contentInset.right;
@@ -307,11 +326,17 @@
 
 @end
 
+#pragma mark - Updates
+
 @implementation NOCChatViewController (NOCUpdates)
 
 - (void)reloadWithChatItems:(NSArray<id<NOCChatItem>> *)chatItems
 {
     dispatch_async(self.serialQueue, ^{
+        if (self.isUpdating) {
+            return;
+        }
+        
         [self.layouts removeAllObjects];
         [chatItems enumerateObjectsUsingBlock:^(id<NOCChatItem> chatItem, NSUInteger idx, BOOL *stop) {
             Class layoutClass = [[self class] cellLayoutClassForItemType:chatItem.type];
@@ -323,33 +348,20 @@
             }
         }];
 
+        self.updating = YES;
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.collectionView reloadData];
+            dispatch_async(self.serialQueue, ^{
+                self.updating = NO;
+            });
         });
     });
 }
 
 - (void)appendChatItems:(NSArray<id<NOCChatItem>> *)chatItems
 {
-    dispatch_async(self.serialQueue, ^{
-        NSMutableArray *indexPaths = [[NSMutableArray alloc] init];
-        [chatItems enumerateObjectsUsingBlock:^(id<NOCChatItem> chatItem, NSUInteger idx, BOOL *stop) {
-            Class layoutClass = [[self class] cellLayoutClassForItemType:chatItem.type];
-            id<NOCChatItemCellLayout> layout = [[layoutClass alloc] initWithChatItem:chatItem cellWidth:self.cellWidth];
-            if (self.inverted) {
-                [self.layouts insertObject:layout atIndex:0];
-            } else {
-                [self.layouts addObject:layout];
-            }
-            
-            NSInteger item = self.isInverted ? (chatItems.count - 1 - idx) : (idx + self.layouts.count);
-            [indexPaths addObject:[NSIndexPath indexPathForItem:item inSection:0]];
-        }];
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.collectionView insertItemsAtIndexPaths:indexPaths];
-        });
-    });
+    NSIndexSet *indexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(self.layouts.count, chatItems.count)];
+    [self insertChatItems:chatItems atIndexes:indexes];
 }
 
 - (NSUInteger)indexOfChatItem:(id<NOCChatItem>)chatItem
@@ -369,18 +381,41 @@
     NSAssert(chatItems.count == indexes.count, @"");
     
     dispatch_async(self.serialQueue, ^{
-        NSMutableIndexSet *set = [indexes mutableCopy];
-        NSMutableArray *indexPaths = [[NSMutableArray alloc] init];
-        [chatItems enumerateObjectsUsingBlock:^(id<NOCChatItem> chatItem, NSUInteger idx, BOOL *stop) {
+        if (self.isUpdating) {
+            return;
+        }
+        
+        NSMutableArray *insertedPaths = [[NSMutableArray alloc] init];
+        __block NSInteger i = 0;
+        [indexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+            id<NOCChatItem> chatItem = chatItems[i];
             Class layoutClass = [[self class] cellLayoutClassForItemType:chatItem.type];
             id<NOCChatItemCellLayout> layout = [[layoutClass alloc] initWithChatItem:chatItem cellWidth:self.cellWidth];
-            NSUInteger item = self.isInverted ? self.layouts.count - 1 - idx + 1 : idx;
-            [self.layouts insertObject:layout atIndex:item];
-            [indexPaths addObject:[NSIndexPath indexPathForItem:item inSection:0]];
+            NSUInteger index = self.isInverted ? self.layouts.count - 1 - idx + 1 : idx;
+            [self.layouts insertObject:layout atIndex:index];
+            [insertedPaths addObject:[NSIndexPath indexPathForItem:index inSection:0]];
+            i++;
         }];
         
+        self.updating = YES;
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self.collectionView insertItemsAtIndexPaths:indexPaths];
+            NOCChatCollectionView *collectionView = self.collectionView;
+            [collectionView performBatchUpdates:^{
+                [collectionView insertItemsAtIndexPaths:insertedPaths];
+            } completion:^(BOOL finished) {
+                if (finished) {
+                    dispatch_async(self.serialQueue, ^{
+                        self.updating = NO;
+                    });
+                } else {
+                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), self.serialQueue, ^{
+                        self.updating = NO;
+                    });
+                }
+            }];
+            if (self.autoScrollToBottomEnable && !collectionView.isDragging && !collectionView.isDecelerating) {
+                [self scrollToBottom:YES];
+            }
         });
     });
 }
@@ -388,6 +423,10 @@
 - (void)deleteChatItemsAtIndexes:(NSIndexSet *)indexes
 {
     dispatch_async(self.serialQueue, ^{
+        if (self.isUpdating) {
+            return;
+        }
+        
         NSMutableArray *indexPaths = [[NSMutableArray alloc] init];
         [indexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
             NSUInteger index = self.isInverted ? self.layouts.count - 1 - idx : idx;
@@ -395,8 +434,22 @@
             [indexPaths addObject:[NSIndexPath indexPathForItem:index inSection:0]];
         }];
         
+        self.updating = YES;
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self.collectionView deleteItemsAtIndexPaths:indexPaths];
+            NOCChatCollectionView *collectionView = self.collectionView;
+            [collectionView performBatchUpdates:^{
+                [collectionView deleteItemsAtIndexPaths:indexPaths];
+            } completion:^(BOOL finished) {
+                if (finished) {
+                    dispatch_async(self.serialQueue, ^{
+                        self.updating = NO;
+                    });
+                } else {
+                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), self.serialQueue, ^{
+                        self.updating = NO;
+                    });
+                }
+            }];
         });
     });
 }
@@ -404,6 +457,10 @@
 - (void)updateChatItemsAtIndexes:(NSIndexSet *)indexes
 {
     dispatch_async(self.serialQueue, ^{
+        if (self.isUpdating) {
+            return;
+        }
+        
         NSMutableArray *indexPaths = [[NSMutableArray alloc] init];
         [indexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
             NSUInteger index = self.isInverted ? self.layouts.count - 1 - idx : idx;
@@ -413,13 +470,29 @@
             [indexPaths addObject:[NSIndexPath indexPathForItem:index inSection:0]];
         }];
         
+        self.updating = YES;
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self.collectionView reloadItemsAtIndexPaths:indexPaths];
+            NOCChatCollectionView *collectionView = self.collectionView;
+            [collectionView performBatchUpdates:^{
+                [collectionView reloadItemsAtIndexPaths:indexPaths];
+            } completion:^(BOOL finished) {
+                if (finished) {
+                    dispatch_async(self.serialQueue, ^{
+                        self.updating = NO;
+                    });
+                } else {
+                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), self.serialQueue, ^{
+                        self.updating = NO;
+                    });
+                }
+            }];
         });
     });
 }
 
 @end
+
+#pragma mark - Scroll
 
 @implementation NOCChatViewController (NOCScroll)
 
@@ -427,6 +500,11 @@ typedef NS_ENUM(NSUInteger, NOCChatCellVerticalEdge) {
     NOCChatCellVerticalEdgeTop,
     NOCChatCellVerticalEdgeBottom
 };
+
+- (BOOL)isCloseToTop
+{
+    return self.isInverted ? [self isCloseToCollectionViewBottom] : [self isCloseToCollectionViewTop];
+}
 
 - (BOOL)isScrolledAtTop
 {
@@ -442,6 +520,11 @@ typedef NS_ENUM(NSUInteger, NOCChatCellVerticalEdge) {
     }
 }
 
+- (BOOL)isCloseToBottom
+{
+    return self.isInverted ? [self isCloseToCollectionViewTop] : [self isCloseToCollectionViewBottom];
+}
+
 - (BOOL)isScrolledAtBottom
 {
     return self.isInverted ? [self isScrolledAtCollectionViewTop] : [self isScrolledAtCollectionViewBottom];
@@ -453,6 +536,19 @@ typedef NS_ENUM(NSUInteger, NOCChatCellVerticalEdge) {
         [self scrollToCollectionViewTop:animated];
     } else {
         [self scrollToCollectionViewBottom:animated];
+    }
+}
+
+#pragma mark - Private
+
+- (BOOL)isCloseToCollectionViewTop
+{
+    NOCChatCollectionView *collectionView = self.collectionView;
+    if (collectionView.contentSize.height > 0) {
+        CGFloat minY = CGRectGetMinY([self collectionViewVisibleRect]);
+        return (minY / collectionView.contentSize.height) < self.autoLoadingFractionalThreshold;
+    } else {
+        return YES;
     }
 }
 
@@ -472,6 +568,17 @@ typedef NS_ENUM(NSUInteger, NOCChatCellVerticalEdge) {
     NOCChatCollectionView *collectionView = self.collectionView;
     NSIndexPath *firstIndexPath = [NSIndexPath indexPathForItem:0 inSection:0];
     [collectionView scrollToItemAtIndexPath:firstIndexPath atScrollPosition:UICollectionViewScrollPositionTop animated:animated];
+}
+
+- (BOOL)isCloseToCollectionViewBottom
+{
+    NOCChatCollectionView *collectionView = self.collectionView;
+    if (collectionView.contentSize.height > 0) {
+        CGFloat maxY = CGRectGetMaxY([self collectionViewVisibleRect]);
+        return (maxY / collectionView.contentSize.height) > (1 - self.autoLoadingFractionalThreshold);
+    } else {
+        return YES;
+    }
 }
 
 - (BOOL)isScrolledAtCollectionViewBottom
@@ -510,18 +617,11 @@ typedef NS_ENUM(NSUInteger, NOCChatCellVerticalEdge) {
         CGRect visibleRect = [self collectionViewVisibleRect];
         CGRect cellRect = layoutAttributes.frame;
         CGRect intersection = CGRectIntersection(visibleRect, cellRect);
-        BOOL result;
-        switch (edge) {
-            case NOCChatCellVerticalEdgeTop: {
-                result = fabs(CGRectGetMinY(intersection) - CGRectGetMinY(cellRect)) < 0.001;
-                break;
-            }
-            case NOCChatCellVerticalEdgeBottom: {
-                result = fabs(CGRectGetMaxY(intersection) - CGRectGetMaxY(cellRect)) < 0.001;
-                break;
-            }
+        if (edge == NOCChatCellVerticalEdgeTop) {
+            return fabs(CGRectGetMinY(intersection) - CGRectGetMinY(cellRect)) < 0.001;
+        } else {
+            return fabs(CGRectGetMaxY(intersection) - CGRectGetMaxY(cellRect)) < 0.001;
         }
-        return result;
     } else {
         return NO;
     }

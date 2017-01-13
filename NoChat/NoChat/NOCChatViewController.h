@@ -24,13 +24,19 @@
 @property (nonatomic, strong, readonly) NSArray<id<NOCChatItem>> *chatItems;
 @property (nonatomic, strong) NSMutableArray<id<NOCChatItemCellLayout>> *layouts;
 @property (nonatomic, strong) dispatch_queue_t serialQueue;
+@property (nonatomic, assign, getter=isUpdating) BOOL updating;
 
-@property (nonatomic, assign, readonly, getter=isInverted) BOOL inverted;
-@property (nonatomic, assign, readonly) UIEdgeInsets chatCollectionViewContentInset;
-@property (nonatomic, assign, readonly) UIEdgeInsets chatCollectionViewScrollIndicatorInsets;
-@property (nonatomic, assign, readonly) CGFloat chatInputContainerViewDefaultHeight;
+@property (nonatomic, assign, getter=isInverted) BOOL inverted;
+@property (nonatomic, assign) UIEdgeInsets chatCollectionViewContentInset;
+@property (nonatomic, assign) UIEdgeInsets chatCollectionViewScrollIndicatorInsets;
+@property (nonatomic, assign) CGFloat chatInputContainerViewDefaultHeight;
 
 @property (nonatomic, assign, readonly) CGFloat cellWidth;
+
+@property (nonatomic, assign, getter=isAutoScrollToBottomEnable) BOOL autoScrollToBottomEnable;
+@property (nonatomic, assign, getter=isAutoLoadingEnable) BOOL autoLoadingEnable;
+@property (nonatomic, assign) CGFloat autoLoadingFractionalThreshold;
+@property (nonatomic, copy) void(^loadPreviousChatItems)();
 
 + (Class)cellLayoutClassForItemType:(NSString *)type;
 + (Class)chatInputViewClass;
@@ -53,9 +59,11 @@
 
 @interface NOCChatViewController (NOCScroll)
 
+- (BOOL)isCloseToTop;
 - (BOOL)isScrolledAtTop;
 - (void)scrollToTop:(BOOL)animated;
 
+- (BOOL)isCloseToBottom;
 - (BOOL)isScrolledAtBottom;
 - (void)scrollToBottom:(BOOL)animated;
 
