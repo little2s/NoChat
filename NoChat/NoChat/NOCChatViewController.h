@@ -67,4 +67,6 @@
 - (BOOL)isScrolledAtBottom;
 - (void)scrollToBottom:(BOOL)animated;
 
+- (void)stopScrollIfNeeded;
+
 @end

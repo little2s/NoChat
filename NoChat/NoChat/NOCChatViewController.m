@@ -122,6 +122,8 @@
 {
     CGFloat dH = newHeight - oldHeight;
     if (fabs(dH) > 1) {
+        [self stopScrollIfNeeded];
+        
         CGFloat minChatInputContainerViewHeight = [self chatInputContainerViewDefaultHeight];
         self.chatInputContainerViewHeightConstraint.constant = MAX(minChatInputContainerViewHeight, newHeight);
         if (!self.inverted) {
@@ -637,6 +639,14 @@ typedef NS_ENUM(NSUInteger, NOCChatCellVerticalEdge) {
     CGFloat width = bounds.size.width;
     CGFloat height = MIN(contentSize.height, bounds.size.height - contentInset.top - contentInset.bottom);
     return CGRectMake(0, y, width, height);
+}
+
+- (void)stopScrollIfNeeded
+{
+    NOCChatCollectionView *collectionView = self.collectionView;
+    if (collectionView.isDragging || collectionView.isDecelerating) {
+        [collectionView setContentOffset:collectionView.contentOffset animated:NO];
+    }
 }
 
 @end
