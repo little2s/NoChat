@@ -32,8 +32,8 @@
         self.chatCollectionViewContentInset = UIEdgeInsetsMake(8, 0, 8, 0);
         self.chatCollectionViewScrollIndicatorInsets = UIEdgeInsetsZero;
         self.chatInputContainerViewDefaultHeight = 45;
-        self.autoScrollToBottomEnable = YES;
-        self.autoLoadingEnable = YES;
+        self.autoLoadAboveChatItemsEnable = NO;
+        self.autoLoadBelowChatItemsEnable = NO;
         self.autoLoadingFractionalThreshold = 0.05;
     }
     return self;
@@ -84,6 +84,16 @@
 - (void)registerChatItemCells
 {
     [self.collectionView registerClass:[NOCChatItemCell class] forCellWithReuseIdentifier:[NOCChatItemCell reuseIdentifier]];
+}
+
+- (void)loadAboveChatItems
+{
+    
+}
+
+- (void)loadBelowChatItems
+{
+    
 }
 
 #pragma mark - UICollectionViewDataSource
@@ -156,7 +166,7 @@
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
-    if (scrollView.isDragging) {
+    if (scrollView == self.collectionView) {
         [self autoLoadMoreContentIfNeeded];
     }
 }
@@ -170,16 +180,15 @@
 
 - (void)autoLoadMoreContentIfNeeded
 {
-    if (!self.isAutoLoadingEnable) {
+    if (self.isUpdating) {
         return;
     }
     
-    if ([self isCloseToTop] && self.loadPreviousChatItems) {
-        dispatch_async(self.serialQueue, ^{
-            if (!self.isUpdating) {
-                self.loadPreviousChatItems();
-            }
-        });
+    if (self.isAutoLoadAboveChatItemsEnable && [self isCloseToTop]) {
+        [self loadAboveChatItems];
+    }
+    if (self.isAutoLoadBelowChatItemsEnable && [self isCloseToBottom]) {
+        [self loadBelowChatItems];
     }
 }
 
@@ -415,9 +424,6 @@
                     });
                 }
             }];
-            if (self.autoScrollToBottomEnable && !collectionView.isDragging && !collectionView.isDecelerating) {
-                [self scrollToBottom:YES];
-            }
         });
     });
 }

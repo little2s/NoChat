@@ -33,14 +33,16 @@
 
 @property (nonatomic, assign, readonly) CGFloat cellWidth;
 
-@property (nonatomic, assign, getter=isAutoScrollToBottomEnable) BOOL autoScrollToBottomEnable;
-@property (nonatomic, assign, getter=isAutoLoadingEnable) BOOL autoLoadingEnable;
+@property (nonatomic, assign, getter=isAutoLoadAboveChatItemsEnable) BOOL autoLoadAboveChatItemsEnable;
+@property (nonatomic, assign, getter=isAutoLoadBelowChatItemsEnable) BOOL autoLoadBelowChatItemsEnable;
 @property (nonatomic, assign) CGFloat autoLoadingFractionalThreshold;
-@property (nonatomic, copy) void(^loadPreviousChatItems)();
 
 + (Class)cellLayoutClassForItemType:(NSString *)type;
 + (Class)chatInputViewClass;
 - (void)registerChatItemCells;
+
+- (void)loadAboveChatItems;
+- (void)loadBelowChatItems;
 
 @end
 

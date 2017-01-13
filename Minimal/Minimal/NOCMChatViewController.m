@@ -43,7 +43,14 @@
     message.text = text;
     message.senderDisplayName = @"Outgoing";
     message.dateString = @"Dec 26 17:01";
+    
+    [self appendMessage:message];
+}
+
+- (void)appendMessage:(NOCMMessage *)message
+{
     [self appendChatItems:@[message]];
+    [self scrollToBottom:YES];
 }
 
 @end
