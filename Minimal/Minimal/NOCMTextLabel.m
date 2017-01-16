@@ -9,12 +9,11 @@
 #import "NOCMTextLabel.h"
 #import <libkern/OSAtomic.h>
 #import <QuartzCore/QuartzCore.h>
-#import <CoreText/CoreText.h>
 
 #pragma mark - NOCMSentinel
 
 @interface NOCMSentinel : NSObject
-@property (nonatomic, assign, readonly) int32_t value;
+@property (nonatomic, readonly, assign) int32_t value;
 - (int32_t)increase;
 @end
 
@@ -580,47 +579,69 @@ static dispatch_queue_t NOCMTextLabelReleaseQueue()
 
 - (void)commonInit
 {
+    self.layer.contentsScale = [UIScreen mainScreen].scale;
+    self.contentMode = UIViewContentModeRedraw;
     
+    _attachmentViews = [NSMutableArray new];
+    _attachmentLayers = [NSMutableArray new];
+    
+    _innerText = [NSMutableString new];
+    _innerContainer = [NOCMTextContainer new];
 }
 
 - (void)clearContents
 {
-    
+    CGImageRef image = (__bridge_retained CGImageRef)(self.layer.contents);
+    self.layer.contents = nil;
+    if (image) {
+        dispatch_async(NOCMTextLabelReleaseQueue(), ^{
+            CFRelease(image);
+        });
+    }
 }
 
 - (void)setLayoutNeedRedraw
 {
-    
+    [self.layer setNeedsDisplay];
 }
 
 - (void)endTouch
 {
-    
+    [self endLongPressTimer];
+    [self removeHighlightAnimated:YES];
+    _state.trackingTouch = NO;
 }
 
 - (void)updateIfNeeded
 {
-    
+    if (_state.layoutNeedUpdate) {
+        _state.layoutNeedUpdate = NO;
+        [self updateLayout];
+        [self.layer setNeedsDisplay];
+    }
 }
 
-- (NOCMTextHighlight *)highlightAtPoint:(CGPoint)point range:(NSRangePointer)range
+- (void)updateLayout
 {
-    return nil;
+    _innerLayout = [NOCMTextLayout layoutWithContainer:_innerContainer text:_innerText];
 }
 
 - (void)startLongPressTimer
 {
-    
-}
-
-- (void)showHighlightAnimated:(BOOL)animated
-{
-    
+    [_longPressTimer invalidate];
+    __weak typeof(self) weakSelf = self;
+    _longPressTimer = [NSTimer timerWithTimeInterval:kLongPressMinimumDuration
+                                              target:weakSelf
+                                            selector:@selector(_trackDidLongPress)
+                                            userInfo:nil
+                                             repeats:NO];
+    [[NSRunLoop currentRunLoop] addTimer:_longPressTimer forMode:NSRunLoopCommonModes];
 }
 
 - (void)endLongPressTimer
 {
-    
+    [_longPressTimer invalidate];
+    _longPressTimer = nil;
 }
 
 - (CGPoint)convertPointToLayout:(CGPoint)point
@@ -628,15 +649,493 @@ static dispatch_queue_t NOCMTextLabelReleaseQueue()
     return CGPointZero;
 }
 
+- (CGPoint)convertPointFromLayout:(CGPoint)point
+{
+    return CGPointZero;
+}
+
+- (CGRect)convertRectToLayout:(CGRect)rect
+{
+    rect.origin = [self convertPointToLayout:rect.origin];
+    return rect;
+}
+
 - (CGRect)convertRectFromLayout:(CGRect)rect
 {
-    return CGRectZero;
+    rect.origin = [self convertPointFromLayout:rect.origin];
+    return rect;
+}
+
+- (NOCMTextHighlight *)highlightAtPoint:(CGPoint)point range:(NSRangePointer)range
+{
+    return nil;
+}
+
+- (void)showHighlightAnimated:(BOOL)animated
+{
+    
 }
 
 - (void)removeHighlightAnimated:(BOOL)animated
 {
     
 }
+
+@end
+
+#pragma mark - NOCMTextContainer
+
+const CGSize NOCMTextContainerMaxSize = (CGSize){0x100000, 0x100000};
+
+static inline CGSize NOCMTextClipCGSize(CGSize size)
+{
+    if (size.width > NOCMTextContainerMaxSize.width) { size.width = NOCMTextContainerMaxSize.width; }
+    if (size.height > NOCMTextContainerMaxSize.height) { size.height = NOCMTextContainerMaxSize.height; }
+    return size;
+}
+
+static inline UIEdgeInsets UIEdgeInsetRotateVertical(UIEdgeInsets insets)
+{
+    UIEdgeInsets one;
+    one.top = insets.left;
+    one.left = insets.bottom;
+    one.bottom = insets.right;
+    one.right = insets.top;
+    return one;
+}
+
+static CGColorRef NOCMTextGetCGColor(CGColorRef color)
+{
+    static UIColor *defaultColor;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        defaultColor = [UIColor blackColor];
+    });
+    if (!color) return defaultColor.CGColor;
+    if ([((__bridge NSObject *)color) respondsToSelector:@selector(CGColor)]) {
+        return ((__bridge UIColor *)color).CGColor;
+    }
+    return color;
+}
+
+@implementation NOCMTextContainer {
+    @package
+    BOOL _readonly;
+    dispatch_semaphore_t _lock;
+    
+    CGSize _size;
+    UIEdgeInsets _insets;
+    UIBezierPath *_path;
+    NSArray *_exclusionPaths;
+    BOOL _pathFillEvenOdd;
+    CGFloat _pathLineWidth;
+    BOOL _verticalForm;
+    NSUInteger _maximumNumberOfRows;
+    NOCMTextTruncationType _truncationType;
+    NSAttributedString *_truncationToken;
+    id<NOCMTextLinePositionModifier> _linePositionModifier;
+}
+
++ (instancetype)containerWithSize:(CGSize)size
+{
+    return [self containerWithSize:size insets:UIEdgeInsetsZero];
+}
+
++ (instancetype)containerWithSize:(CGSize)size insets:(UIEdgeInsets)insets
+{
+    NOCMTextContainer *one = [self new];
+    one.size = NOCMTextClipCGSize(size);
+    one.insets = insets;
+    return one;
+}
+
++ (instancetype)containerWithPath:(nullable UIBezierPath *)path
+{
+    NOCMTextContainer *one = [self new];
+    one.path = path;
+    return one;
+}
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        _lock = dispatch_semaphore_create(1);
+        _pathFillEvenOdd = YES;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone *)zone
+{
+    NOCMTextContainer *one = [self.class new];
+    dispatch_semaphore_wait(_lock, DISPATCH_TIME_FOREVER);
+    one->_size = _size;
+    one->_insets = _insets;
+    one->_path = _path;
+    one->_exclusionPaths = _exclusionPaths.copy;
+    one->_pathFillEvenOdd = _pathFillEvenOdd;
+    one->_pathLineWidth = _pathLineWidth;
+    one->_verticalForm = _verticalForm;
+    one->_maximumNumberOfRows = _maximumNumberOfRows;
+    one->_truncationType = _truncationType;
+    one->_truncationToken = _truncationToken.copy;
+    one->_linePositionModifier = [(NSObject *)_linePositionModifier copy];
+    dispatch_semaphore_signal(_lock);
+    return one;
+}
+
+- (id)mutableCopyWithZone:(nullable NSZone *)zone
+{
+    return [self copyWithZone:zone];
+}
+
+#define Getter(...) \
+dispatch_semaphore_wait(_lock, DISPATCH_TIME_FOREVER); \
+__VA_ARGS__; \
+dispatch_semaphore_signal(_lock);
+
+#define Setter(...) \
+if (_readonly) { \
+@throw [NSException exceptionWithName:NSInternalInconsistencyException \
+reason:@"Cannot change the property of the 'container' in 'NOCMTextLayout'." userInfo:nil]; \
+return; \
+} \
+dispatch_semaphore_wait(_lock, DISPATCH_TIME_FOREVER); \
+__VA_ARGS__; \
+dispatch_semaphore_signal(_lock);
+
+- (CGSize)size
+{
+    Getter(CGSize size = _size) return size;
+}
+
+- (void)setSize:(CGSize)size
+{
+    Setter(if(!_path) _size = NOCMTextClipCGSize(size));
+}
+
+- (UIEdgeInsets)insets
+{
+    Getter(UIEdgeInsets insets = _insets) return insets;
+}
+
+- (void)setInsets:(UIEdgeInsets)insets
+{
+    Setter(if(!_path){
+        if (insets.top < 0) { insets.top = 0; }
+        if (insets.left < 0) { insets.left = 0; }
+        if (insets.bottom < 0) { insets.bottom = 0; }
+        if (insets.right < 0) { insets.right = 0; }
+        _insets = insets;
+    });
+}
+
+- (UIBezierPath *)path
+{
+    Getter(UIBezierPath *path = _path) return path;
+}
+
+- (void)setPath:(UIBezierPath *)path
+{
+    Setter(
+           _path = path.copy;
+           if (_path) {
+               CGRect bounds = _path.bounds;
+               CGSize size = bounds.size;
+               UIEdgeInsets insets = UIEdgeInsetsZero;
+               if (bounds.origin.x < 0) { size.width += bounds.origin.x; }
+               if (bounds.origin.x > 0) { insets.left = bounds.origin.x; }
+               if (bounds.origin.y < 0) { size.height += bounds.origin.y; }
+               if (bounds.origin.y > 0) { insets.top = bounds.origin.y; }
+               _size = size;
+               _insets = insets;
+           }
+           );
+}
+
+- (NSArray *)exclusionPaths
+{
+    Getter(NSArray *paths = _exclusionPaths) return paths;
+}
+
+- (void)setExclusionPaths:(NSArray *)exclusionPaths
+{
+    Setter(_exclusionPaths = exclusionPaths.copy);
+}
+
+- (BOOL)isPathFillEvenOdd
+{
+    Getter(BOOL is = _pathFillEvenOdd) return is;
+}
+
+- (void)setPathFillEvenOdd:(BOOL)pathFillEvenOdd
+{
+    Setter(_pathFillEvenOdd = pathFillEvenOdd);
+}
+
+- (CGFloat)pathLineWidth
+{
+    Getter(CGFloat width = _pathLineWidth) return width;
+}
+
+- (void)setPathLineWidth:(CGFloat)pathLineWidth
+{
+    Setter(_pathLineWidth = pathLineWidth);
+}
+
+- (BOOL)isVerticalForm
+{
+    Getter(BOOL v = _verticalForm) return v;
+}
+
+- (void)setVerticalForm:(BOOL)verticalForm
+{
+    Setter(_verticalForm = verticalForm);
+}
+
+- (NSUInteger)maximumNumberOfRows
+{
+    Getter(NSUInteger num = _maximumNumberOfRows) return num;
+}
+
+- (void)setMaximumNumberOfRows:(NSUInteger)maximumNumberOfRows
+{
+    Setter(_maximumNumberOfRows = maximumNumberOfRows);
+}
+
+- (NOCMTextTruncationType)truncationType
+{
+    Getter(NOCMTextTruncationType type = _truncationType) return type;
+}
+
+- (void)setTruncationType:(NOCMTextTruncationType)truncationType
+{
+    Setter(_truncationType = truncationType);
+}
+
+- (NSAttributedString *)truncationToken
+{
+    Getter(NSAttributedString *token = _truncationToken) return token;
+}
+
+- (void)setTruncationToken:(NSAttributedString *)truncationToken
+{
+    Setter(_truncationToken = truncationToken.copy);
+}
+
+- (void)setLinePositionModifier:(id<NOCMTextLinePositionModifier>)linePositionModifier
+{
+    Setter(_linePositionModifier = [(NSObject *)linePositionModifier copy]);
+}
+
+- (id<NOCMTextLinePositionModifier>)linePositionModifier
+{
+    Getter(id<NOCMTextLinePositionModifier> m = _linePositionModifier) return m;
+}
+
+#undef Getter
+#undef Setter
+
+@end
+
+#pragma mark - NOCMTextLinePositionSimpleModifier
+
+@implementation NOCMTextLinePositionSimpleModifier
+
+- (void)modifyLines:(NSArray<NOCMTextLine *> *)lines fromText:(NSAttributedString *)text inContainer:(NOCMTextContainer *)container
+{
+    if (container.verticalForm) {
+        for (NSUInteger i = 0, max = lines.count; i < max; i++) {
+            NOCMTextLine *line = lines[i];
+            CGPoint pos = line.position;
+            pos.x = container.size.width - container.insets.right - line.row * _fixedLineHeight - _fixedLineHeight * 0.9;
+            line.position = pos;
+        }
+    } else {
+        for (NSUInteger i = 0, max = lines.count; i < max; i++) {
+            NOCMTextLine *line = lines[i];
+            CGPoint pos = line.position;
+            pos.y = line.row * _fixedLineHeight + _fixedLineHeight * 0.9 + container.insets.top;
+            line.position = pos;
+        }
+    }
+}
+
+- (id)copyWithZone:(NSZone *)zone
+{
+    NOCMTextLinePositionSimpleModifier *one = [self.class new];
+    one.fixedLineHeight = _fixedLineHeight;
+    return one;
+}
+
+@end
+
+#pragma mark - NOCMTextLine
+
+@implementation NOCMTextLine {
+    CGFloat _firstGlyphPos;
+}
+
++ (instancetype)lineWithCTLine:(CTLineRef)CTLine position:(CGPoint)position vertical:(BOOL)isVertical
+{
+    if (!CTLine) {
+        return nil;
+    }
+    
+    NOCMTextLine *line = [self new];
+    line->_position = position;
+    line->_vertical = isVertical;
+    [line setCTLine:CTLine];
+    return line;
+}
+
+- (void)dealloc
+{
+    if (_CTLine) CFRelease(_CTLine);
+}
+
+- (void)setCTLine:(_Nonnull CTLineRef)CTLine
+{
+    if (_CTLine != CTLine) {
+        if (CTLine) CFRetain(CTLine);
+        if (_CTLine) CFRelease(_CTLine);
+        _CTLine = CTLine;
+        if (_CTLine) {
+            _lineWidth = CTLineGetTypographicBounds(_CTLine, &_ascent, &_descent, &_leading);
+            CFRange range = CTLineGetStringRange(_CTLine);
+            _range = NSMakeRange(range.location, range.length);
+            if (CTLineGetGlyphCount(_CTLine) > 0) {
+                CFArrayRef runs = CTLineGetGlyphRuns(_CTLine);
+                CTRunRef run = CFArrayGetValueAtIndex(runs, 0);
+                CGPoint pos;
+                CTRunGetPositions(run, CFRangeMake(0, 1), &pos);
+                _firstGlyphPos = pos.x;
+            } else {
+                _firstGlyphPos = 0;
+            }
+            _trailingWhitespaceWidth = CTLineGetTrailingWhitespaceWidth(_CTLine);
+        } else {
+            _lineWidth = _ascent = _descent = _leading = _firstGlyphPos = _trailingWhitespaceWidth = 0;
+            _range = NSMakeRange(0, 0);
+        }
+        [self reloadBounds];
+    }
+}
+
+- (void)setPosition:(CGPoint)position
+{
+    _position = position;
+    [self reloadBounds];
+}
+
+- (void)reloadBounds
+{
+    if (_vertical) {
+        _bounds = CGRectMake(_position.x - _descent, _position.y, _ascent + _descent, _lineWidth);
+        _bounds.origin.y += _firstGlyphPos;
+    } else {
+        _bounds = CGRectMake(_position.x, _position.y - _ascent, _lineWidth, _ascent + _descent);
+        _bounds.origin.x += _firstGlyphPos;
+    }
+    
+    _attachments = nil;
+    _attachmentRanges = nil;
+    _attachmentRects = nil;
+    if (!_CTLine) return;
+    CFArrayRef runs = CTLineGetGlyphRuns(_CTLine);
+    NSUInteger runCount = CFArrayGetCount(runs);
+    if (runCount == 0) return;
+    
+    NSMutableArray *attachments = [NSMutableArray new];
+    NSMutableArray *attachmentRanges = [NSMutableArray new];
+    NSMutableArray *attachmentRects = [NSMutableArray new];
+    for (NSUInteger r = 0; r < runCount; r++) {
+        CTRunRef run = CFArrayGetValueAtIndex(runs, r);
+        CFIndex glyphCount = CTRunGetGlyphCount(run);
+        if (glyphCount == 0) continue;
+        NSDictionary *attrs = (id)CTRunGetAttributes(run);
+        NOCMTextAttachment *attachment = attrs[NOCMTextAttachmentAttributeName];
+        if (attachment) {
+            CGPoint runPosition = CGPointZero;
+            CTRunGetPositions(run, CFRangeMake(0, 1), &runPosition);
+            
+            CGFloat ascent, descent, leading, runWidth;
+            CGRect runTypoBounds;
+            runWidth = CTRunGetTypographicBounds(run, CFRangeMake(0, 0), &ascent, &descent, &leading);
+            
+            if (_vertical) {
+                CGFloat temp = runPosition.x;
+                runPosition.x = runPosition.y;
+                runPosition.y = temp;
+                runPosition.y = _position.y + runPosition.y;
+                runTypoBounds = CGRectMake(_position.x + runPosition.x - descent, runPosition.y , ascent + descent, runWidth);
+            } else {
+                runPosition.x += _position.x;
+                runPosition.y = _position.y - runPosition.y;
+                runTypoBounds = CGRectMake(runPosition.x, runPosition.y - ascent, runWidth, ascent + descent);
+            }
+            
+            CFRange range = CTRunGetStringRange(run);
+            NSRange runRange = NSMakeRange(range.location, range.length);
+            [attachments addObject:attachment];
+            [attachmentRanges addObject:[NSValue valueWithRange:runRange]];
+            [attachmentRects addObject:[NSValue valueWithCGRect:runTypoBounds]];
+        }
+    }
+    _attachments = attachments.count ? attachments : nil;
+    _attachmentRanges = attachmentRanges.count ? attachmentRanges : nil;
+    _attachmentRects = attachmentRects.count ? attachmentRects : nil;
+}
+
+- (CGSize)size
+{
+    return _bounds.size;
+}
+
+- (CGFloat)width
+{
+    return CGRectGetWidth(_bounds);
+}
+
+- (CGFloat)height
+{
+    return CGRectGetHeight(_bounds);
+}
+
+- (CGFloat)top
+{
+    return CGRectGetMinY(_bounds);
+}
+
+- (CGFloat)bottom
+{
+    return CGRectGetMaxY(_bounds);
+}
+
+- (CGFloat)left
+{
+    return CGRectGetMinX(_bounds);
+}
+
+- (CGFloat)right
+{
+    return CGRectGetMaxX(_bounds);
+}
+
+- (NSString *)description
+{
+    NSMutableString *desc = @"".mutableCopy;
+    NSRange range = self.range;
+    [desc appendFormat:@"<NOCMTextLine: %p> row:%zd range:%tu,%tu",self, self.row, range.location, range.length];
+    [desc appendFormat:@" position:%@",NSStringFromCGPoint(self.position)];
+    [desc appendFormat:@" bounds:%@",NSStringFromCGRect(self.bounds)];
+    return desc;
+}
+
+@end
+
+@implementation NOCMTextRunGlyphRange
 
 @end
 
@@ -674,41 +1173,6 @@ static dispatch_queue_t NOCMTextLabelReleaseQueue()
 {
     NOCMTextLayout *newLayout = [[NOCMTextLayout alloc] init];
     return newLayout;
-}
-
-@end
-
-#pragma mark - NOCMTextContainer
-
-@implementation NOCMTextContainer
-
-+ (instancetype)containerWithSize:(CGSize)size
-{
-    NOCMTextContainer *container = [[NOCMTextContainer alloc] init];
-    return container;
-}
-
-- (id)copyWithZone:(NSZone *)zone
-{
-    NOCMTextContainer *newContainer = [[NOCMTextContainer alloc] init];
-    return newContainer;
-}
-
-@end
-
-#pragma mark - NOCMTextLinePositionModifier
-
-@implementation NOCMTextLinePositionModifier
-
-- (CGFloat)heightForLineCount:(NSUInteger)lineCount
-{
-    return 0;
-}
-
-- (id)copyWithZone:(NSZone *)zone
-{
-    NOCMTextLinePositionModifier *modifier = [[NOCMTextLinePositionModifier alloc] init];
-    return modifier;
 }
 
 @end
@@ -751,3 +1215,10 @@ static dispatch_queue_t NOCMTextLabelReleaseQueue()
 
 @end
 
+#pragma mark - NOCMTextAttachment
+
+NSString *NOCMTextAttachmentAttributeName = @"NOCMTextAttachment";
+
+@implementation NOCMTextAttachment
+
+@end
