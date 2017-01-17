@@ -8,7 +8,8 @@
 
 #import "NOCMTextLabel.h"
 #import <libkern/OSAtomic.h>
-#import <QuartzCore/QuartzCore.h>
+#import "NSAttributedString+NOCMinimal.h"
+#import "UIFont+NOCMinimal.h"
 
 #pragma mark - NOCMSentinel
 
@@ -729,7 +730,6 @@ static CGColorRef NOCMTextGetCGColor(CGColorRef color)
     NSArray *_exclusionPaths;
     BOOL _pathFillEvenOdd;
     CGFloat _pathLineWidth;
-    BOOL _verticalForm;
     NSUInteger _maximumNumberOfRows;
     NOCMTextTruncationType _truncationType;
     NSAttributedString *_truncationToken;
@@ -776,7 +776,6 @@ static CGColorRef NOCMTextGetCGColor(CGColorRef color)
     one->_exclusionPaths = _exclusionPaths.copy;
     one->_pathFillEvenOdd = _pathFillEvenOdd;
     one->_pathLineWidth = _pathLineWidth;
-    one->_verticalForm = _verticalForm;
     one->_maximumNumberOfRows = _maximumNumberOfRows;
     one->_truncationType = _truncationType;
     one->_truncationToken = _truncationToken.copy;
@@ -884,16 +883,6 @@ dispatch_semaphore_signal(_lock);
     Setter(_pathLineWidth = pathLineWidth);
 }
 
-- (BOOL)isVerticalForm
-{
-    Getter(BOOL v = _verticalForm) return v;
-}
-
-- (void)setVerticalForm:(BOOL)verticalForm
-{
-    Setter(_verticalForm = verticalForm);
-}
-
 - (NSUInteger)maximumNumberOfRows
 {
     Getter(NSUInteger num = _maximumNumberOfRows) return num;
@@ -945,20 +934,11 @@ dispatch_semaphore_signal(_lock);
 
 - (void)modifyLines:(NSArray<NOCMTextLine *> *)lines fromText:(NSAttributedString *)text inContainer:(NOCMTextContainer *)container
 {
-    if (container.verticalForm) {
-        for (NSUInteger i = 0, max = lines.count; i < max; i++) {
-            NOCMTextLine *line = lines[i];
-            CGPoint pos = line.position;
-            pos.x = container.size.width - container.insets.right - line.row * _fixedLineHeight - _fixedLineHeight * 0.9;
-            line.position = pos;
-        }
-    } else {
-        for (NSUInteger i = 0, max = lines.count; i < max; i++) {
-            NOCMTextLine *line = lines[i];
-            CGPoint pos = line.position;
-            pos.y = line.row * _fixedLineHeight + _fixedLineHeight * 0.9 + container.insets.top;
-            line.position = pos;
-        }
+    for (NSUInteger i = 0, max = lines.count; i < max; i++) {
+        NOCMTextLine *line = lines[i];
+        CGPoint pos = line.position;
+        pos.y = line.row * _fixedLineHeight + _fixedLineHeight * 0.9 + container.insets.top;
+        line.position = pos;
     }
 }
 
@@ -977,7 +957,7 @@ dispatch_semaphore_signal(_lock);
     CGFloat _firstGlyphPos;
 }
 
-+ (instancetype)lineWithCTLine:(CTLineRef)CTLine position:(CGPoint)position vertical:(BOOL)isVertical
++ (instancetype)lineWithCTLine:(CTLineRef)CTLine position:(CGPoint)position
 {
     if (!CTLine) {
         return nil;
@@ -985,7 +965,6 @@ dispatch_semaphore_signal(_lock);
     
     NOCMTextLine *line = [self new];
     line->_position = position;
-    line->_vertical = isVertical;
     [line setCTLine:CTLine];
     return line;
 }
@@ -1031,13 +1010,8 @@ dispatch_semaphore_signal(_lock);
 
 - (void)reloadBounds
 {
-    if (_vertical) {
-        _bounds = CGRectMake(_position.x - _descent, _position.y, _ascent + _descent, _lineWidth);
-        _bounds.origin.y += _firstGlyphPos;
-    } else {
-        _bounds = CGRectMake(_position.x, _position.y - _ascent, _lineWidth, _ascent + _descent);
-        _bounds.origin.x += _firstGlyphPos;
-    }
+    _bounds = CGRectMake(_position.x, _position.y - _ascent, _lineWidth, _ascent + _descent);
+    _bounds.origin.x += _firstGlyphPos;
     
     _attachments = nil;
     _attachmentRanges = nil;
@@ -1064,17 +1038,9 @@ dispatch_semaphore_signal(_lock);
             CGRect runTypoBounds;
             runWidth = CTRunGetTypographicBounds(run, CFRangeMake(0, 0), &ascent, &descent, &leading);
             
-            if (_vertical) {
-                CGFloat temp = runPosition.x;
-                runPosition.x = runPosition.y;
-                runPosition.y = temp;
-                runPosition.y = _position.y + runPosition.y;
-                runTypoBounds = CGRectMake(_position.x + runPosition.x - descent, runPosition.y , ascent + descent, runWidth);
-            } else {
-                runPosition.x += _position.x;
-                runPosition.y = _position.y - runPosition.y;
-                runTypoBounds = CGRectMake(runPosition.x, runPosition.y - ascent, runWidth, ascent + descent);
-            }
+            runPosition.x += _position.x;
+            runPosition.y = _position.y - runPosition.y;
+            runTypoBounds = CGRectMake(runPosition.x, runPosition.y - ascent, runWidth, ascent + descent);
             
             CFRange range = CTRunGetStringRange(run);
             NSRange runRange = NSMakeRange(range.location, range.length);
@@ -1135,13 +1101,51 @@ dispatch_semaphore_signal(_lock);
 
 @end
 
-@implementation NOCMTextRunGlyphRange
+#pragma mark - NOCMTextLayout
+
+typedef struct {
+    CGFloat head;
+    CGFloat foot;
+} NOCMRowEdge;
+
+@interface NOCMTextLayout ()
+
+@property (nonatomic, readwrite, strong) NOCMTextContainer *container;
+@property (nonatomic, readwrite, strong) NSAttributedString *text;
+@property (nonatomic, readwrite, assign) NSRange range;
+
+@property (nonatomic, readwrite, assign) CTFramesetterRef frameSetter;
+@property (nonatomic, readwrite, assign) CTFrameRef frame;
+@property (nonatomic, readwrite, strong) NSArray<NOCMTextLine *> *lines;
+@property (nullable, nonatomic, readwrite, strong) NOCMTextLine *truncatedLine;
+@property (nullable, nonatomic, readwrite, strong) NSArray<NOCMTextAttachment *> *attachments;
+@property (nullable, nonatomic, readwrite, strong) NSArray<NSValue *> *attachmentRanges;
+@property (nullable, nonatomic, readwrite, strong) NSArray<NSValue *> *attachmentRects;
+@property (nullable, nonatomic, readwrite, strong) NSSet *attachmentContentsSet;
+@property (nonatomic, readwrite, assign) NSUInteger rowCount;
+@property (nonatomic, readwrite, assign) NSRange visibleRange;
+@property (nonatomic, readwrite, assign) CGRect textBoundingRect;
+@property (nonatomic, readwrite, assign) CGSize textBoundingSize;
+
+@property (nonatomic, readwrite, assign) BOOL containsHighlight;
+@property (nonatomic, readwrite, assign) BOOL needDrawBlockBorder;
+@property (nonatomic, readwrite, assign) BOOL needDrawBackgroundBorder;
+@property (nonatomic, readwrite, assign) BOOL needDrawShadow;
+@property (nonatomic, readwrite, assign) BOOL needDrawUnderline;
+@property (nonatomic, readwrite, assign) BOOL needDrawText;
+@property (nonatomic, readwrite, assign) BOOL needDrawAttachment;
+@property (nonatomic, readwrite, assign) BOOL needDrawInnerShadow;
+@property (nonatomic, readwrite, assign) BOOL needDrawStrikethrough;
+@property (nonatomic, readwrite, assign) BOOL needDrawBorder;
+
+@property (nonatomic, assign) NSUInteger *lineRowsIndex;
+@property (nonatomic, assign) NOCMRowEdge *lineRowsEdge;
 
 @end
 
-#pragma mark - NOCMTextLayout
-
 @implementation NOCMTextLayout
+
+#pragma mark - Layout
 
 + (instancetype)layoutWithContainer:(NOCMTextContainer *)container text:(NSAttributedString *)text
 {
@@ -1150,9 +1154,406 @@ dispatch_semaphore_signal(_lock);
 
 + (instancetype)layoutWithContainer:(NOCMTextContainer *)container text:(NSAttributedString *)text range:(NSRange)range
 {
-    NOCMTextLayout *layout = [[NOCMTextLayout alloc] init];
+    NOCMTextLayout *layout = nil;
+    CGPathRef cgPath = nil;
+    CGRect cgPathBox = {0};
+    BOOL rowMaySeparated = NO;
+    NSMutableDictionary *frameAttrs = nil;
+    CTFramesetterRef ctSetter = NULL;
+    CTFrameRef ctFrame = NULL;
+    CFArrayRef ctLines = nil;
+    CGPoint *lineOrigins = NULL;
+    NSUInteger lineCount = 0;
+    NSMutableArray *lines = nil;
+    NSMutableArray *attachments = nil;
+    NSMutableArray *attachmentRanges = nil;
+    NSMutableArray *attachmentRects = nil;
+    NSMutableSet *attachmentContentsSet = nil;
+    BOOL needTruncation = NO;
+    NSAttributedString *truncationToken = nil;
+    NOCMTextLine *truncatedLine = nil;
+    NOCMRowEdge *lineRowsEdge = NULL;
+    NSUInteger *lineRowsIndex = NULL;
+    NSRange visibleRange;
+    NSUInteger maximumNumberOfRows = 0;
+    BOOL constraintSizeIsExtended = NO;
+    CGRect constraintRectBeforeExtended = {0};
+    
+    text = text.mutableCopy;
+    container = container.copy;
+    if (!text || !container) return nil;
+    if (range.location + range.length > text.length) return nil;
+    container->_readonly = YES;
+    maximumNumberOfRows = container.maximumNumberOfRows;
+    
+    // CoreText bug when draw joined emoji since iOS 8.3.
+    // See -[NSMutableAttributedString setClearColorToJoinedEmoji] for more information.
+    static BOOL needFixJoinedEmojiBug = NO;
+    // It may use larger constraint size when create CTFrame with
+    // CTFramesetterCreateFrame in iOS 10.
+    static BOOL needFixLayoutSizeBug = NO;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        CGFloat systemVersionFloat = [UIDevice currentDevice].systemVersion.floatValue;
+        if (8.3 <= systemVersionFloat && systemVersionFloat < 9) {
+            needFixJoinedEmojiBug = YES;
+        }
+        if (systemVersionFloat >= 10) {
+            needFixLayoutSizeBug = YES;
+        }
+    });
+    if (needFixJoinedEmojiBug) {
+        [((NSMutableAttributedString *)text) nocm_setClearColorToJoinedEmoji];
+    }
+    
+    layout = [[NOCMTextLayout alloc] _init];
+    layout.text = text;
+    layout.container = container;
+    layout.range = range;
+    
+    // set cgPath and cgPathBox
+    if (container.path == nil && container.exclusionPaths.count == 0) {
+        if (container.size.width <= 0 || container.size.height <= 0) goto fail;
+        CGRect rect = (CGRect) {CGPointZero, container.size };
+        if (needFixLayoutSizeBug) {
+            constraintSizeIsExtended = YES;
+            constraintRectBeforeExtended = UIEdgeInsetsInsetRect(rect, container.insets);
+            constraintRectBeforeExtended = CGRectStandardize(constraintRectBeforeExtended);
+            rect.size.height = NOCMTextContainerMaxSize.height;
+        }
+        rect = UIEdgeInsetsInsetRect(rect, container.insets);
+        rect = CGRectStandardize(rect);
+        cgPathBox = rect;
+        rect = CGRectApplyAffineTransform(rect, CGAffineTransformMakeScale(1, -1));
+        cgPath = CGPathCreateWithRect(rect, NULL); // let CGPathIsRect() returns true
+    } else {
+        // pass
+    }
+    if (!cgPath) goto fail;
+    
+    // frame setter config
+    frameAttrs = [NSMutableDictionary dictionary];
+    if (container.isPathFillEvenOdd == NO) {
+        frameAttrs[(id)kCTFramePathFillRuleAttributeName] = @(kCTFramePathFillWindingNumber);
+    }
+    if (container.pathLineWidth > 0) {
+        frameAttrs[(id)kCTFramePathWidthAttributeName] = @(container.pathLineWidth);
+    }
+    
+    // create CoreText objects
+    ctSetter = CTFramesetterCreateWithAttributedString((CFTypeRef)text);
+    if (!ctSetter) goto fail;
+    ctFrame = CTFramesetterCreateFrame(ctSetter, CFRangeMake(range.location, range.length), cgPath, (CFTypeRef)frameAttrs);
+    if (!ctFrame) goto fail;
+    lines = [NSMutableArray new];
+    ctLines = CTFrameGetLines(ctFrame);
+    lineCount = CFArrayGetCount(ctLines);
+    if (lineCount > 0) {
+        lineOrigins = malloc(lineCount * sizeof(CGPoint));
+        if (lineOrigins == NULL) goto fail;
+        CTFrameGetLineOrigins(ctFrame, CFRangeMake(0, lineCount), lineOrigins);
+    }
+    
+    CGRect textBoundingRect = CGRectZero;
+    CGSize textBoundingSize = CGSizeZero;
+    NSInteger rowIdx = -1;
+    NSUInteger rowCount = 0;
+    CGRect lastRect = CGRectMake(0, -FLT_MAX, 0, 0);
+    CGPoint lastPosition = CGPointMake(0, -FLT_MAX);
+    
+    // calculate line frame
+    NSUInteger lineCurrentIdx = 0;
+    for (NSUInteger i = 0; i < lineCount; i++) {
+        CTLineRef ctLine = CFArrayGetValueAtIndex(ctLines, i);
+        CFArrayRef ctRuns = CTLineGetGlyphRuns(ctLine);
+        if (!ctRuns || CFArrayGetCount(ctRuns) == 0) continue;
+        
+        // CoreText coordinate system
+        CGPoint ctLineOrigin = lineOrigins[i];
+        
+        // UIKit coordinate system
+        CGPoint position;
+        position.x = cgPathBox.origin.x + ctLineOrigin.x;
+        position.y = cgPathBox.size.height + cgPathBox.origin.y - ctLineOrigin.y;
+        
+        NOCMTextLine *line = [NOCMTextLine lineWithCTLine:ctLine position:position];
+        CGRect rect = line.bounds;
+        
+        if (constraintSizeIsExtended) {
+            if (rect.origin.y + rect.size.height >
+                constraintRectBeforeExtended.origin.y +
+                constraintRectBeforeExtended.size.height) break;
+        }
+        
+        BOOL newRow = YES;
+        if (rowMaySeparated && position.x != lastPosition.x) {
+            if (rect.size.height > lastRect.size.height) {
+                if (rect.origin.y < lastPosition.y && lastPosition.y < rect.origin.y + rect.size.height) newRow = NO;
+            } else {
+                if (lastRect.origin.y < position.y && position.y < lastRect.origin.y + lastRect.size.height) newRow = NO;
+            }
+        }
+        
+        if (newRow) rowIdx++;
+        lastRect = rect;
+        lastPosition = position;
+        
+        line.index = lineCurrentIdx;
+        line.row = rowIdx;
+        [lines addObject:line];
+        rowCount = rowIdx + 1;
+        lineCurrentIdx ++;
+        
+        if (i == 0) textBoundingRect = rect;
+        else {
+            if (maximumNumberOfRows == 0 || rowIdx < maximumNumberOfRows) {
+                textBoundingRect = CGRectUnion(textBoundingRect, rect);
+            }
+        }
+    }
+    
+    if (rowCount > 0) {
+        if (maximumNumberOfRows > 0) {
+            if (rowCount > maximumNumberOfRows) {
+                needTruncation = YES;
+                rowCount = maximumNumberOfRows;
+                do {
+                    NOCMTextLine *line = lines.lastObject;
+                    if (!line) break;
+                    if (line.row < rowCount) break;
+                    [lines removeLastObject];
+                } while (1);
+            }
+        }
+        NOCMTextLine *lastLine = lines.lastObject;
+        if (!needTruncation && lastLine.range.location + lastLine.range.length < text.length) {
+            needTruncation = YES;
+        }
+        
+        // Give user a chance to modify the line's position.
+        if (container.linePositionModifier) {
+            [container.linePositionModifier modifyLines:lines fromText:text inContainer:container];
+            textBoundingRect = CGRectZero;
+            for (NSUInteger i = 0, max = lines.count; i < max; i++) {
+                NOCMTextLine *line = lines[i];
+                if (i == 0) textBoundingRect = line.bounds;
+                else textBoundingRect = CGRectUnion(textBoundingRect, line.bounds);
+            }
+        }
+        
+        lineRowsEdge = calloc(rowCount, sizeof(NOCMRowEdge));
+        if (lineRowsEdge == NULL) goto fail;
+        lineRowsIndex = calloc(rowCount, sizeof(NSUInteger));
+        if (lineRowsIndex == NULL) goto fail;
+        NSInteger lastRowIdx = -1;
+        CGFloat lastHead = 0;
+        CGFloat lastFoot = 0;
+        for (NSUInteger i = 0, max = lines.count; i < max; i++) {
+            NOCMTextLine *line = lines[i];
+            CGRect rect = line.bounds;
+            if ((NSInteger)line.row != lastRowIdx) {
+                if (lastRowIdx >= 0) {
+                    lineRowsEdge[lastRowIdx] = (NOCMRowEdge) {.head = lastHead, .foot = lastFoot };
+                }
+                lastRowIdx = line.row;
+                lineRowsIndex[lastRowIdx] = i;
+                lastHead = rect.origin.y;
+                lastFoot = lastHead + rect.size.height;
+            } else {
+                lastHead = MIN(lastHead, rect.origin.y);
+                lastFoot = MAX(lastFoot, rect.origin.y + rect.size.height);
+            }
+        }
+        lineRowsEdge[lastRowIdx] = (NOCMRowEdge) {.head = lastHead, .foot = lastFoot };
+        
+        for (NSUInteger i = 1; i < rowCount; i++) {
+            NOCMRowEdge v0 = lineRowsEdge[i - 1];
+            NOCMRowEdge v1 = lineRowsEdge[i];
+            lineRowsEdge[i - 1].foot = lineRowsEdge[i].head = (v0.foot + v1.head) * 0.5;
+        }
+    }
+
+    { // calculate bounding size
+        CGRect rect = textBoundingRect;
+        if (container.path) {
+            if (container.pathLineWidth > 0) {
+                CGFloat inset = container.pathLineWidth / 2;
+                rect = CGRectInset(rect, -inset, -inset);
+            }
+        } else {
+            UIEdgeInsets insets = container.insets;
+            rect = UIEdgeInsetsInsetRect(rect, UIEdgeInsetsMake(-insets.top, -insets.left, -insets.bottom, -insets.right));
+        }
+        rect = CGRectStandardize(rect);
+        CGSize size = rect.size;
+        size.width += rect.origin.x;
+        size.height += rect.origin.y;
+        if (size.width < 0) size.width = 0;
+        if (size.height < 0) size.height = 0;
+        size.width = ceil(size.width);
+        size.height = ceil(size.height);
+        textBoundingSize = size;
+    }
+    
+    CFRange cfRange = CTFrameGetVisibleStringRange(ctFrame);
+    visibleRange = NSMakeRange(cfRange.location, cfRange.length);
+    if (needTruncation) {
+        NOCMTextLine *lastLine = lines.lastObject;
+        NSRange lastRange = lastLine.range;
+        visibleRange.length = lastRange.location + lastRange.length - visibleRange.location;
+        
+        // create truncated line
+        if (container.truncationType != NOCMTextTruncationTypeNone) {
+            CTLineRef truncationTokenLine = NULL;
+            if (container.truncationToken) {
+                truncationToken = container.truncationToken;
+                truncationTokenLine = CTLineCreateWithAttributedString((CFAttributedStringRef)truncationToken);
+            } else {
+                CFArrayRef runs = CTLineGetGlyphRuns(lastLine.CTLine);
+                NSUInteger runCount = CFArrayGetCount(runs);
+                NSMutableDictionary *attrs = nil;
+                if (runCount > 0) {
+                    CTRunRef run = CFArrayGetValueAtIndex(runs, runCount - 1);
+                    attrs = (id)CTRunGetAttributes(run);
+                    attrs = attrs ? attrs.mutableCopy : [NSMutableArray new];
+                    [attrs removeObjectsForKeys:[NSMutableAttributedString nocm_allDiscontinuousAttributeKeys]];
+                    CTFontRef font = (__bridge CFTypeRef)attrs[(id)kCTFontAttributeName];
+                    CGFloat fontSize = font ? CTFontGetSize(font) : 12.0;
+                    UIFont *uiFont = [UIFont systemFontOfSize:fontSize * 0.9];
+                    font = [uiFont nocm_CTFontRef];
+                    if (font) {
+                        attrs[(id)kCTFontAttributeName] = (__bridge id)(font);
+                        uiFont = nil;
+                        CFRelease(font);
+                    }
+                    CGColorRef color = (__bridge CGColorRef)(attrs[(id)kCTForegroundColorAttributeName]);
+                    if (color && CFGetTypeID(color) == CGColorGetTypeID() && CGColorGetAlpha(color) == 0) {
+                        // ignore clear color
+                        [attrs removeObjectForKey:(id)kCTForegroundColorAttributeName];
+                    }
+                    if (!attrs) attrs = [NSMutableDictionary new];
+                }
+                truncationToken = [[NSAttributedString alloc] initWithString:NOCMTextTruncationToken attributes:attrs];
+                truncationTokenLine = CTLineCreateWithAttributedString((CFAttributedStringRef)truncationToken);
+            }
+            if (truncationTokenLine) {
+                CTLineTruncationType type = kCTLineTruncationEnd;
+                if (container.truncationType == NOCMTextTruncationTypeStart) {
+                    type = kCTLineTruncationStart;
+                } else if (container.truncationType == NOCMTextTruncationTypeMiddle) {
+                    type = kCTLineTruncationMiddle;
+                }
+                NSMutableAttributedString *lastLineText = [text attributedSubstringFromRange:lastLine.range].mutableCopy;
+                [lastLineText appendAttributedString:truncationToken];
+                CTLineRef ctLastLineExtend = CTLineCreateWithAttributedString((CFAttributedStringRef)lastLineText);
+                if (ctLastLineExtend) {
+                    CGFloat truncatedWidth = lastLine.width;
+                    CGRect cgPathRect = CGRectZero;
+                    if (CGPathIsRect(cgPath, &cgPathRect)) {
+                        truncatedWidth = cgPathRect.size.width;
+                    }
+                    CTLineRef ctTruncatedLine = CTLineCreateTruncatedLine(ctLastLineExtend, truncatedWidth, type, truncationTokenLine);
+                    CFRelease(ctLastLineExtend);
+                    if (ctTruncatedLine) {
+                        truncatedLine = [NOCMTextLine lineWithCTLine:ctTruncatedLine position:lastLine.position];
+                        truncatedLine.index = lastLine.index;
+                        truncatedLine.row = lastLine.row;
+                        CFRelease(ctTruncatedLine);
+                    }
+                }
+                CFRelease(truncationTokenLine);
+            }
+        }
+    }
+    
+    if (visibleRange.length > 0) {
+        layout.needDrawText = YES;
+        
+        void (^block)(NSDictionary *attrs, NSRange range, BOOL *stop) = ^(NSDictionary *attrs, NSRange range, BOOL *stop) {
+            if (attrs[NOCMTextHighlightAttributeName]) layout.containsHighlight = YES;
+            if (attrs[NOCMTextBlockBorderAttributeName]) layout.needDrawBlockBorder = YES;
+            if (attrs[NOCMTextBackgroundBorderAttributeName]) layout.needDrawBackgroundBorder = YES;
+            if (attrs[NOCMTextShadowAttributeName] || attrs[NSShadowAttributeName]) layout.needDrawShadow = YES;
+            if (attrs[NOCMTextUnderlineAttributeName]) layout.needDrawUnderline = YES;
+            if (attrs[NOCMTextAttachmentAttributeName]) layout.needDrawAttachment = YES;
+            if (attrs[NOCMTextInnerShadowAttributeName]) layout.needDrawInnerShadow = YES;
+            if (attrs[NOCMTextStrikethroughAttributeName]) layout.needDrawStrikethrough = YES;
+            if (attrs[NOCMTextBorderAttributeName]) layout.needDrawBorder = YES;
+        };
+        
+        [layout.text enumerateAttributesInRange:visibleRange options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired usingBlock:block];
+        if (truncatedLine) {
+            [truncationToken enumerateAttributesInRange:NSMakeRange(0, truncationToken.length) options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired usingBlock:block];
+        }
+    }
+    
+    attachments = [NSMutableArray new];
+    attachmentRanges = [NSMutableArray new];
+    attachmentRects = [NSMutableArray new];
+    attachmentContentsSet = [NSMutableSet new];
+    for (NSUInteger i = 0, max = lines.count; i < max; i++) {
+        NOCMTextLine *line = lines[i];
+        if (truncatedLine && line.index == truncatedLine.index) line = truncatedLine;
+        if (line.attachments.count > 0) {
+            [attachments addObjectsFromArray:line.attachments];
+            [attachmentRanges addObjectsFromArray:line.attachmentRanges];
+            [attachmentRects addObjectsFromArray:line.attachmentRects];
+            for (NOCMTextAttachment *attachment in line.attachments) {
+                if (attachment.content) {
+                    [attachmentContentsSet addObject:attachment.content];
+                }
+            }
+        }
+    }
+    if (attachments.count == 0) {
+        attachments = attachmentRanges = attachmentRects = nil;
+    }
+    
+    layout.frameSetter = ctSetter;
+    layout.frame = ctFrame;
+    layout.lines = lines;
+    layout.truncatedLine = truncatedLine;
+    layout.attachments = attachments;
+    layout.attachmentRanges = attachmentRanges;
+    layout.attachmentRects = attachmentRects;
+    layout.attachmentContentsSet = attachmentContentsSet;
+    layout.rowCount = rowCount;
+    layout.visibleRange = visibleRange;
+    layout.textBoundingRect = textBoundingRect;
+    layout.textBoundingSize = textBoundingSize;
+    layout.lineRowsEdge = lineRowsEdge;
+    layout.lineRowsIndex = lineRowsIndex;
+    CFRelease(cgPath);
+    CFRelease(ctSetter);
+    CFRelease(ctFrame);
+    if (lineOrigins) free(lineOrigins);
     return layout;
+    
+fail:
+    if (cgPath) CFRelease(cgPath);
+    if (ctSetter) CFRelease(ctSetter);
+    if (ctFrame) CFRelease(ctFrame);
+    if (lineOrigins) free(lineOrigins);
+    if (lineRowsEdge) free(lineRowsEdge);
+    if (lineRowsIndex) free(lineRowsIndex);
+    return nil;
 }
+
+- (instancetype)_init
+{
+    self = [super init];
+    return self;
+}
+
+- (void)dealloc
+{
+    if (_frameSetter) CFRelease(_frameSetter);
+    if (_frame) CFRelease(_frame);
+    if (_lineRowsIndex) free(_lineRowsIndex);
+    if (_lineRowsEdge) free(_lineRowsEdge);
+}
+
+#pragma mark - Query
 
 - (NOCMTextRange *)textRangeAtPoint:(CGPoint)point
 {
@@ -1164,15 +1565,73 @@ dispatch_semaphore_signal(_lock);
     return CGRectZero;
 }
 
-- (void)drawInContext:(CGContextRef)context size:(CGSize)size point:(CGPoint)point view:(UIView *)view layer:(CALayer *)layer cancel:(BOOL (^)(void))cancel
-{
-    
-}
+#pragma mark - Copying
 
 - (id)copyWithZone:(NSZone *)zone
 {
-    NOCMTextLayout *newLayout = [[NOCMTextLayout alloc] init];
-    return newLayout;
+    return self; // readonly object
+}
+
+#pragma mark - Draw
+
+static void NOCMTextDrawRun(NOCMTextLine *line, CTRunRef run, CGContextRef context, CGSize size, CGFloat verticalOffset)
+{
+    CGAffineTransform runTextMatrix = CTRunGetTextMatrix(run);
+    BOOL runTextMatrixIsID = CGAffineTransformIsIdentity(runTextMatrix);
+    
+    if (!runTextMatrixIsID) {
+        CGContextSaveGState(context);
+        CGAffineTransform trans = CGContextGetTextMatrix(context);
+        CGContextSetTextMatrix(context, CGAffineTransformConcat(trans, runTextMatrix));
+    }
+    CTRunDraw(run, context, CFRangeMake(0, 0));
+    if (!runTextMatrixIsID) {
+        CGContextRestoreGState(context);
+    }
+}
+
+static void NOCMTextDrawText(NOCMTextLayout *layout, CGContextRef context, CGSize size, CGPoint point, BOOL (^cancel)(void))
+{
+    CGContextSaveGState(context);
+    {
+        CGContextTranslateCTM(context, point.x, point.y);
+        CGContextTranslateCTM(context, 0, size.height);
+        CGContextScaleCTM(context, 1, -1);
+        
+        CGFloat verticalOffset = 0;
+        
+        NSArray *lines = layout.lines;
+        for (NSUInteger l = 0, lMax = lines.count; l < lMax; l++) {
+            NOCMTextLine *line = lines[l];
+            if (layout.truncatedLine && layout.truncatedLine.index == line.index) line = layout.truncatedLine;
+            CGFloat posX = line.position.x + verticalOffset;
+            CGFloat posY = size.height - line.position.y;
+            CFArrayRef runs = CTLineGetGlyphRuns(line.CTLine);
+            for (NSUInteger r = 0, rMax = CFArrayGetCount(runs); r < rMax; r++) {
+                CTRunRef run = CFArrayGetValueAtIndex(runs, r);
+                CGContextSetTextMatrix(context, CGAffineTransformIdentity);
+                CGContextSetTextPosition(context, posX, posY);
+                NOCMTextDrawRun(line, run, context, size, verticalOffset);
+            }
+            if (cancel && cancel()) break;
+        }
+        
+        // Use this to draw frame for test/debug.
+        // CGContextTranslateCTM(context, verticalOffset, size.height);
+        // CTFrameDraw(layout.frame, context);
+        
+    }
+    CGContextRestoreGState(context);
+}
+
+- (void)drawInContext:(CGContextRef)context size:(CGSize)size point:(CGPoint)point view:(UIView *)view layer:(CALayer *)layer cancel:(BOOL (^)(void))cancel
+{
+    @autoreleasepool {
+        if (self.needDrawText && context) {
+            if (cancel && cancel()) return;
+            NOCMTextDrawText(self, context, size, point, cancel);
+        }
+    }
 }
 
 @end
@@ -1217,7 +1676,21 @@ dispatch_semaphore_signal(_lock);
 
 #pragma mark - NOCMTextAttachment
 
-NSString *NOCMTextAttachmentAttributeName = @"NOCMTextAttachment";
+NSString *const NOCMTextBackedStringAttributeName = @"NOCMTextBackedString";
+NSString *const NOCMTextBindingAttributeName = @"NOCMTextBinding";
+NSString *const NOCMTextShadowAttributeName = @"NOCMTextShadow";
+NSString *const NOCMTextInnerShadowAttributeName = @"NOCMTextInnerShadow";
+NSString *const NOCMTextUnderlineAttributeName = @"NOCMTextUnderline";
+NSString *const NOCMTextStrikethroughAttributeName = @"NOCMTextStrikethrough";
+NSString *const NOCMTextBorderAttributeName = @"NOCMTextBorder";
+NSString *const NOCMTextBackgroundBorderAttributeName = @"NOCMTextBackgroundBorder";
+NSString *const NOCMTextBlockBorderAttributeName = @"NOCMTextBlockBorder";
+NSString *const NOCMTextAttachmentAttributeName = @"NOCMTextAttachment";
+NSString *const NOCMTextHighlightAttributeName = @"NOCMTextHighlight";
+NSString *const NOCMTextGlyphTransformAttributeName = @"NOCMTextGlyphTransform";
+
+NSString *const NOCMTextAttachmentToken = @"\uFFFC";
+NSString *const NOCMTextTruncationToken = @"\u2026";
 
 @implementation NOCMTextAttachment
 

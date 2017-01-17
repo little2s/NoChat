@@ -27,6 +27,8 @@
 		E019EADE1E1F3850004706DD /* NOCMKeyboardManager.h in Headers */ = {isa = PBXBuildFile; fileRef = E019EADC1E1F3850004706DD /* NOCMKeyboardManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E019EADF1E1F3850004706DD /* NOCMKeyboardManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E019EADD1E1F3850004706DD /* NOCMKeyboardManager.m */; };
 		E019EAE61E1F386D004706DD /* NoChat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E019EAE51E1F3865004706DD /* NoChat.framework */; };
+		E08ECB3B1E2DB75700A8ED07 /* NSAttributedString+NOCMinimal.h in Headers */ = {isa = PBXBuildFile; fileRef = E08ECB391E2DB75700A8ED07 /* NSAttributedString+NOCMinimal.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E08ECB3C1E2DB75700A8ED07 /* NSAttributedString+NOCMinimal.m in Sources */ = {isa = PBXBuildFile; fileRef = E08ECB3A1E2DB75700A8ED07 /* NSAttributedString+NOCMinimal.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -62,6 +64,8 @@
 		E019EADC1E1F3850004706DD /* NOCMKeyboardManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NOCMKeyboardManager.h; sourceTree = "<group>"; };
 		E019EADD1E1F3850004706DD /* NOCMKeyboardManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NOCMKeyboardManager.m; sourceTree = "<group>"; };
 		E019EAE01E1F3865004706DD /* NoChat.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = NoChat.xcodeproj; path = ../../NoChat/NoChat.xcodeproj; sourceTree = "<group>"; };
+		E08ECB391E2DB75700A8ED07 /* NSAttributedString+NOCMinimal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSAttributedString+NOCMinimal.h"; sourceTree = "<group>"; };
+		E08ECB3A1E2DB75700A8ED07 /* NSAttributedString+NOCMinimal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSAttributedString+NOCMinimal.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -155,6 +159,8 @@
 			children = (
 				E019EAD41E1F3836004706DD /* UIFont+NOCMinimal.h */,
 				E019EAD51E1F3836004706DD /* UIFont+NOCMinimal.m */,
+				E08ECB391E2DB75700A8ED07 /* NSAttributedString+NOCMinimal.h */,
+				E08ECB3A1E2DB75700A8ED07 /* NSAttributedString+NOCMinimal.m */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
@@ -200,6 +206,7 @@
 				E019EAD01E1F3825004706DD /* NOCMGrowingTextView.h in Headers */,
 				E019EADA1E1F3843004706DD /* NOCMChatViewController.h in Headers */,
 				E019EACE1E1F3825004706DD /* NOCMChatInputView.h in Headers */,
+				E08ECB3B1E2DB75700A8ED07 /* NSAttributedString+NOCMinimal.h in Headers */,
 				E019EABE1E1F3813004706DD /* NOCMMessage.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -293,6 +300,7 @@
 				E019EABF1E1F3813004706DD /* NOCMMessage.m in Sources */,
 				E019EAD11E1F3825004706DD /* NOCMGrowingTextView.m in Sources */,
 				E019EAD71E1F3836004706DD /* UIFont+NOCMinimal.m in Sources */,
+				E08ECB3C1E2DB75700A8ED07 /* NSAttributedString+NOCMinimal.m in Sources */,
 				E019EACF1E1F3825004706DD /* NOCMChatInputView.m in Sources */,
 				E019EADF1E1F3850004706DD /* NOCMKeyboardManager.m in Sources */,
 				E019EAD31E1F3825004706DD /* NOCMTextLabel.m in Sources */,

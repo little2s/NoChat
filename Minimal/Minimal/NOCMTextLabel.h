@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import <CoreText/CoreText.h>
+#import <QuartzCore/QuartzCore.h>
 
 @class NOCMTextLayout;
 
@@ -43,7 +44,6 @@ typedef NS_ENUM(NSUInteger, NOCMTextTruncationType) {
 @property (nullable, nonatomic, copy) NSArray<UIBezierPath *> *exclusionPaths;
 @property (nonatomic, assign) CGFloat pathLineWidth;
 @property (nonatomic, assign, getter=isPathFillEvenOdd) BOOL pathFillEvenOdd;
-@property (nonatomic, assign, getter=isVerticalForm) BOOL verticalForm;
 @property (nonatomic, assign) NSUInteger maximumNumberOfRows;
 @property (nonatomic, assign) NOCMTextTruncationType truncationType;
 @property (nullable, nonatomic, copy) NSAttributedString *truncationToken;
@@ -70,18 +70,15 @@ typedef NS_ENUM(NSUInteger, NOCMTextTruncationType) {
 
 @end
 
-@class NOCMTextRunGlyphRange;
 @class NOCMTextAttachment;
 
 @interface NOCMTextLine : NSObject
 
 @property (nonatomic, assign) NSUInteger index;
 @property (nonatomic, assign) NSUInteger row;
-@property (nullable, nonatomic, strong) NSArray<NSArray<NOCMTextRunGlyphRange *> *> *verticalRotateRange;
 
 @property (nonatomic, readonly, assign) CTLineRef CTLine;
 @property (nonatomic, readonly, assign) NSRange range;
-@property (nonatomic, readonly, assign) BOOL vertical;
 
 @property (nonatomic, readonly, assign) CGRect bounds;
 @property (nonatomic, readonly, assign) CGSize size;
@@ -103,38 +100,47 @@ typedef NS_ENUM(NSUInteger, NOCMTextTruncationType) {
 @property (nullable, nonatomic, readonly) NSArray<NSValue *> *attachmentRanges;
 @property (nullable, nonatomic, readonly) NSArray<NSValue *> *attachmentRects;
 
-+ (instancetype)lineWithCTLine:(CTLineRef)CTLine position:(CGPoint)position vertical:(BOOL)isVertical;
++ (instancetype)lineWithCTLine:(CTLineRef)CTLine position:(CGPoint)position;
 
 @end
-
-typedef NS_ENUM(NSUInteger, NOCMTextRunGlyphDrawMode) {
-    NOCMTextRunGlyphDrawModeHorizontal = 0,
-    NOCMTextRunGlyphDrawModeVerticalRotate = 1,
-    NOCMTextRunGlyphDrawModeVerticalRotateMove = 2,
-};
-
-@interface NOCMTextRunGlyphRange : NSObject
-
-@property (nonatomic, assign) NSRange glyphRangeInRun;
-@property (nonatomic, assign) NOCMTextRunGlyphDrawMode drawMode;
-
-+ (instancetype)rangeWithRange:(NSRange)range drawMode:(NOCMTextRunGlyphDrawMode)mode;
-
-@end
-
-NS_ASSUME_NONNULL_END
 
 @class NOCMTextRange;
 
 @interface NOCMTextLayout : NSObject <NSCopying>
 
-@property (nonatomic, strong) NOCMTextContainer *container;
-@property (nonatomic, strong, readonly) NSAttributedString *text;
-@property (nonatomic, strong, readonly) NSArray<NOCMTextAttachment *> *attachments;
-@property (nonatomic, strong, readonly) NSSet *attachmentContentsSet;
-@property (nonatomic, readonly) CGSize textBoundingSize;
+@property (nonatomic, readonly, strong) NOCMTextContainer *container;
+@property (nonatomic, readonly, strong) NSAttributedString *text;
+@property (nonatomic, readonly, assign) NSRange range;
 
-+ (instancetype)layoutWithContainer:(NOCMTextContainer *)container text:(NSAttributedString *)text;
+@property (nonatomic, readonly, assign) CTFramesetterRef frameSetter;
+@property (nonatomic, readonly, assign) CTFrameRef frame;
+@property (nonatomic, readonly, strong) NSArray<NOCMTextLine *> *lines;
+@property (nullable, nonatomic, readonly, strong) NOCMTextLine *truncatedLine;
+@property (nullable, nonatomic, readonly, strong) NSArray<NOCMTextAttachment *> *attachments;
+@property (nullable, nonatomic, readonly, strong) NSArray<NSValue *> *attachmentRanges;
+@property (nullable, nonatomic, readonly, strong) NSArray<NSValue *> *attachmentRects;
+@property (nullable, nonatomic, readonly, strong) NSSet *attachmentContentsSet;
+@property (nonatomic, readonly, assign) NSUInteger rowCount;
+@property (nonatomic, readonly, assign) NSRange visibleRange;
+@property (nonatomic, readonly, assign) CGRect textBoundingRect;
+@property (nonatomic, readonly, assign) CGSize textBoundingSize;
+
+@property (nonatomic, readonly, assign) BOOL containsHighlight;
+@property (nonatomic, readonly, assign) BOOL needDrawBlockBorder;
+@property (nonatomic, readonly, assign) BOOL needDrawBackgroundBorder;
+@property (nonatomic, readonly, assign) BOOL needDrawShadow;
+@property (nonatomic, readonly, assign) BOOL needDrawUnderline;
+@property (nonatomic, readonly, assign) BOOL needDrawText;
+@property (nonatomic, readonly, assign) BOOL needDrawAttachment;
+@property (nonatomic, readonly, assign) BOOL needDrawInnerShadow;
+@property (nonatomic, readonly, assign) BOOL needDrawStrikethrough;
+@property (nonatomic, readonly, assign) BOOL needDrawBorder;
+
++ (nullable instancetype)layoutWithContainer:(NOCMTextContainer *)container text:(NSAttributedString *)text;
++ (nullable instancetype)layoutWithContainer:(NOCMTextContainer *)container text:(NSAttributedString *)text range:(NSRange)range;
+
++ (instancetype)new UNAVAILABLE_ATTRIBUTE;
+- (instancetype)init UNAVAILABLE_ATTRIBUTE;
 
 - (NOCMTextRange *)textRangeAtPoint:(CGPoint)point;
 - (CGRect)rectForRange:(NOCMTextRange *)range;
@@ -142,6 +148,8 @@ NS_ASSUME_NONNULL_END
 - (void)drawInContext:(CGContextRef)context size:(CGSize)size point:(CGPoint)point view:(UIView *)view layer:(CALayer *)layer cancel:(BOOL (^)(void))cancel;
 
 @end
+
+NS_ASSUME_NONNULL_END
 
 @interface NOCMTextHighlight : NSObject
 
@@ -167,7 +175,21 @@ typedef NS_ENUM(NSInteger, NOCMTextAffinity) {
 
 @end
 
-extern NSString *NOCMTextAttachmentAttributeName;
+UIKIT_EXTERN NSString *const NOCMTextBackedStringAttributeName;
+UIKIT_EXTERN NSString *const NOCMTextBindingAttributeName;
+UIKIT_EXTERN NSString *const NOCMTextShadowAttributeName;
+UIKIT_EXTERN NSString *const NOCMTextInnerShadowAttributeName;
+UIKIT_EXTERN NSString *const NOCMTextUnderlineAttributeName;
+UIKIT_EXTERN NSString *const NOCMTextStrikethroughAttributeName;
+UIKIT_EXTERN NSString *const NOCMTextBorderAttributeName;
+UIKIT_EXTERN NSString *const NOCMTextBackgroundBorderAttributeName;
+UIKIT_EXTERN NSString *const NOCMTextBlockBorderAttributeName;
+UIKIT_EXTERN NSString *const NOCMTextAttachmentAttributeName;
+UIKIT_EXTERN NSString *const NOCMTextHighlightAttributeName;
+UIKIT_EXTERN NSString *const NOCMTextGlyphTransformAttributeName;
+
+UIKIT_EXTERN NSString *const NOCMTextAttachmentToken;
+UIKIT_EXTERN NSString *const NOCMTextTruncationToken;
 
 @interface NOCMTextAttachment : NSObject
 

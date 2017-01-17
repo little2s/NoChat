@@ -21,4 +21,10 @@
     return font;
 }
 
+- (CTFontRef)nocm_CTFontRef CF_RETURNS_RETAINED
+{
+    CTFontRef font = CTFontCreateWithName((__bridge CFStringRef)self.fontName, self.pointSize, NULL);
+    return font;
+}
+
 @end
