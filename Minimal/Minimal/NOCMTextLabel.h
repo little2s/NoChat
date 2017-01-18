@@ -142,16 +142,10 @@ typedef NS_ENUM(NSUInteger, NOCMTextTruncationType) {
 + (instancetype)new UNAVAILABLE_ATTRIBUTE;
 - (instancetype)init UNAVAILABLE_ATTRIBUTE;
 
-- (NOCMTextRange *)textRangeAtPoint:(CGPoint)point;
+- (nullable NOCMTextRange *)textRangeAtPoint:(CGPoint)point;
 - (CGRect)rectForRange:(NOCMTextRange *)range;
 
 - (void)drawInContext:(CGContextRef)context size:(CGSize)size point:(CGPoint)point view:(UIView *)view layer:(CALayer *)layer cancel:(BOOL (^)(void))cancel;
-
-@end
-
-NS_ASSUME_NONNULL_END
-
-@interface NOCMTextHighlight : NSObject
 
 @end
 
@@ -160,16 +154,28 @@ typedef NS_ENUM(NSInteger, NOCMTextAffinity) {
     NOCMTextAffinityBackward = 1
 };
 
-@interface NOCMTextPosition : NSObject
+@interface NOCMTextPosition : UITextPosition <NSCopying>
+
+@property (nonatomic, readonly, assign) NSInteger offset;
+@property (nonatomic, readonly, assign) NOCMTextAffinity affinity;
 
 + (instancetype)positionWithOffset:(NSInteger)offset;
 + (instancetype)positionWithOffset:(NSInteger)offset affinity:(NOCMTextAffinity)affinity;
 
+- (NSComparisonResult)compare:(id)otherPosition;
+
 @end
 
-@interface NOCMTextRange : NSObject
+@interface NOCMTextRange : UITextRange <NSCopying>
 
+@property (nonatomic, readonly, assign) NOCMTextPosition *start;
+@property (nonatomic, readonly, assign) NOCMTextPosition *end;
+@property (nonatomic, readonly, assign, getter=isEmpty) BOOL empty;
+
++ (instancetype)rangeWithRange:(NSRange)range;
++ (instancetype)rangeWithRange:(NSRange)range affinity:(NOCMTextAffinity) affinity;
 + (instancetype)rangeWithStart:(NOCMTextPosition *)start end:(NOCMTextPosition *)end;
++ (instancetype)defaultRange; ///< <{0,0} Forward>
 
 - (NSRange)asRange;
 
@@ -191,8 +197,47 @@ UIKIT_EXTERN NSString *const NOCMTextGlyphTransformAttributeName;
 UIKIT_EXTERN NSString *const NOCMTextAttachmentToken;
 UIKIT_EXTERN NSString *const NOCMTextTruncationToken;
 
-@interface NOCMTextAttachment : NSObject
+typedef NS_OPTIONS (NSInteger, NOCMTextLineStyle) {
+    NOCMTextLineStyleNone       = 0x00, ///< (        ) Do not draw a line (Default).
+    NOCMTextLineStyleSingle     = 0x01, ///< (──────) Draw a single line.
+};
 
-@property (nonnull, strong) id content;
+@interface NOCMTextBorder : NSObject <NSCopying>
+
+@property (nonatomic, assign) NOCMTextLineStyle lineStyle;
+@property (nonatomic, assign) CGFloat strokeWidth;
+@property (nullable, nonatomic, strong) UIColor *strokeColor;
+@property (nonatomic, assign) CGLineJoin lineJoin;
+@property (nonatomic, assign) UIEdgeInsets insets;
+@property (nonatomic, assign) CGFloat cornerRadius;
+@property (nullable, nonatomic, strong) UIColor *fillColor;
+
++ (instancetype)borderWithLineStyle:(NOCMTextLineStyle)lineStyle lineWidth:(CGFloat)width strokeColor:(nullable UIColor *)color;
++ (instancetype)borderWithFillColor:(nullable UIColor *)color cornerRadius:(CGFloat)cornerRadius;
 
 @end
+
+@interface NOCMTextAttachment : NSObject <NSCopying>
+
+@property (nullable, nonatomic, strong) id content;
+@property (nonatomic, assign) UIViewContentMode contentMode;
+@property (nonatomic, assign) UIEdgeInsets contentInsets;
+@property (nullable, nonatomic, strong) NSDictionary *userInfo;
+
++ (instancetype)attachmentWithContent:(nullable id)content;
+
+@end
+
+@interface NOCMTextHighlight : NSObject <NSCopying>
+
+@property (nullable, nonatomic, copy) NSDictionary<NSString *, id> *attributes;
+@property (nullable, nonatomic, copy) NSDictionary *userInfo;
+
++ (instancetype)highlightWithAttributes:(nullable NSDictionary<NSString *, id> *)attributes;
++ (instancetype)highlightWithBackgroundColor:(nullable UIColor *)color;
+
+- (void)setBackgroundBorder:(nullable NOCMTextBorder *)border;
+
+@end
+
+NS_ASSUME_NONNULL_END

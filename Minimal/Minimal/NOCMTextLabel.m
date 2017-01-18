@@ -1636,40 +1636,141 @@ static void NOCMTextDrawText(NOCMTextLayout *layout, CGContextRef context, CGSiz
 
 @end
 
-#pragma mark - NOCMTextHighlight
-
-@implementation NOCMTextHighlight
-
-@end
-
 #pragma mark - NOCMTextPosition
 
 @implementation NOCMTextPosition
 
 + (instancetype)positionWithOffset:(NSInteger)offset
 {
-    return nil;
+    return [self positionWithOffset:offset affinity:NOCMTextAffinityForward];
 }
 
 + (instancetype)positionWithOffset:(NSInteger)offset affinity:(NOCMTextAffinity)affinity
 {
-    return nil;
+    NOCMTextPosition *p = [self new];
+    p->_offset = offset;
+    p->_affinity = affinity;
+    return p;
+}
+
+- (instancetype)copyWithZone:(NSZone *)zone
+{
+    return [self.class positionWithOffset:_offset affinity:_affinity];
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<%@: %p> (%@%@)", self.class, self, @(_offset), _affinity == NOCMTextAffinityForward ? @"F":@"B"];
+}
+
+- (NSUInteger)hash
+{
+    return _offset * 2 + (_affinity == NOCMTextAffinityForward ? 1 : 0);
+}
+
+- (BOOL)isEqual:(NOCMTextPosition *)object
+{
+    if (!object) return NO;
+    return _offset == object.offset && _affinity == object.affinity;
+}
+
+- (NSComparisonResult)compare:(NOCMTextPosition *)otherPosition
+{
+    if (!otherPosition) return NSOrderedAscending;
+    if (_offset < otherPosition.offset) return NSOrderedAscending;
+    if (_offset > otherPosition.offset) return NSOrderedDescending;
+    if (_affinity == NOCMTextAffinityBackward && otherPosition.affinity == NOCMTextAffinityForward) return NSOrderedAscending;
+    if (_affinity == NOCMTextAffinityForward && otherPosition.affinity == NOCMTextAffinityBackward) return NSOrderedDescending;
+    return NSOrderedSame;
 }
 
 @end
 
 #pragma mark - NOCMTextRange
 
-@implementation NOCMTextRange
+@implementation NOCMTextRange {
+    NOCMTextPosition *_start;
+    NOCMTextPosition *_end;
+}
 
-+ (instancetype)rangeWithStart:(NOCMTextPosition *)start end:(NOCMTextPosition *)end
+- (instancetype)init
 {
-    return nil;
+    self = [super init];
+    if (!self) return nil;
+    _start = [NOCMTextPosition positionWithOffset:0];
+    _end = [NOCMTextPosition positionWithOffset:0];
+    return self;
+}
+
+- (NOCMTextPosition *)start
+{
+    return _start;
+}
+
+- (NOCMTextPosition *)end
+{
+    return _end;
+}
+
+- (BOOL)isEmpty
+{
+    return _start.offset == _end.offset;
 }
 
 - (NSRange)asRange
 {
-    return NSMakeRange(NSNotFound, 0);
+    return NSMakeRange(_start.offset, _end.offset - _start.offset);
+}
+
++ (instancetype)rangeWithRange:(NSRange)range
+{
+    return [self rangeWithRange:range affinity:NOCMTextAffinityForward];
+}
+
++ (instancetype)rangeWithRange:(NSRange)range affinity:(NOCMTextAffinity)affinity
+{
+    NOCMTextPosition *start = [NOCMTextPosition positionWithOffset:range.location affinity:affinity];
+    NOCMTextPosition *end = [NOCMTextPosition positionWithOffset:range.location + range.length affinity:affinity];
+    return [self rangeWithStart:start end:end];
+}
+
++ (instancetype)rangeWithStart:(NOCMTextPosition *)start end:(NOCMTextPosition *)end
+{
+    if (!start || !end) return nil;
+    if ([start compare:end] == NSOrderedDescending) {
+        NOCMTextPosition *temp = start;
+        start = end;
+        end = temp;
+    }
+    NOCMTextRange *range = [NOCMTextRange new];
+    range->_start = start;
+    range->_end = end;
+    return range;
+}
+
++ (instancetype)defaultRange
+{
+    return [self new];
+}
+
+- (instancetype)copyWithZone:(NSZone *)zone {
+    return [self.class rangeWithStart:_start end:_end];
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<%@: %p> (%@, %@)%@", self.class, self, @(_start.offset), @(_end.offset - _start.offset), _end.affinity == NOCMTextAffinityForward ? @"F":@"B"];
+}
+
+- (NSUInteger)hash
+{
+    return (sizeof(NSUInteger) == 8 ? OSSwapInt64(_start.hash) : OSSwapInt32(_start.hash)) + _end.hash;
+}
+
+- (BOOL)isEqual:(NOCMTextRange *)object
+{
+    if (!object) return NO;
+    return [_start isEqual:object.start] && [_end isEqual:object.end];
 }
 
 @end
@@ -1692,6 +1793,126 @@ NSString *const NOCMTextGlyphTransformAttributeName = @"NOCMTextGlyphTransform";
 NSString *const NOCMTextAttachmentToken = @"\uFFFC";
 NSString *const NOCMTextTruncationToken = @"\u2026";
 
+@implementation NOCMTextBorder
+
++ (instancetype)borderWithLineStyle:(NOCMTextLineStyle)lineStyle lineWidth:(CGFloat)width strokeColor:(UIColor *)color
+{
+    NOCMTextBorder *one = [self new];
+    one.lineStyle = lineStyle;
+    one.strokeWidth = width;
+    one.strokeColor = color;
+    return one;
+}
+
++ (instancetype)borderWithFillColor:(UIColor *)color cornerRadius:(CGFloat)cornerRadius
+{
+    NOCMTextBorder *one = [self new];
+    one.fillColor = color;
+    one.cornerRadius = cornerRadius;
+    one.insets = UIEdgeInsetsMake(-2, 0, 0, -2);
+    return one;
+}
+
+- (instancetype)init
+{
+    self = [super init];
+    self.lineStyle = NOCMTextLineStyleSingle;
+    return self;
+}
+
+- (id)copyWithZone:(NSZone *)zone
+{
+    typeof(self) one = [self.class new];
+    one.lineStyle = self.lineStyle;
+    one.strokeWidth = self.strokeWidth;
+    one.strokeColor = self.strokeColor;
+    one.lineJoin = self.lineJoin;
+    one.insets = self.insets;
+    one.cornerRadius = self.cornerRadius;
+    one.fillColor = self.fillColor;
+    return one;
+}
+
+@end
+
 @implementation NOCMTextAttachment
+
++ (instancetype)attachmentWithContent:(id)content
+{
+    NOCMTextAttachment *one = [self new];
+    one.content = content;
+    return one;
+}
+
+- (id)copyWithZone:(NSZone *)zone
+{
+    typeof(self) one = [self.class new];
+    if ([self.content respondsToSelector:@selector(copy)]) {
+        one.content = [self.content copy];
+    } else {
+        one.content = self.content;
+    }
+    one.contentInsets = self.contentInsets;
+    one.userInfo = self.userInfo.copy;
+    return one;
+}
+
+@end
+
+#pragma mark - NOCMTextHighlight
+
+@implementation NOCMTextHighlight
+
++ (instancetype)highlightWithAttributes:(NSDictionary *)attributes
+{
+    NOCMTextHighlight *one = [self new];
+    one.attributes = attributes;
+    return one;
+}
+
++ (instancetype)highlightWithBackgroundColor:(UIColor *)color
+{
+    NOCMTextBorder *highlightBorder = [NOCMTextBorder new];
+    highlightBorder.insets = UIEdgeInsetsMake(-2, -1, -2, -1);
+    highlightBorder.cornerRadius = 3;
+    highlightBorder.fillColor = color;
+    
+    NOCMTextHighlight *one = [self new];
+    [one setBackgroundBorder:highlightBorder];
+    return one;
+}
+
+- (void)setAttributes:(NSDictionary *)attributes
+{
+    _attributes = attributes.mutableCopy;
+}
+
+- (id)copyWithZone:(NSZone *)zone
+{
+    typeof(self) one = [self.class new];
+    one.attributes = self.attributes.mutableCopy;
+    return one;
+}
+
+- (void)_makeMutableAttributes
+{
+    if (!_attributes) {
+        _attributes = [NSMutableDictionary new];
+    } else if (![_attributes isKindOfClass:[NSMutableDictionary class]]) {
+        _attributes = _attributes.mutableCopy;
+    }
+}
+
+- (void)setTextAttribute:(NSString *)attribute value:(id)value
+{
+    [self _makeMutableAttributes];
+    if (value == nil) value = [NSNull null];
+    ((NSMutableDictionary *)_attributes)[attribute] = value;
+}
+
+- (void)setBackgroundBorder:(NOCMTextBorder *)border
+{
+    [self setTextAttribute:NOCMTextBackgroundBorderAttributeName value:border];
+}
 
 @end
