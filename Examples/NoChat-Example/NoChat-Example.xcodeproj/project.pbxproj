@@ -12,8 +12,6 @@
 		E09B24941E0E322E00E9345B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E09B24921E0E322E00E9345B /* Main.storyboard */; };
 		E09B24961E0E322E00E9345B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E09B24951E0E322E00E9345B /* Assets.xcassets */; };
 		E09B24991E0E322E00E9345B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E09B24971E0E322E00E9345B /* LaunchScreen.storyboard */; };
-		E09B24A41E0E322E00E9345B /* NoChat_ExampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E09B24A31E0E322E00E9345B /* NoChat_ExampleTests.m */; };
-		E09B24AF1E0E322E00E9345B /* NoChat_ExampleUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = E09B24AE1E0E322E00E9345B /* NoChat_ExampleUITests.m */; };
 		E09B24BE1E0E335600E9345B /* NOCChatsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E09B24BD1E0E335600E9345B /* NOCChatsViewController.m */; };
 		E09B24C91E0E34CA00E9345B /* NOCMinimalViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E09B24C81E0E34CA00E9345B /* NOCMinimalViewController.m */; };
 		E09B24CC1E0E354200E9345B /* NOCTelegramViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E09B24CB1E0E354200E9345B /* NOCTelegramViewController.m */; };
@@ -21,23 +19,6 @@
 		E0B74EAF1E1355370001B3CB /* NOCChatItemsFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = E0B74EAE1E1355370001B3CB /* NOCChatItemsFactory.m */; };
 		F693803BAF5DB0048DB9FF9D /* libPods-NoChat-Example.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F96FB2058286FA8CA65A92EB /* libPods-NoChat-Example.a */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		E09B24A01E0E322E00E9345B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E09B247B1E0E322E00E9345B /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E09B24821E0E322E00E9345B;
-			remoteInfo = "NoChat-Example";
-		};
-		E09B24AB1E0E322E00E9345B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E09B247B1E0E322E00E9345B /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E09B24821E0E322E00E9345B;
-			remoteInfo = "NoChat-Example";
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		5F4683890547AED21B7FE846 /* Pods-NoChat-Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NoChat-Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-NoChat-Example/Pods-NoChat-Example.debug.xcconfig"; sourceTree = "<group>"; };
@@ -50,12 +31,6 @@
 		E09B24951E0E322E00E9345B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E09B24981E0E322E00E9345B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		E09B249A1E0E322E00E9345B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		E09B249F1E0E322E00E9345B /* NoChat-ExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "NoChat-ExampleTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		E09B24A31E0E322E00E9345B /* NoChat_ExampleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NoChat_ExampleTests.m; sourceTree = "<group>"; };
-		E09B24A51E0E322E00E9345B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		E09B24AA1E0E322E00E9345B /* NoChat-ExampleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "NoChat-ExampleUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		E09B24AE1E0E322E00E9345B /* NoChat_ExampleUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NoChat_ExampleUITests.m; sourceTree = "<group>"; };
-		E09B24B01E0E322E00E9345B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E09B24BC1E0E335600E9345B /* NOCChatsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NOCChatsViewController.h; sourceTree = "<group>"; };
 		E09B24BD1E0E335600E9345B /* NOCChatsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NOCChatsViewController.m; sourceTree = "<group>"; };
 		E09B24C71E0E34CA00E9345B /* NOCMinimalViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NOCMinimalViewController.h; sourceTree = "<group>"; };
@@ -75,20 +50,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				F693803BAF5DB0048DB9FF9D /* libPods-NoChat-Example.a in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		E09B249C1E0E322E00E9345B /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		E09B24A71E0E322E00E9345B /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -116,8 +77,6 @@
 			isa = PBXGroup;
 			children = (
 				E09B24851E0E322E00E9345B /* NoChat-Example */,
-				E09B24A21E0E322E00E9345B /* NoChat-ExampleTests */,
-				E09B24AD1E0E322E00E9345B /* NoChat-ExampleUITests */,
 				E09B24841E0E322E00E9345B /* Products */,
 				6F33D8327B57E4C5D2F03C1F /* Pods */,
 				2F5A8A878000E7E4DD78A186 /* Frameworks */,
@@ -128,8 +87,6 @@
 			isa = PBXGroup;
 			children = (
 				E09B24831E0E322E00E9345B /* NoChat-Example.app */,
-				E09B249F1E0E322E00E9345B /* NoChat-ExampleTests.xctest */,
-				E09B24AA1E0E322E00E9345B /* NoChat-ExampleUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -153,24 +110,6 @@
 				E09B24871E0E322E00E9345B /* main.m */,
 			);
 			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		E09B24A21E0E322E00E9345B /* NoChat-ExampleTests */ = {
-			isa = PBXGroup;
-			children = (
-				E09B24A31E0E322E00E9345B /* NoChat_ExampleTests.m */,
-				E09B24A51E0E322E00E9345B /* Info.plist */,
-			);
-			path = "NoChat-ExampleTests";
-			sourceTree = "<group>";
-		};
-		E09B24AD1E0E322E00E9345B /* NoChat-ExampleUITests */ = {
-			isa = PBXGroup;
-			children = (
-				E09B24AE1E0E322E00E9345B /* NoChat_ExampleUITests.m */,
-				E09B24B01E0E322E00E9345B /* Info.plist */,
-			);
-			path = "NoChat-ExampleUITests";
 			sourceTree = "<group>";
 		};
 		E09B24BF1E0E336300E9345B /* AppDelegate */ = {
@@ -255,42 +194,6 @@
 			productReference = E09B24831E0E322E00E9345B /* NoChat-Example.app */;
 			productType = "com.apple.product-type.application";
 		};
-		E09B249E1E0E322E00E9345B /* NoChat-ExampleTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = E09B24B61E0E322E00E9345B /* Build configuration list for PBXNativeTarget "NoChat-ExampleTests" */;
-			buildPhases = (
-				E09B249B1E0E322E00E9345B /* Sources */,
-				E09B249C1E0E322E00E9345B /* Frameworks */,
-				E09B249D1E0E322E00E9345B /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				E09B24A11E0E322E00E9345B /* PBXTargetDependency */,
-			);
-			name = "NoChat-ExampleTests";
-			productName = "NoChat-ExampleTests";
-			productReference = E09B249F1E0E322E00E9345B /* NoChat-ExampleTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
-		E09B24A91E0E322E00E9345B /* NoChat-ExampleUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = E09B24B91E0E322E00E9345B /* Build configuration list for PBXNativeTarget "NoChat-ExampleUITests" */;
-			buildPhases = (
-				E09B24A61E0E322E00E9345B /* Sources */,
-				E09B24A71E0E322E00E9345B /* Frameworks */,
-				E09B24A81E0E322E00E9345B /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				E09B24AC1E0E322E00E9345B /* PBXTargetDependency */,
-			);
-			name = "NoChat-ExampleUITests";
-			productName = "NoChat-ExampleUITests";
-			productReference = E09B24AA1E0E322E00E9345B /* NoChat-ExampleUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -304,18 +207,6 @@
 						CreatedOnToolsVersion = 8.2;
 						DevelopmentTeam = YGG9VRRGFV;
 						ProvisioningStyle = Automatic;
-					};
-					E09B249E1E0E322E00E9345B = {
-						CreatedOnToolsVersion = 8.2;
-						DevelopmentTeam = YGG9VRRGFV;
-						ProvisioningStyle = Automatic;
-						TestTargetID = E09B24821E0E322E00E9345B;
-					};
-					E09B24A91E0E322E00E9345B = {
-						CreatedOnToolsVersion = 8.2;
-						DevelopmentTeam = YGG9VRRGFV;
-						ProvisioningStyle = Automatic;
-						TestTargetID = E09B24821E0E322E00E9345B;
 					};
 				};
 			};
@@ -333,8 +224,6 @@
 			projectRoot = "";
 			targets = (
 				E09B24821E0E322E00E9345B /* NoChat-Example */,
-				E09B249E1E0E322E00E9345B /* NoChat-ExampleTests */,
-				E09B24A91E0E322E00E9345B /* NoChat-ExampleUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -347,20 +236,6 @@
 				E09B24991E0E322E00E9345B /* LaunchScreen.storyboard in Resources */,
 				E09B24961E0E322E00E9345B /* Assets.xcassets in Resources */,
 				E09B24941E0E322E00E9345B /* Main.storyboard in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		E09B249D1E0E322E00E9345B /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		E09B24A81E0E322E00E9345B /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -429,36 +304,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		E09B249B1E0E322E00E9345B /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				E09B24A41E0E322E00E9345B /* NoChat_ExampleTests.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		E09B24A61E0E322E00E9345B /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				E09B24AF1E0E322E00E9345B /* NoChat_ExampleUITests.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		E09B24A11E0E322E00E9345B /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E09B24821E0E322E00E9345B /* NoChat-Example */;
-			targetProxy = E09B24A01E0E322E00E9345B /* PBXContainerItemProxy */;
-		};
-		E09B24AC1E0E322E00E9345B /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E09B24821E0E322E00E9345B /* NoChat-Example */;
-			targetProxy = E09B24AB1E0E322E00E9345B /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		E09B24921E0E322E00E9345B /* Main.storyboard */ = {
@@ -596,56 +442,6 @@
 			};
 			name = Release;
 		};
-		E09B24B71E0E322E00E9345B /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				DEVELOPMENT_TEAM = YGG9VRRGFV;
-				INFOPLIST_FILE = "NoChat-ExampleTests/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.little2s.NoChat-ExampleTests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/NoChat-Example.app/NoChat-Example";
-			};
-			name = Debug;
-		};
-		E09B24B81E0E322E00E9345B /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				DEVELOPMENT_TEAM = YGG9VRRGFV;
-				INFOPLIST_FILE = "NoChat-ExampleTests/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.little2s.NoChat-ExampleTests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/NoChat-Example.app/NoChat-Example";
-			};
-			name = Release;
-		};
-		E09B24BA1E0E322E00E9345B /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				DEVELOPMENT_TEAM = YGG9VRRGFV;
-				INFOPLIST_FILE = "NoChat-ExampleUITests/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.little2s.NoChat-ExampleUITests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_TARGET_NAME = "NoChat-Example";
-			};
-			name = Debug;
-		};
-		E09B24BB1E0E322E00E9345B /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				DEVELOPMENT_TEAM = YGG9VRRGFV;
-				INFOPLIST_FILE = "NoChat-ExampleUITests/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.little2s.NoChat-ExampleUITests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_TARGET_NAME = "NoChat-Example";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -663,24 +459,6 @@
 			buildConfigurations = (
 				E09B24B41E0E322E00E9345B /* Debug */,
 				E09B24B51E0E322E00E9345B /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		E09B24B61E0E322E00E9345B /* Build configuration list for PBXNativeTarget "NoChat-ExampleTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				E09B24B71E0E322E00E9345B /* Debug */,
-				E09B24B81E0E322E00E9345B /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		E09B24B91E0E322E00E9345B /* Build configuration list for PBXNativeTarget "NoChat-ExampleUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				E09B24BA1E0E322E00E9345B /* Debug */,
-				E09B24BB1E0E322E00E9345B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

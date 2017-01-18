@@ -12,27 +12,8 @@
 		E019EAFD1E1F3F91004706DD /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E019EAFB1E1F3F91004706DD /* Main.storyboard */; };
 		E019EAFF1E1F3F91004706DD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E019EAFE1E1F3F91004706DD /* Assets.xcassets */; };
 		E019EB021E1F3F91004706DD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E019EB001E1F3F91004706DD /* LaunchScreen.storyboard */; };
-		E019EB0D1E1F3F91004706DD /* NoChat_Swift_ExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E019EB0C1E1F3F91004706DD /* NoChat_Swift_ExampleTests.swift */; };
-		E019EB181E1F3F91004706DD /* NoChat_Swift_ExampleUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E019EB171E1F3F91004706DD /* NoChat_Swift_ExampleUITests.swift */; };
 		F761FF0CFBAC477EEA684132 /* Pods_NoChat_Swift_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F620EC5E214638830A7F8744 /* Pods_NoChat_Swift_Example.framework */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		E019EB091E1F3F91004706DD /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E019EAEC1E1F3F91004706DD /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E019EAF31E1F3F91004706DD;
-			remoteInfo = "NoChat-Swift-Example";
-		};
-		E019EB141E1F3F91004706DD /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E019EAEC1E1F3F91004706DD /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E019EAF31E1F3F91004706DD;
-			remoteInfo = "NoChat-Swift-Example";
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		224008E8A259C9796DE715DC /* Pods-NoChat-Swift-Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NoChat-Swift-Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-NoChat-Swift-Example/Pods-NoChat-Swift-Example.debug.xcconfig"; sourceTree = "<group>"; };
@@ -43,12 +24,6 @@
 		E019EAFE1E1F3F91004706DD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E019EB011E1F3F91004706DD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		E019EB031E1F3F91004706DD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		E019EB081E1F3F91004706DD /* NoChat-Swift-ExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "NoChat-Swift-ExampleTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		E019EB0C1E1F3F91004706DD /* NoChat_Swift_ExampleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoChat_Swift_ExampleTests.swift; sourceTree = "<group>"; };
-		E019EB0E1E1F3F91004706DD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		E019EB131E1F3F91004706DD /* NoChat-Swift-ExampleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "NoChat-Swift-ExampleUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		E019EB171E1F3F91004706DD /* NoChat_Swift_ExampleUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoChat_Swift_ExampleUITests.swift; sourceTree = "<group>"; };
-		E019EB191E1F3F91004706DD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E2F37360C530BAA1DC25E868 /* Pods-NoChat-Swift-Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NoChat-Swift-Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-NoChat-Swift-Example/Pods-NoChat-Swift-Example.release.xcconfig"; sourceTree = "<group>"; };
 		F620EC5E214638830A7F8744 /* Pods_NoChat_Swift_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NoChat_Swift_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -59,20 +34,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				F761FF0CFBAC477EEA684132 /* Pods_NoChat_Swift_Example.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		E019EB051E1F3F91004706DD /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		E019EB101E1F3F91004706DD /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -100,8 +61,6 @@
 			isa = PBXGroup;
 			children = (
 				E019EAF61E1F3F91004706DD /* NoChat-Swift-Example */,
-				E019EB0B1E1F3F91004706DD /* NoChat-Swift-ExampleTests */,
-				E019EB161E1F3F91004706DD /* NoChat-Swift-ExampleUITests */,
 				E019EAF51E1F3F91004706DD /* Products */,
 				BFA6CC91E57C6A6B1D6E4EF2 /* Pods */,
 				3CC61D5EA113F05D943C4CFE /* Frameworks */,
@@ -112,8 +71,6 @@
 			isa = PBXGroup;
 			children = (
 				E019EAF41E1F3F91004706DD /* NoChat-Swift-Example.app */,
-				E019EB081E1F3F91004706DD /* NoChat-Swift-ExampleTests.xctest */,
-				E019EB131E1F3F91004706DD /* NoChat-Swift-ExampleUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -129,24 +86,6 @@
 				E019EB031E1F3F91004706DD /* Info.plist */,
 			);
 			path = "NoChat-Swift-Example";
-			sourceTree = "<group>";
-		};
-		E019EB0B1E1F3F91004706DD /* NoChat-Swift-ExampleTests */ = {
-			isa = PBXGroup;
-			children = (
-				E019EB0C1E1F3F91004706DD /* NoChat_Swift_ExampleTests.swift */,
-				E019EB0E1E1F3F91004706DD /* Info.plist */,
-			);
-			path = "NoChat-Swift-ExampleTests";
-			sourceTree = "<group>";
-		};
-		E019EB161E1F3F91004706DD /* NoChat-Swift-ExampleUITests */ = {
-			isa = PBXGroup;
-			children = (
-				E019EB171E1F3F91004706DD /* NoChat_Swift_ExampleUITests.swift */,
-				E019EB191E1F3F91004706DD /* Info.plist */,
-			);
-			path = "NoChat-Swift-ExampleUITests";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -172,42 +111,6 @@
 			productReference = E019EAF41E1F3F91004706DD /* NoChat-Swift-Example.app */;
 			productType = "com.apple.product-type.application";
 		};
-		E019EB071E1F3F91004706DD /* NoChat-Swift-ExampleTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = E019EB1F1E1F3F91004706DD /* Build configuration list for PBXNativeTarget "NoChat-Swift-ExampleTests" */;
-			buildPhases = (
-				E019EB041E1F3F91004706DD /* Sources */,
-				E019EB051E1F3F91004706DD /* Frameworks */,
-				E019EB061E1F3F91004706DD /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				E019EB0A1E1F3F91004706DD /* PBXTargetDependency */,
-			);
-			name = "NoChat-Swift-ExampleTests";
-			productName = "NoChat-Swift-ExampleTests";
-			productReference = E019EB081E1F3F91004706DD /* NoChat-Swift-ExampleTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
-		E019EB121E1F3F91004706DD /* NoChat-Swift-ExampleUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = E019EB221E1F3F91004706DD /* Build configuration list for PBXNativeTarget "NoChat-Swift-ExampleUITests" */;
-			buildPhases = (
-				E019EB0F1E1F3F91004706DD /* Sources */,
-				E019EB101E1F3F91004706DD /* Frameworks */,
-				E019EB111E1F3F91004706DD /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				E019EB151E1F3F91004706DD /* PBXTargetDependency */,
-			);
-			name = "NoChat-Swift-ExampleUITests";
-			productName = "NoChat-Swift-ExampleUITests";
-			productReference = E019EB131E1F3F91004706DD /* NoChat-Swift-ExampleUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -222,18 +125,6 @@
 						CreatedOnToolsVersion = 8.2;
 						DevelopmentTeam = YGG9VRRGFV;
 						ProvisioningStyle = Automatic;
-					};
-					E019EB071E1F3F91004706DD = {
-						CreatedOnToolsVersion = 8.2;
-						DevelopmentTeam = YGG9VRRGFV;
-						ProvisioningStyle = Automatic;
-						TestTargetID = E019EAF31E1F3F91004706DD;
-					};
-					E019EB121E1F3F91004706DD = {
-						CreatedOnToolsVersion = 8.2;
-						DevelopmentTeam = YGG9VRRGFV;
-						ProvisioningStyle = Automatic;
-						TestTargetID = E019EAF31E1F3F91004706DD;
 					};
 				};
 			};
@@ -251,8 +142,6 @@
 			projectRoot = "";
 			targets = (
 				E019EAF31E1F3F91004706DD /* NoChat-Swift-Example */,
-				E019EB071E1F3F91004706DD /* NoChat-Swift-ExampleTests */,
-				E019EB121E1F3F91004706DD /* NoChat-Swift-ExampleUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -265,20 +154,6 @@
 				E019EB021E1F3F91004706DD /* LaunchScreen.storyboard in Resources */,
 				E019EAFF1E1F3F91004706DD /* Assets.xcassets in Resources */,
 				E019EAFD1E1F3F91004706DD /* Main.storyboard in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		E019EB061E1F3F91004706DD /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		E019EB111E1F3F91004706DD /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -342,36 +217,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		E019EB041E1F3F91004706DD /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				E019EB0D1E1F3F91004706DD /* NoChat_Swift_ExampleTests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		E019EB0F1E1F3F91004706DD /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				E019EB181E1F3F91004706DD /* NoChat_Swift_ExampleUITests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		E019EB0A1E1F3F91004706DD /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E019EAF31E1F3F91004706DD /* NoChat-Swift-Example */;
-			targetProxy = E019EB091E1F3F91004706DD /* PBXContainerItemProxy */;
-		};
-		E019EB151E1F3F91004706DD /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E019EAF31E1F3F91004706DD /* NoChat-Swift-Example */;
-			targetProxy = E019EB141E1F3F91004706DD /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		E019EAFB1E1F3F91004706DD /* Main.storyboard */ = {
@@ -514,64 +360,6 @@
 			};
 			name = Release;
 		};
-		E019EB201E1F3F91004706DD /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				DEVELOPMENT_TEAM = YGG9VRRGFV;
-				INFOPLIST_FILE = "NoChat-Swift-ExampleTests/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.little2s.NoChat-Swift-ExampleTests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/NoChat-Swift-Example.app/NoChat-Swift-Example";
-			};
-			name = Debug;
-		};
-		E019EB211E1F3F91004706DD /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				DEVELOPMENT_TEAM = YGG9VRRGFV;
-				INFOPLIST_FILE = "NoChat-Swift-ExampleTests/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.little2s.NoChat-Swift-ExampleTests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/NoChat-Swift-Example.app/NoChat-Swift-Example";
-			};
-			name = Release;
-		};
-		E019EB231E1F3F91004706DD /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				DEVELOPMENT_TEAM = YGG9VRRGFV;
-				INFOPLIST_FILE = "NoChat-Swift-ExampleUITests/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.little2s.NoChat-Swift-ExampleUITests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
-				TEST_TARGET_NAME = "NoChat-Swift-Example";
-			};
-			name = Debug;
-		};
-		E019EB241E1F3F91004706DD /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				DEVELOPMENT_TEAM = YGG9VRRGFV;
-				INFOPLIST_FILE = "NoChat-Swift-ExampleUITests/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.little2s.NoChat-Swift-ExampleUITests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
-				TEST_TARGET_NAME = "NoChat-Swift-Example";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -591,22 +379,7 @@
 				E019EB1E1E1F3F91004706DD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-		};
-		E019EB1F1E1F3F91004706DD /* Build configuration list for PBXNativeTarget "NoChat-Swift-ExampleTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				E019EB201E1F3F91004706DD /* Debug */,
-				E019EB211E1F3F91004706DD /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-		};
-		E019EB221E1F3F91004706DD /* Build configuration list for PBXNativeTarget "NoChat-Swift-ExampleUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				E019EB231E1F3F91004706DD /* Debug */,
-				E019EB241E1F3F91004706DD /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
