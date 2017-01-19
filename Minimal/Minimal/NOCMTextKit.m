@@ -847,6 +847,24 @@ fail:
     return self;
 }
 
+- (void)setFrameSetter:(CTFramesetterRef)frameSetter
+{
+    if (_frameSetter != frameSetter) {
+        if (frameSetter) CFRetain(frameSetter);
+        if (_frameSetter) CFRelease(_frameSetter);
+        _frameSetter = frameSetter;
+    }
+}
+
+- (void)setFrame:(CTFrameRef)frame
+{
+    if (_frame != frame) {
+        if (frame) CFRetain(frame);
+        if (_frame) CFRelease(_frame);
+        _frame = frame;
+    }
+}
+
 - (void)dealloc
 {
     if (_frameSetter) CFRelease(_frameSetter);
