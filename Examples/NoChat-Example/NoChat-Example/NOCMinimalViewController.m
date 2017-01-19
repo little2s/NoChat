@@ -9,7 +9,7 @@
 #import "NOCMinimalViewController.h"
 #import "NOCChatItemsFactory.h"
 
-@interface NOCMinimalViewController ()
+@interface NOCMinimalViewController () <UINavigationControllerDelegate>
 
 @end
 
@@ -28,7 +28,26 @@
 {
     [super viewDidLoad];
     self.title = @"Minimal";
+    self.navigationController.delegate = self;
     [self loadChatItems];
+}
+
+- (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated
+{
+    if (self == navigationController.topViewController) {
+        return;
+    }
+    
+    self.chatInputView.delegate = nil;
+    
+    __weak typeof(self) weakSelf = self;
+    
+    id<UIViewControllerTransitionCoordinator> transitionCoordinator = navigationController.topViewController.transitionCoordinator;
+    [transitionCoordinator notifyWhenInteractionEndsUsingBlock:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        if ([context isCancelled] && weakSelf) {
+            weakSelf.chatInputView.delegate = weakSelf;
+        }
+    }];
 }
 
 - (void)loadChatItems
