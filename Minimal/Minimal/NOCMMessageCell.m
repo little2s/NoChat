@@ -112,10 +112,7 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
-        _textLabel = [[UILabel alloc] init];
-        _textLabel.numberOfLines = 0;
-        _textLabel.font = [NOCMTextMessageContentViewLayout textFont];
-        _textLabel.textColor = [NOCMTextMessageContentViewLayout textColor];
+        _textLabel = [[NOCMTextLabel alloc] init];
         [self addSubview:_textLabel];
     }
     return self;
@@ -124,9 +121,8 @@
 - (void)setLayout:(id<NOCMMessageContentViewLayout>)layout
 {
     NOCMTextMessageContentViewLayout *contentViewLayout = (NOCMTextMessageContentViewLayout *)layout;
-    NOCMMessage *message = (NOCMMessage *)contentViewLayout.cellLayout.chatItem;
     self.textLabel.frame = contentViewLayout.textLabelFrame;
-    self.textLabel.text = message.text;
+    self.textLabel.textLayout = contentViewLayout.textLayout;
 }
 
 @end

@@ -142,8 +142,29 @@ CGSize nocm_sizeForAttributedString(NSAttributedString *attributedString, CGFloa
 
 - (void)calculateLayout
 {
-    CGSize size = nocm_sizeForAttributedString([self attributedString], self.width);
-    self.height = size.height;
+    self.textLabelFrame = CGRectZero;
+    self.textLayout = nil;
+    
+    NSAttributedString *text = [self attributedString];
+    if (text.length == 0) {
+        return;
+    }
+    
+    NOCMTextLinePositionModifier *modifier = [[NOCMTextLinePositionModifier alloc] init];
+    modifier.font = [NOCMTextMessageContentViewLayout textFont];
+    modifier.paddingTop = 2;
+    modifier.paddingBottom = 2;
+    
+    NOCMTextContainer *container = [[NOCMTextContainer alloc] init];
+    container.size = CGSizeMake(self.width, CGFLOAT_MAX);
+    container.linePositionModifier = modifier;
+    
+    self.textLayout = [NOCMTextLayout layoutWithContainer:container text:text];
+    if (!self.textLayout) {
+        return;
+    }
+    
+    self.height = [modifier heightForLineCount:self.textLayout.rowCount];
     self.textLabelFrame = CGRectMake(0, 0, self.width, self.height);
 }
 
@@ -151,7 +172,8 @@ CGSize nocm_sizeForAttributedString(NSAttributedString *attributedString, CGFloa
 {
     NSString *text = ((NOCMMessage *)self.cellLayout.chatItem).text;
     NSAttributedString *result = [[NSAttributedString alloc] initWithString:text attributes:@{
-        NSFontAttributeName: [NOCMTextMessageContentViewLayout textFont]
+        NSFontAttributeName: [NOCMTextMessageContentViewLayout textFont],
+        NSForegroundColorAttributeName: [NOCMTextMessageContentViewLayout textColor]
     }];
     return result;
 }
@@ -173,6 +195,52 @@ CGSize nocm_sizeForAttributedString(NSAttributedString *attributedString, CGFloa
 + (UIColor *)textColor
 {
     return [UIColor blackColor];
+}
+
+@end
+
+@implementation NOCMTextLinePositionModifier
+
+- (instancetype)init
+{
+    self = [super init];
+    if ([NSProcessInfo.processInfo isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){9,0,0}]) {
+        _lineHeightMultiple = 1.34;   // for PingFang SC
+    } else {
+        _lineHeightMultiple = 1.3125; // for Heiti SC
+    }
+    return self;
+}
+
+- (void)modifyLines:(NSArray *)lines fromText:(NSAttributedString *)text inContainer:(NOCMTextContainer *)container
+{
+    CGFloat ascent = _font.pointSize * 0.86;
+    
+    CGFloat lineHeight = _font.pointSize * _lineHeightMultiple;
+    for (NOCMTextLine *line in lines) {
+        CGPoint position = line.position;
+        position.y = _paddingTop + ascent + line.row  * lineHeight;
+        line.position = position;
+    }
+}
+
+- (id)copyWithZone:(NSZone *)zone
+{
+    NOCMTextLinePositionModifier *one = [self.class new];
+    one->_font = _font;
+    one->_paddingTop = _paddingTop;
+    one->_paddingBottom = _paddingBottom;
+    one->_lineHeightMultiple = _lineHeightMultiple;
+    return one;
+}
+
+- (CGFloat)heightForLineCount:(NSUInteger)lineCount
+{
+    if (lineCount == 0) return 0;
+    CGFloat ascent = _font.pointSize * 0.86;
+    CGFloat descent = _font.pointSize * 0.14;
+    CGFloat lineHeight = _font.pointSize * _lineHeightMultiple;
+    return _paddingTop + _paddingBottom + ascent + descent + (lineCount - 1) * lineHeight;
 }
 
 @end

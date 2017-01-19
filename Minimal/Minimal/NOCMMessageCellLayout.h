@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import <NoChat/NoChat.h>
+#import "NOCMTextKit.h"
 
 @class NOCMMessageCellLayout;
 
@@ -58,6 +59,7 @@
 
 @property (nonatomic, weak) NOCMMessageCellLayout *cellLayout;
 @property (nonatomic, assign) CGRect textLabelFrame;
+@property (nonatomic, strong) NOCMTextLayout *textLayout;
 
 @property (nonatomic, assign) CGFloat width;
 @property (nonatomic, assign) CGFloat height;
@@ -70,5 +72,16 @@
 
 + (UIFont *)textFont;
 + (UIColor *)textColor;
+
+@end
+
+@interface NOCMTextLinePositionModifier : NSObject <NOCMTextLinePositionModifier>
+
+@property (nonatomic, strong) UIFont *font;
+@property (nonatomic, assign) CGFloat paddingTop;
+@property (nonatomic, assign) CGFloat paddingBottom;
+@property (nonatomic, assign) CGFloat lineHeightMultiple;
+
+- (CGFloat)heightForLineCount:(NSUInteger)lineCount;
 
 @end

@@ -18,6 +18,7 @@ FOUNDATION_EXPORT const unsigned char MinimalVersionString[];
 #import <Minimal/NOCMGrowingTextView.h>
 #import <Minimal/NOCMTextLabel.h>
 #import <Minimal/NOCMChatViewController.h>
+#import <Minimal/NOCMTextKit.h>
 #import <Minimal/NOCMKeyboardManager.h>
 #import <Minimal/UIFont+NOCMinimal.h>
 #import <MInimal/NSAttributedString+NOCMinimal.h>

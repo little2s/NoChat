@@ -8,6 +8,7 @@
 
 #import <NoChat/NoChat.h>
 #import "NOCMMessageCellLayout.h"
+#import "NOCMTextLabel.h"
 
 @class NOCMMessageCell;
 
@@ -47,7 +48,7 @@
 // Text Message
 @interface NOCMTextMessageContentView : NOCMMessageContentView
 
-@property (nonatomic, strong) UILabel *textLabel;
+@property (nonatomic, strong) NOCMTextLabel *textLabel;
 
 @end
 
