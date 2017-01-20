@@ -410,6 +410,53 @@ typedef struct {
     CGFloat foot;
 } NOCMRowEdge;
 
+static inline BOOL NOCMTextIsLinebreakChar(unichar c)
+{
+    switch (c) {
+        case 0x000D:
+        case 0x2028:
+        case 0x000A:
+        case 0x2029:
+            return YES;
+        default:
+            return NO;
+    }
+}
+
+static inline BOOL NOCMTextIsLinebreakString(NSString * _Nullable str)
+{
+    if (str.length > 2 || str.length == 0) return NO;
+    if (str.length == 1) {
+        unichar c = [str characterAtIndex:0];
+        return NOCMTextIsLinebreakChar(c);
+    } else {
+        return ([str characterAtIndex:0] == '\r') && ([str characterAtIndex:1] == '\n');
+    }
+}
+
+static inline NSUInteger NOCMTextLinebreakTailLength(NSString * _Nullable str)
+{
+    if (str.length >= 2) {
+        unichar c2 = [str characterAtIndex:str.length - 1];
+        if (NOCMTextIsLinebreakChar(c2)) {
+            unichar c1 = [str characterAtIndex:str.length - 2];
+            if (c1 == '\r' && c2 == '\n') return 2;
+            else return 1;
+        } else {
+            return 0;
+        }
+    } else if (str.length == 1) {
+        return NOCMTextIsLinebreakChar([str characterAtIndex:0]) ? 1 : 0;
+    } else {
+        return 0;
+    }
+}
+
+static inline BOOL NOCMCTFontContainsColorBitmapGlyphs(CTFontRef font)
+{
+    return  (CTFontGetSymbolicTraits(font) & kCTFontTraitColorGlyphs) != 0;
+}
+
 @interface NOCMTextLayout ()
 
 @property (nonatomic, readwrite, strong) NOCMTextContainer *container;
@@ -875,14 +922,911 @@ fail:
 
 #pragma mark - Query
 
-- (NOCMTextRange *)textRangeAtPoint:(CGPoint)point
+- (NSUInteger)_rowIndexForEdge:(CGFloat)edge
 {
-    return nil;
+    if (_rowCount == 0) return NSNotFound;
+    NSUInteger lo = 0, hi = _rowCount - 1, mid = 0;
+    NSUInteger rowIdx = NSNotFound;
+    while (lo <= hi) {
+        mid = (lo + hi) / 2;
+        NOCMRowEdge oneEdge = _lineRowsEdge[mid];
+        if (oneEdge.head <= edge && edge <= oneEdge.foot) {
+            rowIdx = mid;
+            break;
+        }
+        if (edge < oneEdge.head) {
+            if (mid == 0) break;
+            hi = mid - 1;
+        } else {
+            lo = mid + 1;
+        }
+    }
+    return rowIdx;
+}
+
+- (NSUInteger)_closestRowIndexForEdge:(CGFloat)edge
+{
+    if (_rowCount == 0) return NSNotFound;
+    NSUInteger rowIdx = [self _rowIndexForEdge:edge];
+    if (rowIdx == NSNotFound) {
+        if (edge < _lineRowsEdge[0].head) {
+            rowIdx = 0;
+        } else if (edge > _lineRowsEdge[_rowCount - 1].foot) {
+            rowIdx = _rowCount - 1;
+        }
+    }
+    return rowIdx;
+}
+
+- (CTRunRef)_runForLine:(NOCMTextLine *)line position:(NOCMTextPosition *)position
+{
+    if (!line || !position) return NULL;
+    CFArrayRef runs = CTLineGetGlyphRuns(line.CTLine);
+    for (NSUInteger i = 0, max = CFArrayGetCount(runs); i < max; i++) {
+        CTRunRef run = CFArrayGetValueAtIndex(runs, i);
+        CFRange range = CTRunGetStringRange(run);
+        if (position.affinity == NOCMTextAffinityBackward) {
+            if (range.location < position.offset && position.offset <= range.location + range.length) {
+                return run;
+            }
+        } else {
+            if (range.location <= position.offset && position.offset < range.location + range.length) {
+                return run;
+            }
+        }
+    }
+    return NULL;
+}
+
+- (BOOL)_insideComposedCharacterSequences:(NOCMTextLine *)line position:(NSUInteger)position block:(void (^)(CGFloat left, CGFloat right, NSUInteger prev, NSUInteger next))block
+{
+    NSRange range = line.range;
+    if (range.length == 0) return NO;
+    __block BOOL inside = NO;
+    __block NSUInteger _prev, _next;
+    [_text.string enumerateSubstringsInRange:range options:NSStringEnumerationByComposedCharacterSequences usingBlock: ^(NSString *substring, NSRange substringRange, NSRange enclosingRange, BOOL *stop) {
+        NSUInteger prev = substringRange.location;
+        NSUInteger next = substringRange.location + substringRange.length;
+        if (prev == position || next == position) {
+            *stop = YES;
+        }
+        if (prev < position && position < next) {
+            inside = YES;
+            _prev = prev;
+            _next = next;
+            *stop = YES;
+        }
+    }];
+    if (inside && block) {
+        CGFloat left = [self offsetForTextPosition:_prev lineIndex:line.index];
+        CGFloat right = [self offsetForTextPosition:_next lineIndex:line.index];
+        block(left, right, _prev, _next);
+    }
+    return inside;
+}
+
+- (BOOL)_insideEmoji:(NOCMTextLine *)line position:(NSUInteger)position block:(void (^)(CGFloat left, CGFloat right, NSUInteger prev, NSUInteger next))block
+{
+    if (!line) return NO;
+    CFArrayRef runs = CTLineGetGlyphRuns(line.CTLine);
+    for (NSUInteger r = 0, rMax = CFArrayGetCount(runs); r < rMax; r++) {
+        CTRunRef run = CFArrayGetValueAtIndex(runs, r);
+        NSUInteger glyphCount = CTRunGetGlyphCount(run);
+        if (glyphCount == 0) continue;
+        CFRange range = CTRunGetStringRange(run);
+        if (range.length <= 1) continue;
+        if (position <= range.location || position >= range.location + range.length) continue;
+        CFDictionaryRef attrs = CTRunGetAttributes(run);
+        CTFontRef font = CFDictionaryGetValue(attrs, kCTFontAttributeName);
+        if (!NOCMCTFontContainsColorBitmapGlyphs(font)) continue;
+        
+        // Here's Emoji runs (larger than 1 unichar), and position is inside the range.
+        CFIndex indices[glyphCount];
+        CTRunGetStringIndices(run, CFRangeMake(0, glyphCount), indices);
+        for (NSUInteger g = 0; g < glyphCount; g++) {
+            CFIndex prev = indices[g];
+            CFIndex next = g + 1 < glyphCount ? indices[g + 1] : range.location + range.length;
+            if (position == prev) break; // Emoji edge
+            if (prev < position && position < next) { // inside an emoji (such as National Flag Emoji)
+                CGPoint pos = CGPointZero;
+                CGSize adv = CGSizeZero;
+                CTRunGetPositions(run, CFRangeMake(g, 1), &pos);
+                CTRunGetAdvances(run, CFRangeMake(g, 1), &adv);
+                if (block) {
+                    block(line.position.x + pos.x,
+                          line.position.x + pos.x + adv.width,
+                          prev, next);
+                }
+                return YES;
+            }
+        }
+    }
+    return NO;
+}
+
+- (BOOL)_isRightToLeftInLine:(NOCMTextLine *)line atPoint:(CGPoint)point
+{
+    if (!line) return NO;
+    // get write direction
+    BOOL RTL = NO;
+    CFArrayRef runs = CTLineGetGlyphRuns(line.CTLine);
+    for (NSUInteger r = 0, max = CFArrayGetCount(runs); r < max; r++) {
+        CTRunRef run = CFArrayGetValueAtIndex(runs, r);
+        CGPoint glyphPosition;
+        CTRunGetPositions(run, CFRangeMake(0, 1), &glyphPosition);
+        CGFloat runX = glyphPosition.x;
+        runX += line.position.x;
+        CGFloat runWidth = CTRunGetTypographicBounds(run, CFRangeMake(0, 0), NULL, NULL, NULL);
+        if (runX <= point.x && point.x <= runX + runWidth) {
+            if (CTRunGetStatus(run) & kCTRunStatusRightToLeft) RTL = YES;
+            break;
+        }
+    }
+    return RTL;
+}
+
+- (NOCMTextRange *)_correctedRangeWithEdge:(NOCMTextRange *)range
+{
+    NSRange visibleRange = self.visibleRange;
+    NOCMTextPosition *start = range.start;
+    NOCMTextPosition *end = range.end;
+    
+    if (start.offset == visibleRange.location && start.affinity == NOCMTextAffinityBackward) {
+        start = [NOCMTextPosition positionWithOffset:start.offset affinity:NOCMTextAffinityForward];
+    }
+    
+    if (end.offset == visibleRange.location + visibleRange.length && start.affinity == NOCMTextAffinityForward) {
+        end = [NOCMTextPosition positionWithOffset:end.offset affinity:NOCMTextAffinityBackward];
+    }
+    
+    if (start != range.start || end != range.end) {
+        range = [NOCMTextRange rangeWithStart:start end:end];
+    }
+    return range;
+}
+
+- (NSUInteger)lineIndexForRow:(NSUInteger)row
+{
+    if (row >= _rowCount) return NSNotFound;
+    return _lineRowsIndex[row];
+}
+
+- (NSUInteger)lineCountForRow:(NSUInteger)row
+{
+    if (row >= _rowCount) return NSNotFound;
+    if (row == _rowCount - 1) {
+        return _lines.count - _lineRowsIndex[row];
+    } else {
+        return _lineRowsIndex[row + 1] - _lineRowsIndex[row];
+    }
+}
+
+- (NSUInteger)rowIndexForLine:(NSUInteger)line
+{
+    if (line >= _lines.count) return NSNotFound;
+    return ((NOCMTextLine *)_lines[line]).row;
+}
+
+- (NSUInteger)lineIndexForPoint:(CGPoint)point
+{
+    if (_lines.count == 0 || _rowCount == 0) return NSNotFound;
+    NSUInteger rowIdx = [self _rowIndexForEdge:point.y];
+    if (rowIdx == NSNotFound) return NSNotFound;
+    
+    NSUInteger lineIdx0 = _lineRowsIndex[rowIdx];
+    NSUInteger lineIdx1 = rowIdx == _rowCount - 1 ? _lines.count - 1 : _lineRowsIndex[rowIdx + 1] - 1;
+    for (NSUInteger i = lineIdx0; i <= lineIdx1; i++) {
+        CGRect bounds = ((NOCMTextLine *)_lines[i]).bounds;
+        if (CGRectContainsPoint(bounds, point)) return i;
+    }
+    
+    return NSNotFound;
+}
+
+- (NSUInteger)closestLineIndexForPoint:(CGPoint)point
+{
+    if (_lines.count == 0 || _rowCount == 0) return NSNotFound;
+    NSUInteger rowIdx = [self _closestRowIndexForEdge:point.y];
+    if (rowIdx == NSNotFound) return NSNotFound;
+    
+    NSUInteger lineIdx0 = _lineRowsIndex[rowIdx];
+    NSUInteger lineIdx1 = rowIdx == _rowCount - 1 ? _lines.count - 1 : _lineRowsIndex[rowIdx + 1] - 1;
+    if (lineIdx0 == lineIdx1) return lineIdx0;
+    
+    CGFloat minDistance = CGFLOAT_MAX;
+    NSUInteger minIndex = lineIdx0;
+    for (NSUInteger i = lineIdx0; i <= lineIdx1; i++) {
+        CGRect bounds = ((NOCMTextLine *)_lines[i]).bounds;
+        if (bounds.origin.x <= point.x && point.x <= bounds.origin.x + bounds.size.width) return i;
+        CGFloat distance;
+        if (point.x < bounds.origin.x) {
+            distance = bounds.origin.x - point.x;
+        } else {
+            distance = point.x - (bounds.origin.x + bounds.size.width);
+        }
+        if (distance < minDistance) {
+            minDistance = distance;
+            minIndex = i;
+        }
+    }
+    return minIndex;
+}
+
+- (CGFloat)offsetForTextPosition:(NSUInteger)position lineIndex:(NSUInteger)lineIndex
+{
+    if (lineIndex >= _lines.count) return CGFLOAT_MAX;
+    NOCMTextLine *line = _lines[lineIndex];
+    CFRange range = CTLineGetStringRange(line.CTLine);
+    if (position < range.location || position > range.location + range.length) return CGFLOAT_MAX;
+    
+    CGFloat offset = CTLineGetOffsetForStringIndex(line.CTLine, position, NULL);
+    return offset + line.position.x;
+}
+
+- (NSUInteger)textPositionForPoint:(CGPoint)point lineIndex:(NSUInteger)lineIndex
+{
+    if (lineIndex >= _lines.count) return NSNotFound;
+    NOCMTextLine *line = _lines[lineIndex];
+    point.x -= line.position.x;
+    point.y = 0;
+    
+    CFIndex idx = CTLineGetStringIndexForPosition(line.CTLine, point);
+    if (idx == kCFNotFound) return NSNotFound;
+    
+    /*
+     If the emoji contains one or more variant form (such as ☔️ "\u2614\uFE0F")
+     and the font size is smaller than 379/15, then each variant form ("\uFE0F")
+     will rendered as a single blank glyph behind the emoji glyph. Maybe it's a
+     bug in CoreText? Seems iOS8.3 fixes this problem.
+     
+     If the point hit the blank glyph, the CTLineGetStringIndexForPosition()
+     returns the position before the emoji glyph, but it should returns the
+     position after the emoji and variant form.
+     
+     Here's a workaround.
+     */
+    CFArrayRef runs = CTLineGetGlyphRuns(line.CTLine);
+    for (NSUInteger r = 0, max = CFArrayGetCount(runs); r < max; r++) {
+        CTRunRef run = CFArrayGetValueAtIndex(runs, r);
+        CFRange range = CTRunGetStringRange(run);
+        if (range.location <= idx && idx < range.location + range.length) {
+            NSUInteger glyphCount = CTRunGetGlyphCount(run);
+            if (glyphCount == 0) break;
+            CFDictionaryRef attrs = CTRunGetAttributes(run);
+            CTFontRef font = CFDictionaryGetValue(attrs, kCTFontAttributeName);
+            if (!NOCMCTFontContainsColorBitmapGlyphs(font)) break;
+            
+            CFIndex indices[glyphCount];
+            CGPoint positions[glyphCount];
+            CTRunGetStringIndices(run, CFRangeMake(0, glyphCount), indices);
+            CTRunGetPositions(run, CFRangeMake(0, glyphCount), positions);
+            for (NSUInteger g = 0; g < glyphCount; g++) {
+                NSUInteger gIdx = indices[g];
+                if (gIdx == idx && g + 1 < glyphCount) {
+                    CGFloat right = positions[g + 1].x;
+                    if (point.x < right) break;
+                    NSUInteger next = indices[g + 1];
+                    do {
+                        if (next == range.location + range.length) break;
+                        unichar c = [_text.string characterAtIndex:next];
+                        if ((c == 0xFE0E || c == 0xFE0F)) { // unicode variant form for emoji style
+                            next++;
+                        } else break;
+                    }
+                    while (1);
+                    if (next != indices[g + 1]) idx = next;
+                    break;
+                }
+            }
+            break;
+        }
+    }
+    return idx;
+}
+
+- (nullable NOCMTextPosition *)closestPositionToPoint:(CGPoint)point
+{
+    // When call CTLineGetStringIndexForPosition() on ligature such as 'fi',
+    // and the point `hit` the glyph's left edge, it may get the ligature inside offset.
+    // I don't know why, maybe it's a bug of CoreText. Try to avoid it.
+    point.x += 0.00001234;
+    
+    NSUInteger lineIndex = [self closestLineIndexForPoint:point];
+    if (lineIndex == NSNotFound) return nil;
+    NOCMTextLine *line = _lines[lineIndex];
+    __block NSUInteger position = [self textPositionForPoint:point lineIndex:lineIndex];
+    if (position == NSNotFound) position = line.range.location;
+    if (position <= _visibleRange.location) {
+        return [NOCMTextPosition positionWithOffset:_visibleRange.location affinity:NOCMTextAffinityForward];
+    } else if (position >= _visibleRange.location + _visibleRange.length) {
+        return [NOCMTextPosition positionWithOffset:_visibleRange.location + _visibleRange.length affinity:NOCMTextAffinityBackward];
+    }
+    
+    NOCMTextAffinity finalAffinity = NOCMTextAffinityForward;
+    BOOL finalAffinityDetected = NO;
+    
+    // empty line
+    if (line.range.length == 0) {
+        BOOL behind = (_lines.count > 1 && lineIndex == _lines.count - 1);  //end line
+        return [NOCMTextPosition positionWithOffset:line.range.location affinity:behind ? NOCMTextAffinityBackward:NOCMTextAffinityForward];
+    }
+    
+    // detect whether the line is a linebreak token
+    if (line.range.length <= 2) {
+        NSString *str = [_text.string substringWithRange:line.range];
+        if (NOCMTextIsLinebreakString(str)) { // an empty line ("\r", "\n", "\r\n")
+            return [NOCMTextPosition positionWithOffset:line.range.location];
+        }
+    }
+    
+    // above whole text frame
+    if (lineIndex == 0 && (point.y < line.top)) {
+        position = 0;
+        finalAffinity = NOCMTextAffinityForward;
+        finalAffinityDetected = YES;
+    }
+    // below whole text frame
+    if (lineIndex == _lines.count - 1 && (point.y > line.bottom)) {
+        position = line.range.location + line.range.length;
+        finalAffinity = NOCMTextAffinityBackward;
+        finalAffinityDetected = YES;
+    }
+    
+    // There must be at least one non-linebreak char,
+    // ignore the linebreak characters at line end if exists.
+    if (position >= line.range.location + line.range.length - 1) {
+        if (position > line.range.location) {
+            unichar c1 = [_text.string characterAtIndex:position - 1];
+            if (NOCMTextIsLinebreakChar(c1)) {
+                position--;
+                if (position > line.range.location) {
+                    unichar c0 = [_text.string characterAtIndex:position - 1];
+                    if (NOCMTextIsLinebreakChar(c0)) {
+                        position--;
+                    }
+                }
+            }
+        }
+    }
+    if (position == line.range.location) {
+        return [NOCMTextPosition positionWithOffset:position];
+    }
+    if (position == line.range.location + line.range.length) {
+        return [NOCMTextPosition positionWithOffset:position affinity:NOCMTextAffinityBackward];
+    }
+    
+    [self _insideComposedCharacterSequences:line position:position block: ^(CGFloat left, CGFloat right, NSUInteger prev, NSUInteger next) {
+        position = fabs(left - point.x) < fabs(right - point.x) < (right ? prev : next);
+    }];
+    
+    [self _insideEmoji:line position:position block: ^(CGFloat left, CGFloat right, NSUInteger prev, NSUInteger next) {
+        position = fabs(left - point.x) < fabs(right - point.x) < (right ? prev : next);
+    }];
+    
+    if (position < _visibleRange.location) position = _visibleRange.location;
+    else if (position > _visibleRange.location + _visibleRange.length) position = _visibleRange.location + _visibleRange.length;
+    
+    if (!finalAffinityDetected) {
+        CGFloat ofs = [self offsetForTextPosition:position lineIndex:lineIndex];
+        if (ofs != CGFLOAT_MAX) {
+            BOOL RTL = [self _isRightToLeftInLine:line atPoint:point];
+            if (position >= line.range.location + line.range.length) {
+                finalAffinity = RTL ? NOCMTextAffinityForward : NOCMTextAffinityBackward;
+            } else if (position <= line.range.location) {
+                finalAffinity = RTL ? NOCMTextAffinityBackward : NOCMTextAffinityForward;
+            } else {
+                finalAffinity = (ofs < point.x && !RTL) ? NOCMTextAffinityForward : NOCMTextAffinityBackward;
+            }
+        }
+    }
+    
+    return [NOCMTextPosition positionWithOffset:position affinity:finalAffinity];
+}
+
+- (nullable NOCMTextPosition *)positionForPoint:(CGPoint)point oldPosition:(NOCMTextPosition *)oldPosition otherPosition:(NOCMTextPosition *)otherPosition
+{
+    if (!oldPosition || !otherPosition) {
+        return oldPosition;
+    }
+    NOCMTextPosition *newPos = [self closestPositionToPoint:point];
+    if (!newPos) return oldPosition;
+    if ([newPos compare:otherPosition] == [oldPosition compare:otherPosition] &&
+        newPos.offset != otherPosition.offset) {
+        return newPos;
+    }
+    NSUInteger lineIndex = [self lineIndexForPosition:otherPosition];
+    if (lineIndex == NSNotFound) return oldPosition;
+    NOCMTextLine *line = _lines[lineIndex];
+    NOCMRowEdge vertical = _lineRowsEdge[line.row];
+    point.y = (vertical.head + vertical.foot) * 0.5;
+    newPos = [self closestPositionToPoint:point];
+    if ([newPos compare:otherPosition] == [oldPosition compare:otherPosition] &&
+        newPos.offset != otherPosition.offset) {
+        return newPos;
+    }
+    
+    if ([oldPosition compare:otherPosition] == NSOrderedAscending) { // search backward
+        NOCMTextRange *range = [self textRangeByExtendingPosition:otherPosition inDirection:UITextLayoutDirectionLeft offset:1];
+        if (range) return range.start;
+    } else { // search forward
+        NOCMTextRange *range = [self textRangeByExtendingPosition:otherPosition inDirection:UITextLayoutDirectionRight offset:1];
+        if (range) return range.end;
+    }
+    
+    return oldPosition;
+}
+
+- (nullable NOCMTextRange *)textRangeAtPoint:(CGPoint)point
+{
+    NSUInteger lineIndex = [self lineIndexForPoint:point];
+    if (lineIndex == NSNotFound) return nil;
+    NSUInteger textPosition = [self textPositionForPoint:point lineIndex:[self lineIndexForPoint:point]];
+    if (textPosition == NSNotFound) return nil;
+    NOCMTextPosition *pos = [self closestPositionToPoint:point];
+    if (!pos) return nil;
+    
+    // get write direction
+    BOOL RTL = [self _isRightToLeftInLine:_lines[lineIndex] atPoint:point];
+    CGRect rect = [self caretRectForPosition:pos];
+    if (CGRectIsNull(rect)) return nil;
+    
+    NOCMTextRange *range = [self textRangeByExtendingPosition:pos inDirection:(rect.origin.x >= point.x && !RTL) ? UITextLayoutDirectionLeft:UITextLayoutDirectionRight offset:1];
+    return range;
+}
+
+- (nullable NOCMTextRange *)closestTextRangeAtPoint:(CGPoint)point
+{
+    NOCMTextPosition *pos = [self closestPositionToPoint:point];
+    if (!pos) return nil;
+    NSUInteger lineIndex = [self lineIndexForPosition:pos];
+    if (lineIndex == NSNotFound) return nil;
+    NOCMTextLine *line = _lines[lineIndex];
+    BOOL RTL = [self _isRightToLeftInLine:line atPoint:point];
+    CGRect rect = [self caretRectForPosition:pos];
+    if (CGRectIsNull(rect)) return nil;
+    
+    UITextLayoutDirection direction = UITextLayoutDirectionRight;
+    if (pos.offset >= line.range.location + line.range.length) {
+        if (direction != RTL) {
+            direction = UITextLayoutDirectionLeft;
+        } else {
+            direction = UITextLayoutDirectionRight;
+        }
+    } else if (pos.offset <= line.range.location) {
+        if (direction != RTL) {
+            direction = UITextLayoutDirectionRight;
+        } else {
+            direction = UITextLayoutDirectionLeft;
+        }
+    } else {
+        direction = (rect.origin.x >= point.x && !RTL) ? UITextLayoutDirectionLeft:UITextLayoutDirectionRight;
+    }
+    
+    NOCMTextRange *range = [self textRangeByExtendingPosition:pos inDirection:direction offset:1];
+    return range;
+}
+
+- (nullable NOCMTextRange *)textRangeByExtendingPosition:(NOCMTextPosition *)position
+{
+    NSUInteger visibleStart = _visibleRange.location;
+    NSUInteger visibleEnd = _visibleRange.location + _visibleRange.length;
+    
+    if (!position) return nil;
+    if (position.offset < visibleStart || position.offset > visibleEnd) return nil;
+    
+    // head or tail, returns immediately
+    if (position.offset == visibleStart) {
+        return [NOCMTextRange rangeWithRange:NSMakeRange(position.offset, 0)];
+    } else if (position.offset == visibleEnd) {
+        return [NOCMTextRange rangeWithRange:NSMakeRange(position.offset, 0) affinity:NOCMTextAffinityBackward];
+    }
+    
+    // inside emoji or composed character sequences
+    NSUInteger lineIndex = [self lineIndexForPosition:position];
+    if (lineIndex != NSNotFound) {
+        __block NSUInteger _prev, _next;
+        BOOL emoji = NO, seq = NO;
+        
+        NOCMTextLine *line = _lines[lineIndex];
+        emoji = [self _insideEmoji:line position:position.offset block: ^(CGFloat left, CGFloat right, NSUInteger prev, NSUInteger next) {
+            _prev = prev;
+            _next = next;
+        }];
+        if (!emoji) {
+            seq = [self _insideComposedCharacterSequences:line position:position.offset block: ^(CGFloat left, CGFloat right, NSUInteger prev, NSUInteger next) {
+                _prev = prev;
+                _next = next;
+            }];
+        }
+        if (emoji || seq) {
+            return [NOCMTextRange rangeWithRange:NSMakeRange(_prev, _next - _prev)];
+        }
+    }
+    
+    // inside linebreak '\r\n'
+    if (position.offset > visibleStart && position.offset < visibleEnd) {
+        unichar c0 = [_text.string characterAtIndex:position.offset - 1];
+        if ((c0 == '\r') && position.offset < visibleEnd) {
+            unichar c1 = [_text.string characterAtIndex:position.offset];
+            if (c1 == '\n') {
+                return [NOCMTextRange rangeWithStart:[NOCMTextPosition positionWithOffset:position.offset - 1] end:[NOCMTextPosition positionWithOffset:position.offset + 1]];
+            }
+        }
+        if (NOCMTextIsLinebreakChar(c0) && position.affinity == NOCMTextAffinityBackward) {
+            NSString *str = [_text.string substringToIndex:position.offset];
+            NSUInteger len = NOCMTextLinebreakTailLength(str);
+            return [NOCMTextRange rangeWithStart:[NOCMTextPosition positionWithOffset:position.offset - len] end:[NOCMTextPosition positionWithOffset:position.offset]];
+        }
+    }
+    
+    return [NOCMTextRange rangeWithRange:NSMakeRange(position.offset, 0) affinity:position.affinity];
+}
+
+- (nullable NOCMTextRange *)textRangeByExtendingPosition:(NOCMTextPosition *)position inDirection:(UITextLayoutDirection)direction offset:(NSInteger)offset
+{
+    NSInteger visibleStart = _visibleRange.location;
+    NSInteger visibleEnd = _visibleRange.location + _visibleRange.length;
+    
+    if (!position) return nil;
+    if (position.offset < visibleStart || position.offset > visibleEnd) return nil;
+    if (offset == 0) return [self textRangeByExtendingPosition:position];
+    
+    BOOL verticalMove, forwardMove;
+    
+    verticalMove = direction == UITextLayoutDirectionUp || direction == UITextLayoutDirectionDown;
+    forwardMove = direction == UITextLayoutDirectionDown || direction == UITextLayoutDirectionRight;
+    
+    if (offset < 0) {
+        forwardMove = !forwardMove;
+        offset = -offset;
+    }
+    
+    // head or tail, returns immediately
+    if (!forwardMove && position.offset == visibleStart) {
+        return [NOCMTextRange rangeWithRange:NSMakeRange(_visibleRange.location, 0)];
+    } else if (forwardMove && position.offset == visibleEnd) {
+        return [NOCMTextRange rangeWithRange:NSMakeRange(position.offset, 0) affinity:NOCMTextAffinityBackward];
+    }
+    
+    // extend from position
+    NOCMTextRange *fromRange = [self textRangeByExtendingPosition:position];
+    if (!fromRange) return nil;
+    NOCMTextRange *allForward = [NOCMTextRange rangeWithStart:fromRange.start end:[NOCMTextPosition positionWithOffset:visibleEnd]];
+    NOCMTextRange *allBackward = [NOCMTextRange rangeWithStart:[NOCMTextPosition positionWithOffset:visibleStart] end:fromRange.end];
+    
+    if (verticalMove) { // up/down in text layout
+        NSInteger lineIndex = [self lineIndexForPosition:position];
+        if (lineIndex == NSNotFound) return nil;
+        
+        NOCMTextLine *line = _lines[lineIndex];
+        NSInteger moveToRowIndex = (NSInteger)line.row + (forwardMove ? offset : -offset);
+        if (moveToRowIndex < 0) return allBackward;
+        else if (moveToRowIndex >= (NSInteger)_rowCount) return allForward;
+        
+        CGFloat ofs = [self offsetForTextPosition:position.offset lineIndex:lineIndex];
+        if (ofs == CGFLOAT_MAX) return nil;
+        
+        NSUInteger moveToLineFirstIndex = [self lineIndexForRow:moveToRowIndex];
+        NSUInteger moveToLineCount = [self lineCountForRow:moveToRowIndex];
+        if (moveToLineFirstIndex == NSNotFound || moveToLineCount == NSNotFound || moveToLineCount == 0) return nil;
+        CGFloat mostLeft = CGFLOAT_MAX, mostRight = -CGFLOAT_MAX;
+        NOCMTextLine *mostLeftLine = nil, *mostRightLine = nil;
+        NSUInteger insideIndex = NSNotFound;
+        for (NSUInteger i = 0; i < moveToLineCount; i++) {
+            NSUInteger lineIndex = moveToLineFirstIndex + i;
+            NOCMTextLine *line = _lines[lineIndex];
+            if (line.left <= ofs && ofs <= line.right) {
+                insideIndex = line.index;
+                break;
+            }
+            if (line.left < mostLeft) {
+                mostLeft = line.left;
+                mostLeftLine = line;
+            }
+            if (line.right > mostRight) {
+                mostRight = line.right;
+                mostRightLine = line;
+            }
+        }
+        BOOL afinityEdge = NO;
+        if (insideIndex == NSNotFound) {
+            if (ofs <= mostLeft) {
+                insideIndex = mostLeftLine.index;
+            } else {
+                insideIndex = mostRightLine.index;
+            }
+            afinityEdge = YES;
+        }
+        NOCMTextLine *insideLine = _lines[insideIndex];
+        NSUInteger pos = [self textPositionForPoint:CGPointMake(ofs, insideLine.position.y) lineIndex:insideIndex];
+        if (pos == NSNotFound) return nil;
+        NOCMTextPosition *extPos;
+        if (afinityEdge) {
+            if (pos == insideLine.range.location + insideLine.range.length) {
+                NSString *subStr = [_text.string substringWithRange:insideLine.range];
+                NSUInteger lineBreakLen = NOCMTextLinebreakTailLength(subStr);
+                extPos = [NOCMTextPosition positionWithOffset:pos - lineBreakLen];
+            } else {
+                extPos = [NOCMTextPosition positionWithOffset:pos];
+            }
+        } else {
+            extPos = [NOCMTextPosition positionWithOffset:pos];
+        }
+        NOCMTextRange *ext = [self textRangeByExtendingPosition:extPos];
+        if (!ext) return nil;
+        if (forwardMove) {
+            return [NOCMTextRange rangeWithStart:fromRange.start end:ext.end];
+        } else {
+            return [NOCMTextRange rangeWithStart:ext.start end:fromRange.end];
+        }
+        
+    } else { // left/right in text layout
+        NOCMTextPosition *toPosition = [NOCMTextPosition positionWithOffset:position.offset + (forwardMove ? offset : -offset)];
+        if (toPosition.offset <= visibleStart) return allBackward;
+        else if (toPosition.offset >= visibleEnd) return allForward;
+        
+        NOCMTextRange *toRange = [self textRangeByExtendingPosition:toPosition];
+        if (!toRange) return nil;
+        
+        NSInteger start = MIN(fromRange.start.offset, toRange.start.offset);
+        NSInteger end = MAX(fromRange.end.offset, toRange.end.offset);
+        return [NOCMTextRange rangeWithRange:NSMakeRange(start, end - start)];
+    }
+}
+
+- (NSUInteger)lineIndexForPosition:(NOCMTextPosition *)position
+{
+    if (!position) return NSNotFound;
+    if (_lines.count == 0) return NSNotFound;
+    NSUInteger location = position.offset;
+    NSInteger lo = 0, hi = _lines.count - 1, mid = 0;
+    if (position.affinity == NOCMTextAffinityBackward) {
+        while (lo <= hi) {
+            mid = (lo + hi) / 2;
+            NOCMTextLine *line = _lines[mid];
+            NSRange range = line.range;
+            if (range.location < location && location <= range.location + range.length) {
+                return mid;
+            }
+            if (location <= range.location) {
+                hi = mid - 1;
+            } else {
+                lo = mid + 1;
+            }
+        }
+    } else {
+        while (lo <= hi) {
+            mid = (lo + hi) / 2;
+            NOCMTextLine *line = _lines[mid];
+            NSRange range = line.range;
+            if (range.location <= location && location < range.location + range.length) {
+                return mid;
+            }
+            if (location < range.location) {
+                hi = mid - 1;
+            } else {
+                lo = mid + 1;
+            }
+        }
+    }
+    return NSNotFound;
+}
+
+- (CGPoint)linePositionForPosition:(NOCMTextPosition *)position
+{
+    NSUInteger lineIndex = [self lineIndexForPosition:position];
+    if (lineIndex == NSNotFound) return CGPointZero;
+    NOCMTextLine *line = _lines[lineIndex];
+    CGFloat offset = [self offsetForTextPosition:position.offset lineIndex:lineIndex];
+    if (offset == CGFLOAT_MAX) return CGPointZero;
+    return CGPointMake(offset, line.position.y);
+}
+
+- (CGRect)caretRectForPosition:(NOCMTextPosition *)position
+{
+    NSUInteger lineIndex = [self lineIndexForPosition:position];
+    if (lineIndex == NSNotFound) return CGRectNull;
+    NOCMTextLine *line = _lines[lineIndex];
+    CGFloat offset = [self offsetForTextPosition:position.offset lineIndex:lineIndex];
+    if (offset == CGFLOAT_MAX) return CGRectNull;
+    return CGRectMake(offset, line.bounds.origin.y, 0, line.bounds.size.height);
+}
+
+- (CGRect)firstRectForRange:(NOCMTextRange *)range
+{
+    range = [self _correctedRangeWithEdge:range];
+    
+    NSUInteger startLineIndex = [self lineIndexForPosition:range.start];
+    NSUInteger endLineIndex = [self lineIndexForPosition:range.end];
+    if (startLineIndex == NSNotFound || endLineIndex == NSNotFound) return CGRectNull;
+    if (startLineIndex > endLineIndex) return CGRectNull;
+    NOCMTextLine *startLine = _lines[startLineIndex];
+    NOCMTextLine *endLine = _lines[endLineIndex];
+    NSMutableArray *lines = [NSMutableArray new];
+    for (NSUInteger i = startLineIndex; i <= startLineIndex; i++) {
+        NOCMTextLine *line = _lines[i];
+        if (line.row != startLine.row) break;
+        [lines addObject:line];
+    }
+    
+    if (lines.count == 1) {
+        CGFloat left = [self offsetForTextPosition:range.start.offset lineIndex:startLineIndex];
+        CGFloat right;
+        if (startLine == endLine) {
+            right = [self offsetForTextPosition:range.end.offset lineIndex:startLineIndex];
+        } else {
+            right = startLine.right;
+        }
+        if (left == CGFLOAT_MAX || right == CGFLOAT_MAX) return CGRectNull;
+        if (left > right) {
+            CGFloat temp = left;
+            left = right;
+            right = temp;
+        }
+        return CGRectMake(left, startLine.top, right - left, startLine.height);
+    } else {
+        CGFloat left = [self offsetForTextPosition:range.start.offset lineIndex:startLineIndex];
+        CGFloat right = startLine.right;
+        if (left == CGFLOAT_MAX || right == CGFLOAT_MAX) return CGRectNull;
+        if (left > right) {
+            CGFloat temp = left;
+            left = right;
+            right = temp;
+        }
+        CGRect rect = CGRectMake(left, startLine.top, right - left, startLine.height);
+        for (NSUInteger i = 1; i < lines.count; i++) {
+            NOCMTextLine *line = lines[i];
+            rect = CGRectUnion(rect, line.bounds);
+        }
+        return rect;
+    }
 }
 
 - (CGRect)rectForRange:(NOCMTextRange *)range
 {
-    return CGRectZero;
+    NSArray *rects = [self selectionRectsForRange:range];
+    if (rects.count == 0) return CGRectNull;
+    CGRect rectUnion = ((NOCMTextSelectionRect *)rects.firstObject).rect;
+    for (NSUInteger i = 1; i < rects.count; i++) {
+        NOCMTextSelectionRect *rect = rects[i];
+        rectUnion = CGRectUnion(rectUnion, rect.rect);
+    }
+    return rectUnion;
+}
+
+- (NSArray<NOCMTextSelectionRect *> *)selectionRectsForRange:(NOCMTextRange *)range
+{
+    range = [self _correctedRangeWithEdge:range];
+    
+    NSMutableArray *rects = [NSMutableArray array];
+    if (!range) return rects;
+    
+    NSUInteger startLineIndex = [self lineIndexForPosition:range.start];
+    NSUInteger endLineIndex = [self lineIndexForPosition:range.end];
+    if (startLineIndex == NSNotFound || endLineIndex == NSNotFound) return rects;
+    if (startLineIndex > endLineIndex) {
+        NSUInteger temp = startLineIndex;
+        startLineIndex = endLineIndex;
+        endLineIndex = temp;
+    }
+    NOCMTextLine *startLine = _lines[startLineIndex];
+    NOCMTextLine *endLine = _lines[endLineIndex];
+    CGFloat offsetStart = [self offsetForTextPosition:range.start.offset lineIndex:startLineIndex];
+    CGFloat offsetEnd = [self offsetForTextPosition:range.end.offset lineIndex:endLineIndex];
+    
+    NOCMTextSelectionRect *start = [NOCMTextSelectionRect new];
+    start.rect = CGRectMake(offsetStart, startLine.top, 0, startLine.height);
+    start.containsStart = YES;
+    [rects addObject:start];
+    
+    NOCMTextSelectionRect *end = [NOCMTextSelectionRect new];
+    end.rect = CGRectMake(offsetEnd, endLine.top, 0, endLine.height);
+    end.containsEnd = YES;
+    [rects addObject:end];
+    
+    if (startLine.row == endLine.row) { // same row
+        if (offsetStart > offsetEnd) {
+            CGFloat temp = offsetStart;
+            offsetStart = offsetEnd;
+            offsetEnd = temp;
+        }
+        NOCMTextSelectionRect *rect = [NOCMTextSelectionRect new];
+        rect.rect = CGRectMake(offsetStart, startLine.bounds.origin.y, offsetEnd - offsetStart, MAX(startLine.height, endLine.height));
+        [rects addObject:rect];
+        
+    } else { // more than one row
+        
+        // start line select rect
+        NOCMTextSelectionRect *topRect = [NOCMTextSelectionRect new];
+        CGFloat topOffset = [self offsetForTextPosition:range.start.offset lineIndex:startLineIndex];
+        CTRunRef topRun = [self _runForLine:startLine position:range.start];
+        if (topRun && (CTRunGetStatus(topRun) & kCTRunStatusRightToLeft)) {
+            topRect.rect = CGRectMake(_container.path ? startLine.left : _container.insets.left, startLine.top, topOffset - startLine.left, startLine.height);
+            topRect.writingDirection = UITextWritingDirectionRightToLeft;
+        } else {
+            topRect.rect = CGRectMake(topOffset, startLine.top, (_container.path ? startLine.right : _container.size.width - _container.insets.right) - topOffset, startLine.height);
+        }
+        [rects addObject:topRect];
+        
+        // end line select rect
+        NOCMTextSelectionRect *bottomRect = [NOCMTextSelectionRect new];
+        CGFloat bottomOffset = [self offsetForTextPosition:range.end.offset lineIndex:endLineIndex];
+        CTRunRef bottomRun = [self _runForLine:endLine position:range.end];
+        if (bottomRun && (CTRunGetStatus(bottomRun) & kCTRunStatusRightToLeft)) {
+            bottomRect.rect = CGRectMake(bottomOffset, endLine.top, (_container.path ? endLine.right : _container.size.width - _container.insets.right) - bottomOffset, endLine.height);
+            bottomRect.writingDirection = UITextWritingDirectionRightToLeft;
+        } else {
+            CGFloat left = _container.path ? endLine.left : _container.insets.left;
+            bottomRect.rect = CGRectMake(left, endLine.top, bottomOffset - left, endLine.height);
+        }
+        [rects addObject:bottomRect];
+        
+        if (endLineIndex - startLineIndex >= 2) {
+            CGRect r = CGRectZero;
+            BOOL startLineDetected = NO;
+            for (NSUInteger l = startLineIndex + 1; l < endLineIndex; l++) {
+                NOCMTextLine *line = _lines[l];
+                if (line.row == startLine.row || line.row == endLine.row) continue;
+                if (!startLineDetected) {
+                    r = line.bounds;
+                    startLineDetected = YES;
+                } else {
+                    r = CGRectUnion(r, line.bounds);
+                }
+            }
+        if (startLineDetected) {
+                if (!_container.path) {
+                    r.origin.x = _container.insets.left;
+                    r.size.width = _container.size.width - _container.insets.right - _container.insets.left;
+                }
+                r.origin.y = CGRectGetMaxY(topRect.rect);
+                r.size.height = bottomRect.rect.origin.y - r.origin.y;
+                
+                NOCMTextSelectionRect *rect = [NOCMTextSelectionRect new];
+                rect.rect = r;
+                [rects addObject:rect];
+            }
+        } else {
+            CGRect r0 = topRect.rect;
+            CGRect r1 = bottomRect.rect;
+            CGFloat mid = (CGRectGetMaxY(r0) + CGRectGetMinY(r1)) * 0.5;
+            r0.size.height = mid - r0.origin.y;
+            CGFloat r1ofs = r1.origin.y - mid;
+            r1.origin.y -= r1ofs;
+            r1.size.height += r1ofs;
+            topRect.rect = r0;
+            bottomRect.rect = r1;
+        }
+    }
+    return rects;
+}
+
+- (NSArray<NOCMTextSelectionRect *> *)selectionRectsWithoutStartAndEndForRange:(NOCMTextRange *)range
+{
+    NSMutableArray *rects = [self selectionRectsForRange:range].mutableCopy;
+    for (NSInteger i = 0, max = rects.count; i < max; i++) {
+        NOCMTextSelectionRect *rect = rects[i];
+        if (rect.containsStart || rect.containsEnd) {
+            [rects removeObjectAtIndex:i];
+            i--;
+            max--;
+        }
+    }
+    return rects;
+}
+
+- (NSArray<NOCMTextSelectionRect *> *)selectionRectsWithOnlyStartAndEndForRange:(NOCMTextRange *)range
+{
+    NSMutableArray *rects = [self selectionRectsForRange:range].mutableCopy;
+    for (NSInteger i = 0, max = rects.count; i < max; i++) {
+        NOCMTextSelectionRect *rect = rects[i];
+        if (!rect.containsStart && !rect.containsEnd) {
+            [rects removeObjectAtIndex:i];
+            i--;
+            max--;
+        }
+    }
+    return rects;
 }
 
 #pragma mark - Copying
@@ -893,6 +1837,19 @@ fail:
 }
 
 #pragma mark - Draw
+
+typedef NS_OPTIONS(NSUInteger, NOCMTextBorderType) {
+    NOCMTextBorderTypeBackgound = 1 << 0,
+    NOCMTextBorderTypeNormal    = 1 << 1,
+};
+
+static CGRect NOCMTextMergeRectInSameLine(CGRect rect1, CGRect rect2)
+{
+    CGFloat left = MIN(rect1.origin.x, rect2.origin.x);
+    CGFloat right = MAX(rect1.origin.x + rect1.size.width, rect2.origin.x + rect2.size.width);
+    CGFloat height = MAX(rect1.size.height, rect2.size.height);
+    return CGRectMake(left, rect1.origin.y, right - left, height);
+}
 
 static void NOCMTextDrawRun(NOCMTextLine *line, CTRunRef run, CGContextRef context, CGSize size, CGFloat verticalOffset)
 {
@@ -944,12 +1901,170 @@ static void NOCMTextDrawText(NOCMTextLayout *layout, CGContextRef context, CGSiz
     CGContextRestoreGState(context);
 }
 
+static void NOCMTextDrawBorder(NOCMTextLayout *layout, CGContextRef context, CGSize size, CGPoint point, NOCMTextBorderType type, BOOL (^cancel)(void))
+{
+    CGContextSaveGState(context);
+    CGContextTranslateCTM(context, point.x, point.y);
+    
+    CGFloat verticalOffset = 0;
+    
+    NSArray *lines = layout.lines;
+    NSString *borderKey = (type == NOCMTextBorderTypeNormal ? NOCMTextBorderAttributeName : NOCMTextBackgroundBorderAttributeName);
+    
+    BOOL needJumpRun = NO;
+    NSUInteger jumpRunIndex = 0;
+    
+    for (NSInteger l = 0, lMax = lines.count; l < lMax; l++) {
+        if (cancel && cancel()) break;
+        
+        NOCMTextLine *line = lines[l];
+        if (layout.truncatedLine && layout.truncatedLine.index == line.index) line = layout.truncatedLine;
+        CFArrayRef runs = CTLineGetGlyphRuns(line.CTLine);
+        for (NSInteger r = 0, rMax = CFArrayGetCount(runs); r < rMax; r++) {
+            if (needJumpRun) {
+                needJumpRun = NO;
+                r = jumpRunIndex + 1;
+                if (r >= rMax) break;
+            }
+            
+            CTRunRef run = CFArrayGetValueAtIndex(runs, r);
+            CFIndex glyphCount = CTRunGetGlyphCount(run);
+            if (glyphCount == 0) continue;
+            
+            NSDictionary *attrs = (id)CTRunGetAttributes(run);
+            NOCMTextBorder *border = attrs[borderKey];
+            if (!border) continue;
+            
+            CFRange runRange = CTRunGetStringRange(run);
+            if (runRange.location == kCFNotFound || runRange.length == 0) continue;
+            if (runRange.location + runRange.length > layout.text.length) continue;
+            
+            NSMutableArray *runRects = [NSMutableArray new];
+            NSInteger endLineIndex = l;
+            NSInteger endRunIndex = r;
+            BOOL endFound = NO;
+            for (NSInteger ll = l; ll < lMax; ll++) {
+                if (endFound) break;
+                NOCMTextLine *iLine = lines[ll];
+                CFArrayRef iRuns = CTLineGetGlyphRuns(iLine.CTLine);
+                
+                CGRect extLineRect = CGRectNull;
+                for (NSInteger rr = (ll == l) ? r : 0, rrMax = CFArrayGetCount(iRuns); rr < rrMax; rr++) {
+                    CTRunRef iRun = CFArrayGetValueAtIndex(iRuns, rr);
+                    NSDictionary *iAttrs = (id)CTRunGetAttributes(iRun);
+                    NOCMTextBorder *iBorder = iAttrs[borderKey];
+                    if (![border isEqual:iBorder]) {
+                        endFound = YES;
+                        break;
+                    }
+                    endLineIndex = ll;
+                    endRunIndex = rr;
+                    
+                    CGPoint iRunPosition = CGPointZero;
+                    CTRunGetPositions(iRun, CFRangeMake(0, 1), &iRunPosition);
+                    CGFloat ascent, descent;
+                    CGFloat iRunWidth = CTRunGetTypographicBounds(iRun, CFRangeMake(0, 0), &ascent, &descent, NULL);
+                    
+                    iRunPosition.x += iLine.position.x;
+                    CGRect iRect = CGRectMake(iRunPosition.x, iLine.position.y - ascent, iRunWidth, ascent + descent);
+                    if (CGRectIsNull(extLineRect)) {
+                        extLineRect = iRect;
+                    } else {
+                        extLineRect = CGRectUnion(extLineRect, iRect);
+                    }
+                }
+                
+                if (!CGRectIsNull(extLineRect)) {
+                    [runRects addObject:[NSValue valueWithCGRect:extLineRect]];
+                }
+            }
+            
+            NSMutableArray *drawRects = [NSMutableArray new];
+            CGRect curRect= ((NSValue *)[runRects firstObject]).CGRectValue;
+            for (NSInteger re = 0, reMax = runRects.count; re < reMax; re++) {
+                CGRect rect = ((NSValue *)runRects[re]).CGRectValue;
+                if (fabs(rect.origin.y - curRect.origin.y) < 1) {
+                    curRect = NOCMTextMergeRectInSameLine(rect, curRect);
+                } else {
+                    [drawRects addObject:[NSValue valueWithCGRect:curRect]];
+                    curRect = rect;
+                }
+            }
+            if (!CGRectEqualToRect(curRect, CGRectZero)) {
+                [drawRects addObject:[NSValue valueWithCGRect:curRect]];
+            }
+            
+            NOCMTextDrawBorderRects(context, size, border, drawRects);
+            
+            if (l == endLineIndex) {
+                r = endRunIndex;
+            } else {
+                l = endLineIndex - 1;
+                needJumpRun = YES;
+                jumpRunIndex = endRunIndex;
+                break;
+            }
+            
+        }
+    }
+    
+    CGContextRestoreGState(context);
+}
+
+static inline CGPoint NOCMCGPointPixelRound(CGPoint point)
+{
+    CGFloat scale = [UIScreen mainScreen].scale;
+    return CGPointMake(round(point.x * scale) / scale,
+                       round(point.y * scale) / scale);
+}
+
+static inline CGRect NOCMCGRectPixelRound(CGRect rect)
+{
+    CGPoint origin = NOCMCGPointPixelRound(rect.origin);
+    CGPoint corner = NOCMCGPointPixelRound(CGPointMake(rect.origin.x + rect.size.width,
+                                                       rect.origin.y + rect.size.height));
+    return CGRectMake(origin.x, origin.y, corner.x - origin.x, corner.y - origin.y);
+}
+
+static void NOCMTextDrawBorderRects(CGContextRef context, CGSize size, NOCMTextBorder *border, NSArray *rects)
+{
+    if (rects.count == 0) return;
+    
+    NSMutableArray *paths = [NSMutableArray new];
+    for (NSValue *value in rects) {
+        CGRect rect = value.CGRectValue;
+        rect = UIEdgeInsetsInsetRect(rect, border.insets);
+        rect = NOCMCGRectPixelRound(rect);
+        UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:rect cornerRadius:border.cornerRadius];
+        [path closePath];
+        [paths addObject:path];
+    }
+    
+    if (border.fillColor) {
+        CGContextSaveGState(context);
+        CGContextSetFillColorWithColor(context, border.fillColor.CGColor);
+        for (UIBezierPath *path in paths) {
+            CGContextAddPath(context, path.CGPath);
+        }
+        CGContextFillPath(context);
+        CGContextRestoreGState(context);
+    }
+}
+
 - (void)drawInContext:(CGContextRef)context size:(CGSize)size point:(CGPoint)point view:(UIView *)view layer:(CALayer *)layer cancel:(BOOL (^)(void))cancel
 {
     @autoreleasepool {
+        if (self.needDrawBackgroundBorder && context) {
+            if (cancel && cancel()) return;
+            NOCMTextDrawBorder(self, context, size, point, NOCMTextBorderTypeBackgound, cancel);
+        }
         if (self.needDrawText && context) {
             if (cancel && cancel()) return;
             NOCMTextDrawText(self, context, size, point, cancel);
+        }
+        if (self.needDrawBorder && context) {
+            if (cancel && cancel()) return;
+            NOCMTextDrawBorder(self, context, size, point, NOCMTextBorderTypeNormal, cancel);
         }
     }
 }
@@ -1091,6 +2206,27 @@ static void NOCMTextDrawText(NOCMTextLayout *layout, CGContextRef context, CGSiz
 {
     if (!object) return NO;
     return [_start isEqual:object.start] && [_end isEqual:object.end];
+}
+
+@end
+
+#pragma mark - NOCMTextSelectionRect
+
+@implementation NOCMTextSelectionRect
+
+@synthesize rect = _rect;
+@synthesize writingDirection = _writingDirection;
+@synthesize containsStart = _containsStart;
+@synthesize containsEnd = _containsEnd;
+
+- (id)copyWithZone:(NSZone *)zone
+{
+    NOCMTextSelectionRect *one = [self.class new];
+    one.rect = _rect;
+    one.writingDirection = _writingDirection;
+    one.containsStart = _containsStart;
+    one.containsEnd = _containsEnd;
+    return one;
 }
 
 @end

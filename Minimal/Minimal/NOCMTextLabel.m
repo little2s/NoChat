@@ -260,6 +260,9 @@ static dispatch_queue_t NOCMTextLabelReleaseQueue()
     NOCMTextHighlight *_highlight;
     NOCMTextLayout *_highlightLayout;
     
+    NOCMTextLayout *_shrinkInnerLayout;
+    NOCMTextLayout *_shrinkHighlightLayout;
+    
     NSTimer *_longPressTimer;
     CGPoint _touchBeganPoint;
     
@@ -273,6 +276,8 @@ static dispatch_queue_t NOCMTextLabelReleaseQueue()
         
         unsigned int hasTapAction : 1;
         unsigned int hasLongPressAction : 1;
+        
+        unsigned int contentsNeedFade : 1;
     } _state;
 }
 
@@ -344,8 +349,10 @@ static dispatch_queue_t NOCMTextLabelReleaseQueue()
     
     _highlight = [self highlightAtPoint:point range:&_highlightRange];
     _highlightLayout = nil;
+    _state.hasTapAction = _textTapAction != nil;
+    _state.hasLongPressAction = _textLongPressAction != nil;
     
-    if (_highlight || _tapAction || _longPressAction) {
+    if (_highlight || _textTapAction || _textLongPressAction) {
         _touchBeganPoint = point;
         _state.trackingTouch = YES;
         _state.swallowTouch = YES;
@@ -394,7 +401,7 @@ static dispatch_queue_t NOCMTextLabelReleaseQueue()
             if (highlight == _highlight) {
                 [self showHighlightAnimated:NO];
             } else {
-                [self showHighlightAnimated:NO];
+                [self hideHighlightAnimated:NO];
             }
         }
     }
@@ -411,7 +418,7 @@ static dispatch_queue_t NOCMTextLabelReleaseQueue()
     
     if (_state.trackingTouch) {
         [self endLongPressTimer];
-        if (!_state.touchMoved && _tapAction) {
+        if (!_state.touchMoved && _textTapAction) {
             NSRange range = NSMakeRange(NSNotFound, 0);
             CGRect rect = CGRectNull;
             CGPoint point = [self convertPointToLayout:_touchBeganPoint];
@@ -422,11 +429,11 @@ static dispatch_queue_t NOCMTextLabelReleaseQueue()
                 range = textRange.asRange;
                 rect = textRect;
             }
-            _tapAction(self, _innerText, range, rect);
+            _textTapAction(self, _innerText, range, rect);
         }
         if (_highlight) {
-            if (!_state.touchMoved || [self highlightAtPoint:point range:nil] == _highlight) {
-                NOCMTextAction tapAction = _tapAction;
+            if (!_state.touchMoved || [self highlightAtPoint:point range:NULL] == _highlight) {
+                NOCMTextAction tapAction = _highlightTapAction;
                 if (tapAction) {
                     NOCMTextPosition *start = [NOCMTextPosition positionWithOffset:_highlightRange.location];
                     NOCMTextPosition *end = [NOCMTextPosition positionWithOffset:_highlightRange.location + _highlightRange.length affinity:NOCMTextAffinityBackward];
@@ -647,25 +654,55 @@ static dispatch_queue_t NOCMTextLabelReleaseQueue()
     [[NSRunLoop currentRunLoop] addTimer:_longPressTimer forMode:NSRunLoopCommonModes];
 }
 
-- (void)trackDidLongPress
-{
-    
-}
-
 - (void)endLongPressTimer
 {
     [_longPressTimer invalidate];
     _longPressTimer = nil;
 }
 
+- (void)trackDidLongPress
+{
+    [self endLongPressTimer];
+    if (_state.hasLongPressAction && _textLongPressAction) {
+        NSRange range = NSMakeRange(NSNotFound, 0);
+        CGRect rect = CGRectNull;
+        CGPoint point = [self convertPointToLayout:_touchBeganPoint];
+        NOCMTextRange *textRange = [_innerLayout textRangeAtPoint:point];
+        CGRect textRect = [_innerLayout rectForRange:textRange];
+        textRect = [self convertRectFromLayout:textRect];
+        if (textRange) {
+            range = textRange.asRange;
+            rect = textRect;
+        }
+        _textLongPressAction(self, _innerText, range, rect);
+    }
+    if (_highlight) {
+        NOCMTextAction longPressAction = _highlightLongPressAction;
+        if (longPressAction) {
+            NOCMTextPosition *start = [NOCMTextPosition positionWithOffset:_highlightRange.location];
+            NOCMTextPosition *end = [NOCMTextPosition positionWithOffset:_highlightRange.location + _highlightRange.length affinity:NOCMTextAffinityBackward];
+            NOCMTextRange *range = [NOCMTextRange rangeWithStart:start end:end];
+            CGRect rect = [_innerLayout rectForRange:range];
+            rect = [self convertRectFromLayout:rect];
+            longPressAction(self, _innerText, _highlightRange, rect);
+            [self removeHighlightAnimated:YES];
+            _state.trackingTouch = NO;
+        }
+    }
+}
+
 - (CGPoint)convertPointToLayout:(CGPoint)point
 {
-    return CGPointZero;
+    CGSize boundingSize = _innerLayout.textBoundingSize;
+    point.y -= (self.bounds.size.height - boundingSize.height) * 0.5;
+    return point;
 }
 
 - (CGPoint)convertPointFromLayout:(CGPoint)point
 {
-    return CGPointZero;
+    CGSize boundingSize = _innerLayout.textBoundingSize;
+    point.y += (self.bounds.size.height - boundingSize.height) * 0.5;
+    return point;
 }
 
 - (CGRect)convertRectToLayout:(CGRect)rect
@@ -682,17 +719,63 @@ static dispatch_queue_t NOCMTextLabelReleaseQueue()
 
 - (NOCMTextHighlight *)highlightAtPoint:(CGPoint)point range:(NSRangePointer)range
 {
-    return nil;
+    if (!_innerLayout.containsHighlight) return nil;
+    point = [self convertPointToLayout:point];
+    NOCMTextRange *textRange = [_innerLayout textRangeAtPoint:point];
+    if (!textRange) return nil;
+    
+    NSUInteger startIndex = textRange.start.offset;
+    if (startIndex == _innerText.length) {
+        if (startIndex > 0) {
+            startIndex--;
+        }
+    }
+    NSRange highlightRange = {0};
+    NOCMTextHighlight *highlight = [_innerText attribute:NOCMTextHighlightAttributeName
+                                                 atIndex:startIndex
+                                   longestEffectiveRange:&highlightRange
+                                                 inRange:NSMakeRange(0, _innerText.length)];
+    
+    if (!highlight) return nil;
+    if (range) *range = highlightRange;
+    return highlight;
 }
 
 - (void)showHighlightAnimated:(BOOL)animated
 {
+    if (!_highlight) return;
+    if (!_highlightLayout) {
+        NSMutableAttributedString *hiText = _innerText.mutableCopy;
+        NSDictionary *newAttrs = _highlight.attributes;
+        [newAttrs enumerateKeysAndObjectsUsingBlock:^(NSString *key, id value, BOOL *stop) {
+            [hiText addAttribute:key value:value range:_highlightRange];
+        }];
+        _highlightLayout = [NOCMTextLayout layoutWithContainer:_innerContainer text:hiText];
+        if (!_highlightLayout) _highlight = nil;
+    }
     
+    if (_highlightLayout && !_state.showingHighlight) {
+        _state.showingHighlight = YES;
+        _state.contentsNeedFade = animated;
+        [self setLayoutNeedRedraw];
+    }
+}
+
+- (void)hideHighlightAnimated:(BOOL)animated
+{
+    if (_state.showingHighlight) {
+        _state.showingHighlight = NO;
+        _state.contentsNeedFade = animated;
+        [self setLayoutNeedRedraw];
+    }
 }
 
 - (void)removeHighlightAnimated:(BOOL)animated
 {
-    
+    [self hideHighlightAnimated:animated];
+    _highlight = nil;
+    _highlightLayout = nil;
+    _shrinkHighlightLayout = nil;
 }
 
 @end

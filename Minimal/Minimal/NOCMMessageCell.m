@@ -52,6 +52,7 @@
         [self addSubview:_headView];
         
         _contentView = [[[[cell class] messageContentViewClass] alloc] init];
+        _contentView.cell = cell;
         [self addSubview:_contentView];
     }
     return self;
@@ -112,7 +113,24 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
+        __weak typeof(self) weakSelf = self;
+        
         _textLabel = [[NOCMTextLabel alloc] init];
+        _textLabel.highlightTapAction = ^(UIView *containerView, NSAttributedString *text, NSRange range, CGRect rect) {
+            __strong typeof(weakSelf) strongSelf = weakSelf;
+            [text enumerateAttribute:NOCMTextHighlightAttributeName inRange:range options:0 usingBlock:^(NOCMTextHighlight *textHighlight, NSRange range, BOOL *stop) {
+                if (textHighlight && textHighlight.userInfo) {
+                    NSURL *linkURL = textHighlight.userInfo[@"url"];
+                    if (linkURL) {
+                        NOCMTextMessageCell *cell = strongSelf.cell;
+                        id<NOCMTextMessageCellDelegate> delegate = cell.delegate;
+                        if (delegate && [delegate respondsToSelector:@selector(cell:didTapLink:)]) {
+                            [delegate cell:cell didTapLink:linkURL];
+                        }
+                    }
+                }
+            }];
+        };
         [self addSubview:_textLabel];
     }
     return self;

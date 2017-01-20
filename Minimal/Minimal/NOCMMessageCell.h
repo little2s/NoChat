@@ -21,6 +21,8 @@
 
 @interface NOCMMessageContentView : UIView
 
+@property (nonatomic, weak) NOCMMessageCell *cell;
+
 - (void)setLayout:(id<NOCMMessageContentViewLayout>)layout;
 
 @end
@@ -53,5 +55,13 @@
 @end
 
 @interface NOCMTextMessageCell : NOCMMessageCell
+
+@end
+
+@protocol NOCMTextMessageCellDelegate <NOCChatItemCellDelegate>
+
+@optional
+- (void)cell:(NOCMTextMessageCell *)cell didTapLink:(NSURL *)linkURL;
+- (void)cell:(NOCMTextMessageCell *)cell didLongPressLink:(NSURL *)linkURL;
 
 @end

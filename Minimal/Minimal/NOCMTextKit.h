@@ -91,7 +91,9 @@ typedef NS_ENUM(NSUInteger, NOCMTextTruncationType) {
 
 @end
 
+@class NOCMTextPosition;
 @class NOCMTextRange;
+@class NOCMTextSelectionRect;
 
 @interface NOCMTextLayout : NSObject <NSCopying>
 
@@ -129,8 +131,27 @@ typedef NS_ENUM(NSUInteger, NOCMTextTruncationType) {
 + (instancetype)new UNAVAILABLE_ATTRIBUTE;
 - (instancetype)init UNAVAILABLE_ATTRIBUTE;
 
+- (NSUInteger)lineIndexForRow:(NSUInteger)row;
+- (NSUInteger)lineCountForRow:(NSUInteger)row;
+- (NSUInteger)rowIndexForLine:(NSUInteger)line;
+- (NSUInteger)lineIndexForPoint:(CGPoint)point;
+- (NSUInteger)closestLineIndexForPoint:(CGPoint)point;
+- (CGFloat)offsetForTextPosition:(NSUInteger)position lineIndex:(NSUInteger)lineIndex;
+- (NSUInteger)textPositionForPoint:(CGPoint)point lineIndex:(NSUInteger)lineIndex;
+- (nullable NOCMTextPosition *)closestPositionToPoint:(CGPoint)point;
+- (nullable NOCMTextPosition *)positionForPoint:(CGPoint)point oldPosition:(NOCMTextPosition *)oldPosition otherPosition:(NOCMTextPosition *)otherPosition;
 - (nullable NOCMTextRange *)textRangeAtPoint:(CGPoint)point;
+- (nullable NOCMTextRange *)closestTextRangeAtPoint:(CGPoint)point;
+- (nullable NOCMTextRange *)textRangeByExtendingPosition:(NOCMTextPosition *)position;
+- (nullable NOCMTextRange *)textRangeByExtendingPosition:(NOCMTextPosition *)position inDirection:(UITextLayoutDirection)direction offset:(NSInteger)offset;
+- (NSUInteger)lineIndexForPosition:(NOCMTextPosition *)position;
+- (CGPoint)linePositionForPosition:(NOCMTextPosition *)position;
+- (CGRect)caretRectForPosition:(NOCMTextPosition *)position;
+- (CGRect)firstRectForRange:(NOCMTextRange *)range;
 - (CGRect)rectForRange:(NOCMTextRange *)range;
+- (NSArray<NOCMTextSelectionRect *> *)selectionRectsForRange:(NOCMTextRange *)range;
+- (NSArray<NOCMTextSelectionRect *> *)selectionRectsWithoutStartAndEndForRange:(NOCMTextRange *)range;
+- (NSArray<NOCMTextSelectionRect *> *)selectionRectsWithOnlyStartAndEndForRange:(NOCMTextRange *)range;
 
 - (void)drawInContext:(nullable CGContextRef)context size:(CGSize)size point:(CGPoint)point view:(nullable UIView *)view layer:(nullable CALayer *)layer cancel:(nullable BOOL (^)(void))cancel;
 
@@ -165,6 +186,15 @@ typedef NS_ENUM(NSInteger, NOCMTextAffinity) {
 + (instancetype)defaultRange; ///< <{0,0} Forward>
 
 - (NSRange)asRange;
+
+@end
+
+@interface NOCMTextSelectionRect : UITextSelectionRect <NSCopying>
+
+@property (nonatomic, readwrite) CGRect rect;
+@property (nonatomic, readwrite) UITextWritingDirection writingDirection;
+@property (nonatomic, readwrite) BOOL containsStart;
+@property (nonatomic, readwrite) BOOL containsEnd;
 
 @end
 

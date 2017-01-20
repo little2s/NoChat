@@ -171,11 +171,30 @@ CGSize nocm_sizeForAttributedString(NSAttributedString *attributedString, CGFloa
 - (NSAttributedString *)attributedString
 {
     NSString *text = ((NOCMMessage *)self.cellLayout.chatItem).text;
-    NSAttributedString *result = [[NSAttributedString alloc] initWithString:text attributes:@{
-        NSFontAttributeName: [NOCMTextMessageContentViewLayout textFont],
-        NSForegroundColorAttributeName: [NOCMTextMessageContentViewLayout textColor]
-    }];
-    return result;
+    NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithString:text attributes:@{ NSFontAttributeName: [NOCMTextMessageContentViewLayout textFont], NSForegroundColorAttributeName: [NOCMTextMessageContentViewLayout textColor] }];
+    
+    NOCMTextBorder *highlightBorder = [NOCMTextBorder new];
+    highlightBorder.insets = UIEdgeInsetsZero;
+    highlightBorder.cornerRadius = 3;
+    highlightBorder.fillColor = [UIColor colorWithWhite:0.85 alpha:1];
+
+    NSDataDetector *detecor = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
+    NSArray *linkResults = [detecor matchesInString:attrString.string options:kNilOptions range:NSMakeRange(0, attrString.length)];
+    for (NSTextCheckingResult *linkResult in linkResults) {
+        if (linkResult.range.location == NSNotFound && linkResult.range.length <= 1) {
+            continue;
+        }
+        if ([attrString attribute:NOCMTextHighlightAttributeName atIndex:linkResult.range.length effectiveRange:NULL] == nil) {
+            [attrString addAttributes:@{ NSForegroundColorAttributeName: [NOCMTextMessageContentViewLayout linkColor], NSUnderlineStyleAttributeName: @(NSUnderlineStyleSingle), NSUnderlineColorAttributeName: [NOCMTextMessageContentViewLayout linkColor] } range:linkResult.range];
+            
+            NOCMTextHighlight *highlight = [NOCMTextHighlight new];
+            [highlight setBackgroundBorder:highlightBorder];
+            highlight.userInfo = @{ @"url": [attrString.string substringWithRange:linkResult.range] };
+            [attrString addAttribute:NOCMTextHighlightAttributeName value:highlight range:linkResult.range];
+        }
+    }
+    
+    return attrString;
 }
 
 @end
@@ -183,18 +202,18 @@ CGSize nocm_sizeForAttributedString(NSAttributedString *attributedString, CGFloa
 @implementation NOCMTextMessageContentViewLayout (NOCMStyle)
 
 + (UIFont *)textFont
-{
-    static id _textFont = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        _textFont = [UIFont systemFontOfSize:16];
-    });
-    return _textFont;
+{    
+    return [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
 }
 
 + (UIColor *)textColor
 {
     return [UIColor blackColor];
+}
+
++ (UIColor *)linkColor
+{
+    return [UIColor blueColor];
 }
 
 @end

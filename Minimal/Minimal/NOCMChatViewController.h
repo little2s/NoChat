@@ -8,7 +8,9 @@
 
 #import <UIKit/UIKit.h>
 #import <NoChat/NoChat.h>
+#import "NOCMMessageCell.h"
+#import "NOCMChatInputView.h"
 
-@interface NOCMChatViewController : NOCChatViewController
+@interface NOCMChatViewController : NOCChatViewController <NOCMChatInputViewDelegate, NOCMTextMessageCellDelegate>
 
 @end

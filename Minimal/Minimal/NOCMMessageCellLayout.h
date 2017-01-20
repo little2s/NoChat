@@ -72,6 +72,7 @@
 
 + (UIFont *)textFont;
 + (UIColor *)textColor;
++ (UIColor *)linkColor;
 
 @end
 

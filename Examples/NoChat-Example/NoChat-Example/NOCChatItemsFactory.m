@@ -29,17 +29,28 @@
 + (NSArray *)fetchMetaItemsWithNumber:(NSInteger)number
 {
     NSMutableArray *result = [[NSMutableArray alloc] init];
-    for (NSInteger index = 0; index < number; index++) {
-        NSInteger words = (arc4random() % 40) + 1;
-        
+    for (NSInteger index = 0; index < number; index++) {        
         NSDictionary *metaItem = @{
             @"senderDisplayName": [LoremIpsum name],
             @"dateString": @"Dec 26 17:01",
-            @"text": [LoremIpsum wordsWithNumber:words]
+            @"text": [self richWords]
         };
         [result addObject:metaItem];
     }
     return result;
+}
+
++ (NSString *)richWords
+{
+    NSInteger rd = arc4random() % 3;
+    if (rd == 0) {
+        NSInteger words1 = (arc4random() % 15) + 1;
+        NSInteger words2 = (arc4random() % 15) + 1;
+        return [NSString stringWithFormat:@"%@ %@ %@", [LoremIpsum wordsWithNumber:words1], [LoremIpsum URL].absoluteString, [LoremIpsum wordsWithNumber:words2]];
+    } else {
+        NSInteger words = (arc4random() % 40) + 1;
+        return [LoremIpsum wordsWithNumber:words];
+    }
 }
 
 @end

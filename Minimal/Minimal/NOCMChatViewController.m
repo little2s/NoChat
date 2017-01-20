@@ -7,11 +7,9 @@
 //
 
 #import "NOCMChatViewController.h"
-#import "NOCMMessageCell.h"
-#import "NOCMChatInputView.h"
 #import "NOCMMessage.h"
 
-@interface NOCMChatViewController () <NOCMChatInputViewDelegate>
+@interface NOCMChatViewController ()
 
 @end
 
@@ -33,6 +31,26 @@
 - (void)registerChatItemCells
 {
     [self.collectionView registerClass:[NOCMTextMessageCell class] forCellWithReuseIdentifier:[NOCMTextMessageCell reuseIdentifier]];
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleContentSizeCategoryDidChanged:) name:UIContentSizeCategoryDidChangeNotification object:nil];
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)handleContentSizeCategoryDidChanged:(NSNotification *)notification
+{
+    if (self.layouts.count == 0) {
+        return;
+    }
+    [self.collectionView.collectionViewLayout invalidateLayout];
+    [self updateChatItemsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.layouts.count)]];
 }
 
 #pragma mark - NOCMChatInputViewDelegate

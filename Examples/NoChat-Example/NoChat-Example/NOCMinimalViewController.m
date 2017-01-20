@@ -66,4 +66,16 @@
     });
 }
 
+#pragma mark - NOCMTextMessageCellDelegate
+
+- (void)cell:(NOCMTextMessageCell *)cell didTapLink:(NSURL *)linkURL
+{
+    NSLog(@"did tap link: %@", linkURL);
+}
+
+- (void)cell:(NOCMTextMessageCell *)cell didLongPressLink:(NSURL *)linkURL
+{
+    NSLog(@"did long press link: %@", linkURL);
+}
+
 @end

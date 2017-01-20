@@ -17,8 +17,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nullable, nonatomic, strong) NOCMTextLayout *textLayout;
 
-@property (nullable, nonatomic, copy) NOCMTextAction tapAction;
-@property (nullable, nonatomic, copy) NOCMTextAction longPressAction;
+@property (nullable, nonatomic, copy) NOCMTextAction textTapAction;
+@property (nullable, nonatomic, copy) NOCMTextAction textLongPressAction;
+
+@property (nullable, nonatomic, copy) NOCMTextAction highlightTapAction;
+@property (nullable, nonatomic, copy) NOCMTextAction highlightLongPressAction;
 
 @end
 
