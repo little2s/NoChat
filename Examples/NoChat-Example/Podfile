@@ -1,9 +1,10 @@
 platform :ios, '8.0'
 
 target 'NoChat-Example' do
+    
     pod 'NoChat', :path => '../../'
-    pod 'Minimal', :path => '../../'
-
     pod 'LoremIpsum'
+    pod 'YYText'
+    pod 'pop'
 
 end

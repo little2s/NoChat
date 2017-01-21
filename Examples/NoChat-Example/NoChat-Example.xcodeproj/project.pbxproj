@@ -13,10 +13,10 @@
 		E09B24961E0E322E00E9345B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E09B24951E0E322E00E9345B /* Assets.xcassets */; };
 		E09B24991E0E322E00E9345B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E09B24971E0E322E00E9345B /* LaunchScreen.storyboard */; };
 		E09B24BE1E0E335600E9345B /* NOCChatsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E09B24BD1E0E335600E9345B /* NOCChatsViewController.m */; };
-		E09B24C91E0E34CA00E9345B /* NOCMinimalViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E09B24C81E0E34CA00E9345B /* NOCMinimalViewController.m */; };
-		E09B24CC1E0E354200E9345B /* NOCTelegramViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E09B24CB1E0E354200E9345B /* NOCTelegramViewController.m */; };
-		E09B24CF1E0E355000E9345B /* NOCWeChatViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E09B24CE1E0E355000E9345B /* NOCWeChatViewController.m */; };
-		E0B74EAF1E1355370001B3CB /* NOCChatItemsFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = E0B74EAE1E1355370001B3CB /* NOCChatItemsFactory.m */; };
+		E0C29E431E331359001A793F /* TGChatViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C29E421E331359001A793F /* TGChatViewController.m */; };
+		E0C29E461E33136E001A793F /* MMChatViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C29E451E33136E001A793F /* MMChatViewController.m */; };
+		E0C29E491E3313C2001A793F /* NOCMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C29E481E3313C2001A793F /* NOCMessage.m */; };
+		E0C29E4C1E3313DD001A793F /* NOCMessageFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C29E4B1E3313DD001A793F /* NOCMessageFactory.m */; };
 		F693803BAF5DB0048DB9FF9D /* libPods-NoChat-Example.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F96FB2058286FA8CA65A92EB /* libPods-NoChat-Example.a */; };
 /* End PBXBuildFile section */
 
@@ -33,14 +33,14 @@
 		E09B249A1E0E322E00E9345B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E09B24BC1E0E335600E9345B /* NOCChatsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NOCChatsViewController.h; sourceTree = "<group>"; };
 		E09B24BD1E0E335600E9345B /* NOCChatsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NOCChatsViewController.m; sourceTree = "<group>"; };
-		E09B24C71E0E34CA00E9345B /* NOCMinimalViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NOCMinimalViewController.h; sourceTree = "<group>"; };
-		E09B24C81E0E34CA00E9345B /* NOCMinimalViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NOCMinimalViewController.m; sourceTree = "<group>"; };
-		E09B24CA1E0E354200E9345B /* NOCTelegramViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NOCTelegramViewController.h; sourceTree = "<group>"; };
-		E09B24CB1E0E354200E9345B /* NOCTelegramViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NOCTelegramViewController.m; sourceTree = "<group>"; };
-		E09B24CD1E0E355000E9345B /* NOCWeChatViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NOCWeChatViewController.h; sourceTree = "<group>"; };
-		E09B24CE1E0E355000E9345B /* NOCWeChatViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NOCWeChatViewController.m; sourceTree = "<group>"; };
-		E0B74EAD1E1355370001B3CB /* NOCChatItemsFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NOCChatItemsFactory.h; sourceTree = "<group>"; };
-		E0B74EAE1E1355370001B3CB /* NOCChatItemsFactory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NOCChatItemsFactory.m; sourceTree = "<group>"; };
+		E0C29E411E331359001A793F /* TGChatViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TGChatViewController.h; sourceTree = "<group>"; };
+		E0C29E421E331359001A793F /* TGChatViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TGChatViewController.m; sourceTree = "<group>"; };
+		E0C29E441E33136E001A793F /* MMChatViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMChatViewController.h; sourceTree = "<group>"; };
+		E0C29E451E33136E001A793F /* MMChatViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMChatViewController.m; sourceTree = "<group>"; };
+		E0C29E471E3313C2001A793F /* NOCMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NOCMessage.h; sourceTree = "<group>"; };
+		E0C29E481E3313C2001A793F /* NOCMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NOCMessage.m; sourceTree = "<group>"; };
+		E0C29E4A1E3313DD001A793F /* NOCMessageFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NOCMessageFactory.h; sourceTree = "<group>"; };
+		E0C29E4B1E3313DD001A793F /* NOCMessageFactory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NOCMessageFactory.m; sourceTree = "<group>"; };
 		F96FB2058286FA8CA65A92EB /* libPods-NoChat-Example.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NoChat-Example.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -133,31 +133,23 @@
 		E09B24C11E0E337A00E9345B /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				E0C29E471E3313C2001A793F /* NOCMessage.h */,
+				E0C29E481E3313C2001A793F /* NOCMessage.m */,
+				E0C29E4A1E3313DD001A793F /* NOCMessageFactory.h */,
+				E0C29E4B1E3313DD001A793F /* NOCMessageFactory.m */,
 				E09B24BC1E0E335600E9345B /* NOCChatsViewController.h */,
 				E09B24BD1E0E335600E9345B /* NOCChatsViewController.m */,
-				E0B74EAD1E1355370001B3CB /* NOCChatItemsFactory.h */,
-				E0B74EAE1E1355370001B3CB /* NOCChatItemsFactory.m */,
-				E09B24D01E0E358600E9345B /* Minimal */,
 				E09B24D11E0E358D00E9345B /* Telegram */,
 				E09B24D21E0E359800E9345B /* WeChat */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
 		};
-		E09B24D01E0E358600E9345B /* Minimal */ = {
-			isa = PBXGroup;
-			children = (
-				E09B24C71E0E34CA00E9345B /* NOCMinimalViewController.h */,
-				E09B24C81E0E34CA00E9345B /* NOCMinimalViewController.m */,
-			);
-			name = Minimal;
-			sourceTree = "<group>";
-		};
 		E09B24D11E0E358D00E9345B /* Telegram */ = {
 			isa = PBXGroup;
 			children = (
-				E09B24CA1E0E354200E9345B /* NOCTelegramViewController.h */,
-				E09B24CB1E0E354200E9345B /* NOCTelegramViewController.m */,
+				E0C29E411E331359001A793F /* TGChatViewController.h */,
+				E0C29E421E331359001A793F /* TGChatViewController.m */,
 			);
 			name = Telegram;
 			sourceTree = "<group>";
@@ -165,8 +157,8 @@
 		E09B24D21E0E359800E9345B /* WeChat */ = {
 			isa = PBXGroup;
 			children = (
-				E09B24CD1E0E355000E9345B /* NOCWeChatViewController.h */,
-				E09B24CE1E0E355000E9345B /* NOCWeChatViewController.m */,
+				E0C29E441E33136E001A793F /* MMChatViewController.h */,
+				E0C29E451E33136E001A793F /* MMChatViewController.m */,
 			);
 			name = WeChat;
 			sourceTree = "<group>";
@@ -294,12 +286,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E09B24C91E0E34CA00E9345B /* NOCMinimalViewController.m in Sources */,
-				E0B74EAF1E1355370001B3CB /* NOCChatItemsFactory.m in Sources */,
+				E0C29E461E33136E001A793F /* MMChatViewController.m in Sources */,
+				E0C29E491E3313C2001A793F /* NOCMessage.m in Sources */,
+				E0C29E4C1E3313DD001A793F /* NOCMessageFactory.m in Sources */,
 				E09B248B1E0E322E00E9345B /* NOCAppDelegate.m in Sources */,
+				E0C29E431E331359001A793F /* TGChatViewController.m in Sources */,
 				E09B24881E0E322E00E9345B /* main.m in Sources */,
-				E09B24CF1E0E355000E9345B /* NOCWeChatViewController.m in Sources */,
-				E09B24CC1E0E354200E9345B /* NOCTelegramViewController.m in Sources */,
 				E09B24BE1E0E335600E9345B /* NOCChatsViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -1,25 +1,24 @@
 //
-//  NOCChatItemsFactory.m
+//  NOCMessageFactory.m
 //  NoChat-Example
 //
-//  Created by little2s on 2016/12/28.
-//  Copyright © 2016年 little2s. All rights reserved.
+//  Created by little2s on 2017/1/21.
+//  Copyright © 2017年 little2s. All rights reserved.
 //
 
-#import "NOCChatItemsFactory.h"
+#import "NOCMessageFactory.h"
+#import "NOCMessage.h"
 #import <LoremIpsum/LoremIpsum.h>
-#import "NOCMMessage.h"
 
-@implementation NOCChatItemsFactory
+@implementation NOCMessageFactory
 
-+ (NSArray *)fetchMinimalChatItemsWithNumber:(NSInteger)number
++ (NSArray *)fetchMessagesWithNumber:(NSInteger)number
 {
     NSArray *metaItems = [self fetchMetaItemsWithNumber:number];
     NSMutableArray *result = [[NSMutableArray alloc] init];
     for (NSDictionary *metaItem in metaItems) {
-        NOCMMessage *message = [[NOCMMessage alloc] init];
+        NOCMessage *message = [NOCMessage new];
         message.senderDisplayName = metaItem[@"senderDisplayName"];
-        message.dateString = metaItem[@"dateString"];
         message.text = metaItem[@"text"];
         [result addObject:message];
     }
@@ -29,12 +28,12 @@
 + (NSArray *)fetchMetaItemsWithNumber:(NSInteger)number
 {
     NSMutableArray *result = [[NSMutableArray alloc] init];
-    for (NSInteger index = 0; index < number; index++) {        
+    for (NSInteger index = 0; index < number; index++) {
         NSDictionary *metaItem = @{
-            @"senderDisplayName": [LoremIpsum name],
-            @"dateString": @"Dec 26 17:01",
-            @"text": [self richWords]
-        };
+                                   @"senderDisplayName": [LoremIpsum name],
+                                   @"dateString": @"Dec 26 17:01",
+                                   @"text": [self richWords]
+                                   };
         [result addObject:metaItem];
     }
     return result;

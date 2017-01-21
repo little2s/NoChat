@@ -25,21 +25,16 @@
     NSString *className = nil;
     NSInteger row = indexPath.row;
     switch (row) {
-        case 0:
-            className = @"NOCMinimalViewController";
+        case 0: {
+            className = @"TGChatViewController";
             break;
-            
-        case 1:
-            className = @"NOCTelegramViewController";
+        }
+        case 1: {
+            className = @"MMChatViewController";
             break;
-            
-        case 2:
-            className = @"NOCWeChatViewController";
-            break;
-            
+        }
         default:
             abort();
-            break;
     }
     Class clz = NSClassFromString(className);
     UIViewController *nextViewController = [[clz alloc] init];
