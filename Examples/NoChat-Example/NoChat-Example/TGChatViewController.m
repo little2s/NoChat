@@ -8,30 +8,120 @@
 
 #import "TGChatViewController.h"
 
-@interface TGChatViewController ()
+#import "TGTextMessageCell.h"
+#import "TGTextMessageCellLayout.h"
+#import "TGChatInputView.h"
+
+#import "NOCMessage.h"
+#import "NOCMessageFactory.h"
+
+@interface TGChatViewController () <UINavigationControllerDelegate>
 
 @end
 
 @implementation TGChatViewController
 
-- (void)viewDidLoad {
+#pragma mark - Overrides
+
++ (Class)cellLayoutClassForItemType:(NSString *)type
+{
+    if ([type isEqualToString:@"Text"]) {
+        return [TGTextMessageCellLayout class];
+    } else {
+        return nil;
+    }
+}
+
++ (Class)chatInputViewClass
+{
+    return [TGChatInputView class];
+}
+
+- (void)registerChatItemCells
+{
+    [self.collectionView registerClass:[TGTextMessageCell class] forCellWithReuseIdentifier:[TGTextMessageCell reuseIdentifier]];
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)viewDidLoad
+{
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
+    self.backgroundView.image = [UIImage imageNamed:@"TGWallpaper"];
+    self.navigationController.delegate = self;
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleContentSizeCategoryDidChanged:) name:UIContentSizeCategoryDidChangeNotification object:nil];
+    
+    [self loadChatItems];
 }
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+#pragma mark - TGChatInputViewDelegate
+
+- (void)chatInputView:(TGChatInputView *)chatInputView didSendText:(NSString *)text
+{
+    NOCMessage *message = [[NOCMessage alloc] init];
+    message.text = text;
+    [self appendMessage:message];
 }
 
-/*
-#pragma mark - Navigation
+#pragma mark - TGTextMessageCellDelegate
 
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
+- (void)cell:(TGTextMessageCell *)cell didTapLink:(NSURL *)linkURL
+{
+    [self.chatInputView endInputting:YES];
+    NSLog(@"did tap link: %@", linkURL);
 }
-*/
+
+- (void)cell:(TGTextMessageCell *)cell didLongPressLink:(NSURL *)linkURL
+{
+    NSLog(@"did long press link: %@", linkURL);
+}
+
+#pragma mark - UINavigationControllerDelegate
+
+- (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated
+{
+    if (self == navigationController.topViewController) {
+        return;
+    }
+    
+    self.chatInputView.delegate = nil;
+    
+    __weak typeof(self) weakSelf = self;
+    id<UIViewControllerTransitionCoordinator> transitionCoordinator = navigationController.topViewController.transitionCoordinator;
+    [transitionCoordinator notifyWhenInteractionEndsUsingBlock:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        if ([context isCancelled] && weakSelf) {
+            weakSelf.chatInputView.delegate = weakSelf;
+        }
+    }];
+}
+
+#pragma mark - Private
+
+- (void)loadChatItems
+{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSArray *chatItems = [NOCMessageFactory fetchMessagesWithNumber:20];
+        [self reloadChatItems:chatItems];
+    });
+}
+
+- (void)appendMessage:(NOCMessage *)message
+{
+    [self appendChatItems:@[message]];
+    [self scrollToBottom:YES];
+}
+
+- (void)handleContentSizeCategoryDidChanged:(NSNotification *)notification
+{
+    if (self.layouts.count == 0) {
+        return;
+    }
+    [self.collectionView.collectionViewLayout invalidateLayout];
+    [self updateChatItemsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.layouts.count)]];
+}
 
 @end

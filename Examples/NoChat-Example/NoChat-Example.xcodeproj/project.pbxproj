@@ -17,6 +17,14 @@
 		E0C29E461E33136E001A793F /* MMChatViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C29E451E33136E001A793F /* MMChatViewController.m */; };
 		E0C29E491E3313C2001A793F /* NOCMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C29E481E3313C2001A793F /* NOCMessage.m */; };
 		E0C29E4C1E3313DD001A793F /* NOCMessageFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C29E4B1E3313DD001A793F /* NOCMessageFactory.m */; };
+		E0C29E541E33AC43001A793F /* NOCGrowingTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C29E531E33AC43001A793F /* NOCGrowingTextView.m */; };
+		E0C29E571E33ACF6001A793F /* NOCKeyboardManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C29E561E33ACF6001A793F /* NOCKeyboardManager.m */; };
+		E0C29E5A1E33AFD4001A793F /* UIFont+NOChat.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C29E591E33AFD4001A793F /* UIFont+NOChat.m */; };
+		E0C29E5D1E33B68A001A793F /* TGChatInputView.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C29E5C1E33B68A001A793F /* TGChatInputView.m */; };
+		E0C29E641E33BA59001A793F /* TGTextMessageCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C29E631E33BA59001A793F /* TGTextMessageCell.m */; };
+		E0C29E671E33BA7A001A793F /* TGTextMessageCellLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C29E661E33BA7A001A793F /* TGTextMessageCellLayout.m */; };
+		E0C29E6C1E33BEBB001A793F /* TGBaseMessageCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C29E6B1E33BEBB001A793F /* TGBaseMessageCell.m */; };
+		E0C29E6F1E33BEDF001A793F /* TGBaseMessageCellLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C29E6E1E33BEDF001A793F /* TGBaseMessageCellLayout.m */; };
 		F693803BAF5DB0048DB9FF9D /* libPods-NoChat-Example.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F96FB2058286FA8CA65A92EB /* libPods-NoChat-Example.a */; };
 /* End PBXBuildFile section */
 
@@ -41,6 +49,22 @@
 		E0C29E481E3313C2001A793F /* NOCMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NOCMessage.m; sourceTree = "<group>"; };
 		E0C29E4A1E3313DD001A793F /* NOCMessageFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NOCMessageFactory.h; sourceTree = "<group>"; };
 		E0C29E4B1E3313DD001A793F /* NOCMessageFactory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NOCMessageFactory.m; sourceTree = "<group>"; };
+		E0C29E521E33AC43001A793F /* NOCGrowingTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NOCGrowingTextView.h; sourceTree = "<group>"; };
+		E0C29E531E33AC43001A793F /* NOCGrowingTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NOCGrowingTextView.m; sourceTree = "<group>"; };
+		E0C29E551E33ACF6001A793F /* NOCKeyboardManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NOCKeyboardManager.h; sourceTree = "<group>"; };
+		E0C29E561E33ACF6001A793F /* NOCKeyboardManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NOCKeyboardManager.m; sourceTree = "<group>"; };
+		E0C29E581E33AFD4001A793F /* UIFont+NOChat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIFont+NOChat.h"; sourceTree = "<group>"; };
+		E0C29E591E33AFD4001A793F /* UIFont+NOChat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIFont+NOChat.m"; sourceTree = "<group>"; };
+		E0C29E5B1E33B68A001A793F /* TGChatInputView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TGChatInputView.h; sourceTree = "<group>"; };
+		E0C29E5C1E33B68A001A793F /* TGChatInputView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TGChatInputView.m; sourceTree = "<group>"; };
+		E0C29E621E33BA59001A793F /* TGTextMessageCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TGTextMessageCell.h; sourceTree = "<group>"; };
+		E0C29E631E33BA59001A793F /* TGTextMessageCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TGTextMessageCell.m; sourceTree = "<group>"; };
+		E0C29E651E33BA7A001A793F /* TGTextMessageCellLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TGTextMessageCellLayout.h; sourceTree = "<group>"; };
+		E0C29E661E33BA7A001A793F /* TGTextMessageCellLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TGTextMessageCellLayout.m; sourceTree = "<group>"; };
+		E0C29E6A1E33BEBB001A793F /* TGBaseMessageCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TGBaseMessageCell.h; sourceTree = "<group>"; };
+		E0C29E6B1E33BEBB001A793F /* TGBaseMessageCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TGBaseMessageCell.m; sourceTree = "<group>"; };
+		E0C29E6D1E33BEDF001A793F /* TGBaseMessageCellLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TGBaseMessageCellLayout.h; sourceTree = "<group>"; };
+		E0C29E6E1E33BEDF001A793F /* TGBaseMessageCellLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TGBaseMessageCellLayout.m; sourceTree = "<group>"; };
 		F96FB2058286FA8CA65A92EB /* libPods-NoChat-Example.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NoChat-Example.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -137,6 +161,8 @@
 		E09B24D11E0E358D00E9345B /* Telegram */ = {
 			isa = PBXGroup;
 			children = (
+				E0C29E5E1E33B79F001A793F /* Cell */,
+				E0C29E5F1E33B7A5001A793F /* Input */,
 				E0C29E411E331359001A793F /* TGChatViewController.h */,
 				E0C29E421E331359001A793F /* TGChatViewController.m */,
 			);
@@ -146,6 +172,8 @@
 		E09B24D21E0E359800E9345B /* WeChat */ = {
 			isa = PBXGroup;
 			children = (
+				E0C29E611E33B7BB001A793F /* Cell */,
+				E0C29E601E33B7B6001A793F /* Input */,
 				E0C29E441E33136E001A793F /* MMChatViewController.h */,
 				E0C29E451E33136E001A793F /* MMChatViewController.m */,
 			);
@@ -155,6 +183,8 @@
 		E0C29E4D1E33A763001A793F /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				E0C29E551E33ACF6001A793F /* NOCKeyboardManager.h */,
+				E0C29E561E33ACF6001A793F /* NOCKeyboardManager.m */,
 			);
 			name = Utilities;
 			sourceTree = "<group>";
@@ -162,6 +192,8 @@
 		E0C29E4E1E33A772001A793F /* Categories */ = {
 			isa = PBXGroup;
 			children = (
+				E0C29E581E33AFD4001A793F /* UIFont+NOChat.h */,
+				E0C29E591E33AFD4001A793F /* UIFont+NOChat.m */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
@@ -180,6 +212,8 @@
 		E0C29E501E33A783001A793F /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				E0C29E521E33AC43001A793F /* NOCGrowingTextView.h */,
+				E0C29E531E33AC43001A793F /* NOCGrowingTextView.m */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -193,6 +227,60 @@
 				E0C29E4B1E3313DD001A793F /* NOCMessageFactory.m */,
 			);
 			name = Models;
+			sourceTree = "<group>";
+		};
+		E0C29E5E1E33B79F001A793F /* Cell */ = {
+			isa = PBXGroup;
+			children = (
+				E0C29E691E33BE8E001A793F /* Base */,
+				E0C29E681E33BE89001A793F /* Text */,
+			);
+			name = Cell;
+			sourceTree = "<group>";
+		};
+		E0C29E5F1E33B7A5001A793F /* Input */ = {
+			isa = PBXGroup;
+			children = (
+				E0C29E5B1E33B68A001A793F /* TGChatInputView.h */,
+				E0C29E5C1E33B68A001A793F /* TGChatInputView.m */,
+			);
+			name = Input;
+			sourceTree = "<group>";
+		};
+		E0C29E601E33B7B6001A793F /* Input */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Input;
+			sourceTree = "<group>";
+		};
+		E0C29E611E33B7BB001A793F /* Cell */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Cell;
+			sourceTree = "<group>";
+		};
+		E0C29E681E33BE89001A793F /* Text */ = {
+			isa = PBXGroup;
+			children = (
+				E0C29E621E33BA59001A793F /* TGTextMessageCell.h */,
+				E0C29E631E33BA59001A793F /* TGTextMessageCell.m */,
+				E0C29E651E33BA7A001A793F /* TGTextMessageCellLayout.h */,
+				E0C29E661E33BA7A001A793F /* TGTextMessageCellLayout.m */,
+			);
+			name = Text;
+			sourceTree = "<group>";
+		};
+		E0C29E691E33BE8E001A793F /* Base */ = {
+			isa = PBXGroup;
+			children = (
+				E0C29E6A1E33BEBB001A793F /* TGBaseMessageCell.h */,
+				E0C29E6B1E33BEBB001A793F /* TGBaseMessageCell.m */,
+				E0C29E6D1E33BEDF001A793F /* TGBaseMessageCellLayout.h */,
+				E0C29E6E1E33BEDF001A793F /* TGBaseMessageCellLayout.m */,
+			);
+			name = Base;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -320,11 +408,19 @@
 			files = (
 				E0C29E461E33136E001A793F /* MMChatViewController.m in Sources */,
 				E0C29E491E3313C2001A793F /* NOCMessage.m in Sources */,
+				E0C29E671E33BA7A001A793F /* TGTextMessageCellLayout.m in Sources */,
+				E0C29E541E33AC43001A793F /* NOCGrowingTextView.m in Sources */,
 				E0C29E4C1E3313DD001A793F /* NOCMessageFactory.m in Sources */,
 				E09B248B1E0E322E00E9345B /* NOCAppDelegate.m in Sources */,
+				E0C29E571E33ACF6001A793F /* NOCKeyboardManager.m in Sources */,
+				E0C29E6C1E33BEBB001A793F /* TGBaseMessageCell.m in Sources */,
 				E0C29E431E331359001A793F /* TGChatViewController.m in Sources */,
 				E09B24881E0E322E00E9345B /* main.m in Sources */,
+				E0C29E5D1E33B68A001A793F /* TGChatInputView.m in Sources */,
 				E09B24BE1E0E335600E9345B /* NOCChatsViewController.m in Sources */,
+				E0C29E5A1E33AFD4001A793F /* UIFont+NOChat.m in Sources */,
+				E0C29E6F1E33BEDF001A793F /* TGBaseMessageCellLayout.m in Sources */,
+				E0C29E641E33BA59001A793F /* TGTextMessageCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -16,7 +16,6 @@
     if (self) {
         _uniqueIdentifier = [NSUUID new].UUIDString;
         _type = @"Text";
-        _chatType = NOCChatTypeSingle;
     }
     return self;
 }
