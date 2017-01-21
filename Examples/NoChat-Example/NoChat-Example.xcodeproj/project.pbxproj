@@ -96,7 +96,11 @@
 			children = (
 				E09B24BF1E0E336300E9345B /* AppDelegate */,
 				E09B24C01E0E336C00E9345B /* Storyboards */,
-				E09B24C11E0E337A00E9345B /* Classes */,
+				E0C29E511E33A789001A793F /* Models */,
+				E0C29E501E33A783001A793F /* Views */,
+				E0C29E4F1E33A77C001A793F /* ViewControllers */,
+				E0C29E4E1E33A772001A793F /* Categories */,
+				E0C29E4D1E33A763001A793F /* Utilities */,
 				E09B24861E0E322E00E9345B /* Supporting Files */,
 			);
 			path = "NoChat-Example";
@@ -130,21 +134,6 @@
 			name = Storyboards;
 			sourceTree = "<group>";
 		};
-		E09B24C11E0E337A00E9345B /* Classes */ = {
-			isa = PBXGroup;
-			children = (
-				E0C29E471E3313C2001A793F /* NOCMessage.h */,
-				E0C29E481E3313C2001A793F /* NOCMessage.m */,
-				E0C29E4A1E3313DD001A793F /* NOCMessageFactory.h */,
-				E0C29E4B1E3313DD001A793F /* NOCMessageFactory.m */,
-				E09B24BC1E0E335600E9345B /* NOCChatsViewController.h */,
-				E09B24BD1E0E335600E9345B /* NOCChatsViewController.m */,
-				E09B24D11E0E358D00E9345B /* Telegram */,
-				E09B24D21E0E359800E9345B /* WeChat */,
-			);
-			name = Classes;
-			sourceTree = "<group>";
-		};
 		E09B24D11E0E358D00E9345B /* Telegram */ = {
 			isa = PBXGroup;
 			children = (
@@ -161,6 +150,49 @@
 				E0C29E451E33136E001A793F /* MMChatViewController.m */,
 			);
 			name = WeChat;
+			sourceTree = "<group>";
+		};
+		E0C29E4D1E33A763001A793F /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Utilities;
+			sourceTree = "<group>";
+		};
+		E0C29E4E1E33A772001A793F /* Categories */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Categories;
+			sourceTree = "<group>";
+		};
+		E0C29E4F1E33A77C001A793F /* ViewControllers */ = {
+			isa = PBXGroup;
+			children = (
+				E09B24BC1E0E335600E9345B /* NOCChatsViewController.h */,
+				E09B24BD1E0E335600E9345B /* NOCChatsViewController.m */,
+				E09B24D11E0E358D00E9345B /* Telegram */,
+				E09B24D21E0E359800E9345B /* WeChat */,
+			);
+			name = ViewControllers;
+			sourceTree = "<group>";
+		};
+		E0C29E501E33A783001A793F /* Views */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Views;
+			sourceTree = "<group>";
+		};
+		E0C29E511E33A789001A793F /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				E0C29E471E3313C2001A793F /* NOCMessage.h */,
+				E0C29E481E3313C2001A793F /* NOCMessage.m */,
+				E0C29E4A1E3313DD001A793F /* NOCMessageFactory.h */,
+				E0C29E4B1E3313DD001A793F /* NOCMessageFactory.m */,
+			);
+			name = Models;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
