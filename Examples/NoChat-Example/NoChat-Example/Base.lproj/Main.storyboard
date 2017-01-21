@@ -72,7 +72,7 @@
         <scene sceneID="26n-vU-dhI">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="dKp-Wr-l7V" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Settings" image="settings" selectedImage="settingsHL" id="cPa-gy-q4n"/>
+                    <tabBarItem key="tabBarItem" title="Settings" image="Settings" selectedImage="SettingsHL" id="cPa-gy-q4n"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="1KC-pr-Ta4">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
@@ -91,7 +91,7 @@
         <scene sceneID="ngc-WB-dRl">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="Enc-6C-AX4" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Chats" image="chats" selectedImage="chatsHL" id="acW-dT-cKf"/>
+                    <tabBarItem key="tabBarItem" title="Chats" image="Chats" selectedImage="ChatsHL" id="acW-dT-cKf"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="onO-G2-z0V">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
@@ -167,9 +167,9 @@
         </scene>
     </scenes>
     <resources>
-        <image name="chats" width="32" height="32"/>
-        <image name="chatsHL" width="32" height="32"/>
-        <image name="settings" width="32" height="32"/>
-        <image name="settingsHL" width="32" height="32"/>
+        <image name="Chats" width="32" height="32"/>
+        <image name="ChatsHL" width="32" height="32"/>
+        <image name="Settings" width="32" height="32"/>
+        <image name="SettingsHL" width="32" height="32"/>
     </resources>
 </document>
