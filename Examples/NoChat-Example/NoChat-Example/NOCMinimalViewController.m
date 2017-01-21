@@ -70,6 +70,8 @@
 
 - (void)cell:(NOCMTextMessageCell *)cell didTapLink:(NSURL *)linkURL
 {
+    [super cell:cell didTapLink:linkURL];
+    
     NSLog(@"did tap link: %@", linkURL);
 }
 

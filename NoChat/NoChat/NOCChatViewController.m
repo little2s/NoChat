@@ -173,11 +173,6 @@
 
 #pragma mark - Private
 
-- (void)didTapChatCollectionContainerView:(UITapGestureRecognizer *)recognizer
-{
-    [self.chatInputView endInputting:YES];
-}
-
 - (void)autoLoadMoreContentIfNeeded
 {
     if (self.isUpdating) {
@@ -233,14 +228,14 @@
     UIView *chatCollectionContainerView = [[UIView alloc] init];
     chatCollectionContainerView.translatesAutoresizingMaskIntoConstraints = NO;
     chatCollectionContainerView.backgroundColor = [UIColor clearColor];
-    UITapGestureRecognizer *recognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didTapChatCollectionContainerView:)];
-    [chatCollectionContainerView addGestureRecognizer:recognizer];
     [self.view addSubview:chatCollectionContainerView];
     self.chatCollectionContainerView = chatCollectionContainerView;
 }
 
 - (void)setupChatCollectionView
 {
+    __weak typeof(self) weakSelf = self;
+    
     NOCChatCollectionViewLayout *collectionViewLayout = [[NOCChatCollectionViewLayout alloc] init];
     collectionViewLayout.minimumLineSpacing = 0;
     NOCChatCollectionView *collectionView = [[NOCChatCollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:collectionViewLayout];
@@ -252,6 +247,9 @@
     if (self.isInverted) {
         collectionView.transform = CGAffineTransformMake(1, 0, 0, -1, 0, 0);
     }
+    collectionView.tapAction = ^(){
+        [weakSelf.chatInputView endInputting:YES];
+    };
     [self.chatCollectionContainerView addSubview:collectionView];
     self.collectionView = collectionView;
 }

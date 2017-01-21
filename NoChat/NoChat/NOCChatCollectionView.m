@@ -23,4 +23,13 @@
     return self;
 }
 
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
+{
+    [super touchesBegan:touches withEvent:event];
+    
+    if (self.tapAction) {
+        self.tapAction();
+    }
+}
+
 @end

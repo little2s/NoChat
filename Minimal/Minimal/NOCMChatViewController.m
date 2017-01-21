@@ -71,4 +71,11 @@
     [self scrollToBottom:YES];
 }
 
+#pragma mark - NOCMTextMessageCellDelegate
+
+- (void)cell:(NOCMTextMessageCell *)cell didTapLink:(NSURL *)linkURL
+{
+    [self.chatInputView endInputting:YES];
+}
+
 @end
