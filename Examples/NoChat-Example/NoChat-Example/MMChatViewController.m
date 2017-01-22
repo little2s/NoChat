@@ -8,30 +8,120 @@
 
 #import "MMChatViewController.h"
 
-@interface MMChatViewController ()
+#import "MMTextMessageCell.h"
+#import "MMTextMessageCellLayout.h"
+#import "MMChatInputView.h"
+
+#import "NOCMessage.h"
+#import "NOCMessageFactory.h"
+
+@interface MMChatViewController () <UINavigationControllerDelegate>
 
 @end
 
 @implementation MMChatViewController
 
-- (void)viewDidLoad {
+#pragma mark - Overrides
+
++ (Class)cellLayoutClassForItemType:(NSString *)type
+{
+    if ([type isEqualToString:@"Text"]) {
+        return [MMTextMessageCellLayout class];
+    } else {
+        return nil;
+    }
+}
+
++ (Class)chatInputViewClass
+{
+    return [MMChatInputView class];
+}
+
+- (void)registerChatItemCells
+{
+    [self.collectionView registerClass:[MMTextMessageCell class] forCellWithReuseIdentifier:[MMTextMessageCell reuseIdentifier]];
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)viewDidLoad
+{
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
+    self.backgroundView.image = [UIImage imageNamed:@"MMWallpaper"];
+    self.navigationController.delegate = self;
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleContentSizeCategoryDidChanged:) name:UIContentSizeCategoryDidChangeNotification object:nil];
+    
+    [self loadChatItems];
 }
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+#pragma mark - MMChatInputViewDelegate
+
+- (void)chatInputView:(MMChatInputView *)chatInputView didSendText:(NSString *)text
+{
+    NOCMessage *message = [[NOCMessage alloc] init];
+    message.text = text;
+    [self appendMessage:message];
 }
 
-/*
-#pragma mark - Navigation
+#pragma mark - MMTextMessageCellDelegate
 
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
+- (void)cell:(MMTextMessageCell *)cell didTapLink:(NSURL *)linkURL
+{
+    [self.chatInputView endInputting:YES];
+    NSLog(@"did tap link: %@", linkURL);
 }
-*/
+
+- (void)cell:(MMTextMessageCell *)cell didLongPressLink:(NSURL *)linkURL
+{
+    NSLog(@"did long press link: %@", linkURL);
+}
+
+#pragma mark - UINavigationControllerDelegate
+
+- (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated
+{
+    if (self == navigationController.topViewController) {
+        return;
+    }
+    
+    self.chatInputView.delegate = nil;
+    
+    __weak typeof(self) weakSelf = self;
+    id<UIViewControllerTransitionCoordinator> transitionCoordinator = navigationController.topViewController.transitionCoordinator;
+    [transitionCoordinator notifyWhenInteractionEndsUsingBlock:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        if ([context isCancelled] && weakSelf) {
+            weakSelf.chatInputView.delegate = weakSelf;
+        }
+    }];
+}
+
+#pragma mark - Private
+
+- (void)loadChatItems
+{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSArray *chatItems = [NOCMessageFactory fetchMessagesWithNumber:20];
+        [self reloadChatItems:chatItems];
+    });
+}
+
+- (void)appendMessage:(NOCMessage *)message
+{
+    [self appendChatItems:@[message]];
+    [self scrollToBottom:YES];
+}
+
+- (void)handleContentSizeCategoryDidChanged:(NSNotification *)notification
+{
+    if (self.layouts.count == 0) {
+        return;
+    }
+    [self.collectionView.collectionViewLayout invalidateLayout];
+    [self updateChatItemsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.layouts.count)]];
+}
 
 @end

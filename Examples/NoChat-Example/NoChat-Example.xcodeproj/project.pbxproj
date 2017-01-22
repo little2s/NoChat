@@ -25,6 +25,11 @@
 		E0C29E671E33BA7A001A793F /* TGTextMessageCellLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C29E661E33BA7A001A793F /* TGTextMessageCellLayout.m */; };
 		E0C29E6C1E33BEBB001A793F /* TGBaseMessageCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C29E6B1E33BEBB001A793F /* TGBaseMessageCell.m */; };
 		E0C29E6F1E33BEDF001A793F /* TGBaseMessageCellLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C29E6E1E33BEDF001A793F /* TGBaseMessageCellLayout.m */; };
+		E0C29E721E345AFE001A793F /* MMChatInputView.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C29E711E345AFE001A793F /* MMChatInputView.m */; };
+		E0C29E771E345B99001A793F /* MMBaseMessageCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C29E761E345B99001A793F /* MMBaseMessageCell.m */; };
+		E0C29E7A1E345BB1001A793F /* MMBaseMessageCellLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C29E791E345BB1001A793F /* MMBaseMessageCellLayout.m */; };
+		E0C29E7D1E345BC3001A793F /* MMTextMessageCellLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C29E7C1E345BC3001A793F /* MMTextMessageCellLayout.m */; };
+		E0C29E801E345BDC001A793F /* MMTextMessageCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C29E7F1E345BDC001A793F /* MMTextMessageCell.m */; };
 		F693803BAF5DB0048DB9FF9D /* libPods-NoChat-Example.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F96FB2058286FA8CA65A92EB /* libPods-NoChat-Example.a */; };
 /* End PBXBuildFile section */
 
@@ -65,6 +70,16 @@
 		E0C29E6B1E33BEBB001A793F /* TGBaseMessageCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TGBaseMessageCell.m; sourceTree = "<group>"; };
 		E0C29E6D1E33BEDF001A793F /* TGBaseMessageCellLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TGBaseMessageCellLayout.h; sourceTree = "<group>"; };
 		E0C29E6E1E33BEDF001A793F /* TGBaseMessageCellLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TGBaseMessageCellLayout.m; sourceTree = "<group>"; };
+		E0C29E701E345AFE001A793F /* MMChatInputView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMChatInputView.h; sourceTree = "<group>"; };
+		E0C29E711E345AFE001A793F /* MMChatInputView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMChatInputView.m; sourceTree = "<group>"; };
+		E0C29E751E345B99001A793F /* MMBaseMessageCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMBaseMessageCell.h; sourceTree = "<group>"; };
+		E0C29E761E345B99001A793F /* MMBaseMessageCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMBaseMessageCell.m; sourceTree = "<group>"; };
+		E0C29E781E345BB1001A793F /* MMBaseMessageCellLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMBaseMessageCellLayout.h; sourceTree = "<group>"; };
+		E0C29E791E345BB1001A793F /* MMBaseMessageCellLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMBaseMessageCellLayout.m; sourceTree = "<group>"; };
+		E0C29E7B1E345BC3001A793F /* MMTextMessageCellLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMTextMessageCellLayout.h; sourceTree = "<group>"; };
+		E0C29E7C1E345BC3001A793F /* MMTextMessageCellLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMTextMessageCellLayout.m; sourceTree = "<group>"; };
+		E0C29E7E1E345BDC001A793F /* MMTextMessageCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMTextMessageCell.h; sourceTree = "<group>"; };
+		E0C29E7F1E345BDC001A793F /* MMTextMessageCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMTextMessageCell.m; sourceTree = "<group>"; };
 		F96FB2058286FA8CA65A92EB /* libPods-NoChat-Example.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NoChat-Example.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -250,6 +265,8 @@
 		E0C29E601E33B7B6001A793F /* Input */ = {
 			isa = PBXGroup;
 			children = (
+				E0C29E701E345AFE001A793F /* MMChatInputView.h */,
+				E0C29E711E345AFE001A793F /* MMChatInputView.m */,
 			);
 			name = Input;
 			sourceTree = "<group>";
@@ -257,6 +274,8 @@
 		E0C29E611E33B7BB001A793F /* Cell */ = {
 			isa = PBXGroup;
 			children = (
+				E0C29E731E345B50001A793F /* Base */,
+				E0C29E741E345B55001A793F /* Text */,
 			);
 			name = Cell;
 			sourceTree = "<group>";
@@ -281,6 +300,28 @@
 				E0C29E6E1E33BEDF001A793F /* TGBaseMessageCellLayout.m */,
 			);
 			name = Base;
+			sourceTree = "<group>";
+		};
+		E0C29E731E345B50001A793F /* Base */ = {
+			isa = PBXGroup;
+			children = (
+				E0C29E751E345B99001A793F /* MMBaseMessageCell.h */,
+				E0C29E761E345B99001A793F /* MMBaseMessageCell.m */,
+				E0C29E781E345BB1001A793F /* MMBaseMessageCellLayout.h */,
+				E0C29E791E345BB1001A793F /* MMBaseMessageCellLayout.m */,
+			);
+			name = Base;
+			sourceTree = "<group>";
+		};
+		E0C29E741E345B55001A793F /* Text */ = {
+			isa = PBXGroup;
+			children = (
+				E0C29E7E1E345BDC001A793F /* MMTextMessageCell.h */,
+				E0C29E7F1E345BDC001A793F /* MMTextMessageCell.m */,
+				E0C29E7B1E345BC3001A793F /* MMTextMessageCellLayout.h */,
+				E0C29E7C1E345BC3001A793F /* MMTextMessageCellLayout.m */,
+			);
+			name = Text;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -407,20 +448,25 @@
 			buildActionMask = 2147483647;
 			files = (
 				E0C29E461E33136E001A793F /* MMChatViewController.m in Sources */,
+				E0C29E721E345AFE001A793F /* MMChatInputView.m in Sources */,
 				E0C29E491E3313C2001A793F /* NOCMessage.m in Sources */,
 				E0C29E671E33BA7A001A793F /* TGTextMessageCellLayout.m in Sources */,
+				E0C29E7A1E345BB1001A793F /* MMBaseMessageCellLayout.m in Sources */,
 				E0C29E541E33AC43001A793F /* NOCGrowingTextView.m in Sources */,
 				E0C29E4C1E3313DD001A793F /* NOCMessageFactory.m in Sources */,
 				E09B248B1E0E322E00E9345B /* NOCAppDelegate.m in Sources */,
 				E0C29E571E33ACF6001A793F /* NOCKeyboardManager.m in Sources */,
 				E0C29E6C1E33BEBB001A793F /* TGBaseMessageCell.m in Sources */,
 				E0C29E431E331359001A793F /* TGChatViewController.m in Sources */,
+				E0C29E771E345B99001A793F /* MMBaseMessageCell.m in Sources */,
 				E09B24881E0E322E00E9345B /* main.m in Sources */,
 				E0C29E5D1E33B68A001A793F /* TGChatInputView.m in Sources */,
+				E0C29E801E345BDC001A793F /* MMTextMessageCell.m in Sources */,
 				E09B24BE1E0E335600E9345B /* NOCChatsViewController.m in Sources */,
 				E0C29E5A1E33AFD4001A793F /* UIFont+NOChat.m in Sources */,
 				E0C29E6F1E33BEDF001A793F /* TGBaseMessageCellLayout.m in Sources */,
 				E0C29E641E33BA59001A793F /* TGTextMessageCell.m in Sources */,
+				E0C29E7D1E345BC3001A793F /* MMTextMessageCellLayout.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
