@@ -10,4 +10,15 @@
 
 @implementation NOCChatCollectionViewLayout
 
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        self.minimumLineSpacing = 0;
+        self.minimumInteritemSpacing = 0;
+        self.scrollDirection = UICollectionViewScrollDirectionVertical;
+    }
+    return self;
+}
+
 @end

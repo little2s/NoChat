@@ -8,9 +8,13 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @protocol NOCChatItem <NSObject>
 
-@property (nonatomic, copy, readonly) NSString *uniqueIdentifier;
-@property (nonatomic, copy, readonly) NSString *type;
+@property (nonatomic, readonly, copy) NSString *uniqueIdentifier;
+@property (nonatomic, readonly, copy) NSString *type;
 
 @end
+
+NS_ASSUME_NONNULL_END

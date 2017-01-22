@@ -11,15 +11,19 @@
 
 @class NOCChatItemCell;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @protocol NOCChatItemCellDelegate <NSObject>
 
 @end
 
 @interface NOCChatItemCell : UICollectionViewCell
 
-@property (nonatomic, weak) id<NOCChatItemCellDelegate> delegate;
-@property (nonatomic, strong) id<NOCChatItemCellLayout> layout;
+@property (nullable, nonatomic, weak) id<NOCChatItemCellDelegate> delegate;
+@property (nullable, nonatomic, strong) id<NOCChatItemCellLayout> layout;
 
 + (NSString *)reuseIdentifier;
 
 @end
+
+NS_ASSUME_NONNULL_END

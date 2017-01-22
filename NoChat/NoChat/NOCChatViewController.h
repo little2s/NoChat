@@ -12,17 +12,19 @@
 
 @class NOCChatCollectionView;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface NOCChatViewController : UIViewController <UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, NOCChatInputViewDelegate, NOCChatItemCellDelegate>
 
-@property (nonatomic, weak) UIImageView *backgroundView;
-@property (nonatomic, weak) UIScrollView *proxyScrollView;
-@property (nonatomic, weak) UIView *chatCollectionContainerView;
-@property (nonatomic, weak) NOCChatCollectionView *collectionView;
-@property (nonatomic, weak) UIView *chatInputContainerView;
-@property (nonatomic, weak) NOCChatInputView *chatInputView;
+@property (nullable, nonatomic, weak) UIImageView *backgroundView;
+@property (nullable, nonatomic, weak) UIScrollView *proxyScrollView;
+@property (nullable, nonatomic, weak) UIView *chatCollectionContainerView;
+@property (nullable, nonatomic, weak) NOCChatCollectionView *collectionView;
+@property (nullable, nonatomic, weak) UIView *chatInputContainerView;
+@property (nullable, nonatomic, weak) NOCChatInputView *chatInputView;
 
-@property (nonatomic, strong, readonly) NSArray<id<NOCChatItem>> *chatItems;
-@property (nonatomic, strong) NSMutableArray<id<NOCChatItemCellLayout>> *layouts;
+@property (nullable, nonatomic, strong, readonly) NSArray<id<NOCChatItem>> *chatItems;
+@property (nullable, nonatomic, strong) NSMutableArray<id<NOCChatItemCellLayout>> *layouts;
 @property (nonatomic, strong) dispatch_queue_t serialQueue;
 @property (nonatomic, assign, getter=isUpdating) BOOL updating;
 
@@ -37,8 +39,8 @@
 @property (nonatomic, assign, getter=isAutoLoadBelowChatItemsEnable) BOOL autoLoadBelowChatItemsEnable;
 @property (nonatomic, assign) CGFloat autoLoadingFractionalThreshold;
 
-+ (Class)cellLayoutClassForItemType:(NSString *)type;
-+ (Class)chatInputViewClass;
++ (nullable Class)cellLayoutClassForItemType:(NSString *)type;
++ (nullable Class)chatInputViewClass;
 - (void)registerChatItemCells;
 
 - (void)loadAboveChatItems;
@@ -72,3 +74,5 @@
 - (void)stopScrollIfNeeded;
 
 @end
+
+NS_ASSUME_NONNULL_END

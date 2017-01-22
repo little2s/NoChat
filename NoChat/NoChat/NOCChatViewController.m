@@ -237,7 +237,6 @@
     __weak typeof(self) weakSelf = self;
     
     NOCChatCollectionViewLayout *collectionViewLayout = [[NOCChatCollectionViewLayout alloc] init];
-    collectionViewLayout.minimumLineSpacing = 0;
     NOCChatCollectionView *collectionView = [[NOCChatCollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:collectionViewLayout];
     collectionView.translatesAutoresizingMaskIntoConstraints = NO;
     collectionView.contentInset = self.chatCollectionViewContentInset;

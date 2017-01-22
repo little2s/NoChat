@@ -10,6 +10,8 @@
 
 @class NOCChatInputView;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @protocol NOCChatInputViewDelegate <NSObject>
 
 @required
@@ -19,7 +21,10 @@
 
 @interface NOCChatInputView : UIView
 
-@property (nonatomic, weak) id<NOCChatInputViewDelegate> delegate;
+@property (nullable, nonatomic, weak) id<NOCChatInputViewDelegate> delegate;
+
 - (void)endInputting:(BOOL)animated;
 
 @end
+
+NS_ASSUME_NONNULL_END
