@@ -116,10 +116,10 @@ static inline CGSize NOCSizeForAttributedString(NSAttributedString *attributedSt
     CGFloat outgoingStateWidth = (isOutgoing && (self.message.deliveryStatus != NOCMessageDeliveryStatusFailure)) ? 15 : 0;
     CGFloat outgoingStateHeight = outgoingStateWidth;
     
-    CGFloat hPadding = 6;
-    CGFloat vPadding = 3;
+    CGFloat hPadding = 8;
+    CGFloat vPadding = 4;
     
-    UIEdgeInsets textMargin = isOutgoing ? UIEdgeInsetsMake(6, 10, 6, 16) : UIEdgeInsetsMake(6, 16, 6, 10);
+    UIEdgeInsets textMargin = isOutgoing ? UIEdgeInsetsMake(8, 10, 8, 15) : UIEdgeInsetsMake(8, 15, 8, 10);
     CGFloat textLabelWidth = bubbleViewWidth - textMargin.left - textMargin.right - hPadding - timeLabelWidth - hPadding/2 - outgoingStateWidth;
     
     TGTextLinePositionModifier *modifier = [[TGTextLinePositionModifier alloc] init];
