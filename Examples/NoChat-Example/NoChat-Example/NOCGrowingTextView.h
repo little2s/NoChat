@@ -26,15 +26,12 @@
 @property (nonatomic, strong) UIColor *placeholderColor;
 @property (nonatomic, strong) UIFont *plcaeholderFont;
 
+@property (nonatomic, assign) UIEdgeInsets textInsets;
+@property (nonatomic, assign) CGFloat maximumHeight;
+@property (nonatomic, assign) CGFloat minimumHeight;
+
 - (void)resetContentSizeAndOffset;
 - (void)clear;
 
 @end
 
-@interface NOCGrowingTextView (NOCStyle)
-
-+ (UIEdgeInsets)textInsets;
-+ (CGFloat)maximumHeight;
-+ (CGFloat)minimumHeight;
-
-@end

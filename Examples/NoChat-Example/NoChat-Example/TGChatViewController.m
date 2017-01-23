@@ -70,6 +70,11 @@
     [self appendMessage:message];
 }
 
+- (void)chatInputView:(TGChatInputView *)chatInputView didTapAttachButton:(UIButton *)attachButton
+{
+    NSLog(@"did tap attach button");
+}
+
 #pragma mark - TGTextMessageCellDelegate
 
 - (void)cell:(TGTextMessageCell *)cell didTapLink:(NSURL *)linkURL

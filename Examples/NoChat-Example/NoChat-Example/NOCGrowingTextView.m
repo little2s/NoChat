@@ -20,7 +20,11 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
-        self.textContainerInset = [NOCGrowingTextView textInsets];
+        _textInsets = UIEdgeInsetsMake(4.5, 8, 3.5, 8);
+        _maximumHeight = 100;
+        _minimumHeight = 28;
+        
+        self.textContainerInset = _textInsets;
         self.textContainer.lineFragmentPadding = 0;
         self.layoutManager.allowsNonContiguousLayout = false;
         self.scrollsToTop = false;
@@ -44,6 +48,13 @@
 
 #pragma mark - Public
 
+- (void)setTextInsets:(UIEdgeInsets)textInsets
+{
+    _textInsets = textInsets;
+    self.textContainerInset = textInsets;
+    self.placeholderView.textContainerInset = textInsets;
+}
+
 - (void)setPlaceholder:(NSString *)placeholder
 {
     self.placeholderView.text = placeholder;
@@ -62,7 +73,7 @@
 - (void)resetContentSizeAndOffset
 {
     [self layoutIfNeeded];
-    CGFloat textViewHeight = MAX(MIN(self.contentSize.height, [NOCGrowingTextView maximumHeight]), [NOCGrowingTextView minimumHeight]);
+    CGFloat textViewHeight = MAX(MIN(self.contentSize.height, self.maximumHeight), self.minimumHeight);
     if ([self.growingDelegate respondsToSelector:@selector(growingTextView:didUpdateHeight:)]) {
         [self.growingDelegate growingTextView:self didUpdateHeight:textViewHeight];
     }
@@ -114,7 +125,7 @@
     self.placeholderView.editable = NO;
     self.placeholderView.selectable = NO;
     self.placeholderView.userInteractionEnabled = NO;
-    self.placeholderView.textContainerInset = self.textContainerInset;
+    self.placeholderView.textContainerInset = self.textInsets;
     self.placeholderView.textContainer.lineFragmentPadding = 0;
     self.placeholderView.layoutManager.allowsNonContiguousLayout = NO;
     self.placeholderView.scrollsToTop = NO;
@@ -142,7 +153,7 @@
 
 - (void)letRectVisible:(CGRect)rect
 {
-    if (self.contentSize.height < [NOCGrowingTextView maximumHeight]) {
+    if (self.contentSize.height < self.maximumHeight) {
         return;
     }
     [super scrollRectToVisible:rect animated:YES];
@@ -150,21 +161,3 @@
 
 @end
 
-@implementation NOCGrowingTextView (NOCStyle)
-
-+ (UIEdgeInsets)textInsets
-{
-    return UIEdgeInsetsMake(4.5, 8, 3.5, 8);
-}
-
-+ (CGFloat)maximumHeight
-{
-    return 100;
-}
-
-+ (CGFloat)minimumHeight
-{
-    return 28;
-}
-
-@end

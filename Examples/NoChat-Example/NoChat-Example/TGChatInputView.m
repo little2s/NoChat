@@ -30,7 +30,7 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
-        _textViewHeight = [NOCGrowingTextView minimumHeight];
+        _textViewHeight = 28;
         _height = 45;
         _keyboardManager = [[NOCKeyboardManager alloc] init];
         [self setupSubviews];
@@ -52,7 +52,11 @@
 
 - (void)toggleSendButtonEnabled
 {
-    self.sendButton.enabled = self.textView.hasText;
+    BOOL hasText = self.textView.hasText;
+    self.sendButton.enabled = hasText;
+    self.sendButton.hidden = !hasText;
+    self.micButton.hidden = hasText;
+    
 }
 
 - (void)clearInputText
@@ -110,7 +114,8 @@
     textView.font = [TGChatInputView textViewFont];
     textView.placeholder = self.textPlaceholder ?: @"Message";
     textView.placeholderColor = [UIColor lightGrayColor];
-    textView.plcaeholderFont = [TGChatInputView textViewFont];;
+    textView.plcaeholderFont = [TGChatInputView textViewFont];
+    textView.textInsets = UIEdgeInsetsMake(4.5, 4, 3.5, 4);
     [self.inputBar addSubview:textView];
     self.textView = textView;
     
@@ -120,8 +125,22 @@
     [sendButton addTarget:self action:@selector(didTapSendButton:) forControlEvents:UIControlEventTouchUpInside];
     sendButton.titleLabel.font = [TGChatInputView sendButtonFont];
     sendButton.enabled = NO;
+    sendButton.hidden= YES;
     [self.inputBar addSubview:sendButton];
     self.sendButton = sendButton;
+    
+    UIButton *micButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    micButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [micButton setImage:[UIImage imageNamed:@"TGMicButton"] forState:UIControlStateNormal];
+    [self.inputBar addSubview:micButton];
+    self.micButton = micButton;
+    
+    UIButton *attachButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    attachButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [attachButton setImage:[UIImage imageNamed:@"TGAttachButton"] forState:UIControlStateNormal];
+    [attachButton addTarget:self action:@selector(didTapAttachButton:) forControlEvents:UIControlEventTouchUpInside];
+    [self.inputBar addSubview:attachButton];
+    self.attachButton = attachButton;
 }
 
 - (void)setupLayoutConstraints
@@ -139,16 +158,26 @@
     [self.inputBar addConstraint:[NSLayoutConstraint constraintWithItem:self.barBackgroundView attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:self.inputBar attribute:NSLayoutAttributeTrailing multiplier:1 constant:0]];
     
     self.textViewTopConstraint = [NSLayoutConstraint constraintWithItem:self.textView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.inputBar attribute:NSLayoutAttributeTop multiplier:1 constant:9];
-    self.textViewLeadingConstraint = [NSLayoutConstraint constraintWithItem:self.textView attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self.inputBar attribute:NSLayoutAttributeLeading multiplier:1 constant:16];
+    self.textViewLeadingConstraint = [NSLayoutConstraint constraintWithItem:self.textView attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self.inputBar attribute:NSLayoutAttributeLeading multiplier:1 constant:40];
     self.textViewBottomConstraint = [NSLayoutConstraint constraintWithItem:self.inputBar attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.textView attribute:NSLayoutAttributeBottom multiplier:1 constant:8];
-    self.textViewTrailingConstraint = [NSLayoutConstraint constraintWithItem:self.inputBar attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:self.textView attribute:NSLayoutAttributeTrailing multiplier:1 constant:55];
+    self.textViewTrailingConstraint = [NSLayoutConstraint constraintWithItem:self.inputBar attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:self.textView attribute:NSLayoutAttributeTrailing multiplier:1 constant:50];
     self.textViewHeightConstraint = [NSLayoutConstraint constraintWithItem:self.textView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1 constant:28];
     [self.inputBar addConstraints:@[self.textViewTopConstraint, self.textViewLeadingConstraint, self.textViewBottomConstraint, self.textViewTrailingConstraint, self.textViewHeightConstraint]];
     
     [self.inputBar addConstraint:[NSLayoutConstraint constraintWithItem:self.sendButton attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.inputBar attribute:NSLayoutAttributeBottom multiplier:1 constant:0]];
     [self.inputBar addConstraint:[NSLayoutConstraint constraintWithItem:self.sendButton attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:self.inputBar attribute:NSLayoutAttributeTrailing multiplier:1 constant:0]];
-    [self.inputBar addConstraint:[NSLayoutConstraint constraintWithItem:self.sendButton attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1 constant:55]];
+    [self.inputBar addConstraint:[NSLayoutConstraint constraintWithItem:self.sendButton attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1 constant:50]];
     [self.inputBar addConstraint:[NSLayoutConstraint constraintWithItem:self.sendButton attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1 constant:45]];
+    
+    [self.inputBar addConstraint:[NSLayoutConstraint constraintWithItem:self.micButton attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.inputBar attribute:NSLayoutAttributeBottom multiplier:1 constant:0]];
+    [self.inputBar addConstraint:[NSLayoutConstraint constraintWithItem:self.micButton attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:self.inputBar attribute:NSLayoutAttributeTrailing multiplier:1 constant:0]];
+    [self.inputBar addConstraint:[NSLayoutConstraint constraintWithItem:self.micButton attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1 constant:50]];
+    [self.inputBar addConstraint:[NSLayoutConstraint constraintWithItem:self.micButton attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1 constant:45]];
+    
+    [self.inputBar addConstraint:[NSLayoutConstraint constraintWithItem:self.attachButton attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.inputBar attribute:NSLayoutAttributeBottom multiplier:1 constant:0]];
+    [self.inputBar addConstraint:[NSLayoutConstraint constraintWithItem:self.attachButton attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self.inputBar attribute:NSLayoutAttributeLeading multiplier:1 constant:0]];
+    [self.inputBar addConstraint:[NSLayoutConstraint constraintWithItem:self.attachButton attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1 constant:40]];
+    [self.inputBar addConstraint:[NSLayoutConstraint constraintWithItem:self.attachButton attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1 constant:45]];
 }
 
 - (void)startKeyboardManager
@@ -191,10 +220,18 @@
         NSString *str = [text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         if (str.length > 0) {
             if ([self.delegate respondsToSelector:@selector(chatInputView:didSendText:)]) {
-                [(id<TGChatInputViewDelegate>)self.delegate chatInputView:self didSendText:str];
+                [((id<TGChatInputViewDelegate>)self.delegate) chatInputView:self didSendText:str];
             }
             [self clearInputText];
         }
+    }
+}
+
+- (void)didTapAttachButton:(UIButton *)button
+{
+    [self endInputting:YES];
+    if ([self.delegate respondsToSelector:@selector(chatInputView:didTapAttachButton:)]) {
+        [((id<TGChatInputViewDelegate>)self.delegate) chatInputView:self didTapAttachButton:button];
     }
 }
 

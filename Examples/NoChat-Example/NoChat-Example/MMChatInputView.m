@@ -30,7 +30,7 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
-        _textViewHeight = [NOCGrowingTextView minimumHeight];
+        _textViewHeight = 28;
         _height = 45;
         _keyboardManager = [[NOCKeyboardManager alloc] init];
         [self setupSubviews];
@@ -110,7 +110,7 @@
     textView.font = [MMChatInputView textViewFont];
     textView.placeholder = self.textPlaceholder ?: @"Message";
     textView.placeholderColor = [UIColor lightGrayColor];
-    textView.plcaeholderFont = [MMChatInputView textViewFont];;
+    textView.plcaeholderFont = [MMChatInputView textViewFont];
     [self.inputBar addSubview:textView];
     self.textView = textView;
     
