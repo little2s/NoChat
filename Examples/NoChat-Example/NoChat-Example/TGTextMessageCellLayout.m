@@ -16,7 +16,7 @@ static inline CGSize NOCSizeForAttributedString(NSAttributedString *attributedSt
 }
 
 @implementation TGTextMessageCellLayout {
-    NSAttributedString *_attributedText;
+    NSMutableAttributedString *_attributedText;
 }
 
 - (instancetype)initWithChatItem:(id<NOCChatItem>)chatItem cellWidth:(CGFloat)width
@@ -95,10 +95,13 @@ static inline CGSize NOCSizeForAttributedString(NSAttributedString *attributedSt
     self.timeLabelFrame = CGRectZero;
     self.deliveryStatusViewFrame = CGRectZero;
     
-    NSAttributedString *text = _attributedText;
+    NSMutableAttributedString *text = _attributedText;
     if (text.length == 0) {
         return;
     }
+    
+    // dynamic font support
+    [text yy_setAttribute:NSFontAttributeName value:[TGTextMessageCellLayout textFont]];
     
     BOOL isOutgoing = self.isOutgoing;
     UIEdgeInsets bubbleMargin = self.bubbleViewMargin;
