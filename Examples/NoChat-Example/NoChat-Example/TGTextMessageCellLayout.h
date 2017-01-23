@@ -11,16 +11,38 @@
 
 @interface TGTextMessageCellLayout : TGBaseMessageCellLayout
 
+@property (nonatomic, strong) NSAttributedString *attributedTime;
+@property (nonatomic, assign) BOOL hasTail;
+@property (nonatomic, strong) UIImage *bubbleImage;
+@property (nonatomic, strong) UIImage *highlightBubbleImage;
+
+@property (nonatomic, assign) CGRect bubbleImageViewFrame;
 @property (nonatomic, assign) CGRect textLabelFrame;
 @property (nonatomic, strong) YYTextLayout *textLayout;
+@property (nonatomic, assign) CGRect timeLabelFrame;
+@property (nonatomic, assign) CGRect deliveryStatusViewFrame;
 
 @end
 
 @interface TGTextMessageCellLayout (TGStyle)
 
++ (UIImage *)fullOutgoingBubbleImage;
++ (UIImage *)highlightFullOutgoingBubbleImage;
++ (UIImage *)partialOutgoingBubbleImage;
++ (UIImage *)highlightPartialOutgoingBubbleImage;
++ (UIImage *)fullIncomingBubbleImage;
++ (UIImage *)highlightFullIncomingBubbleImage;
++ (UIImage *)partialIncomingBubbleImage;
++ (UIImage *)highlightPartialIncomingBubbleImage;
+
 + (UIFont *)textFont;
 + (UIColor *)textColor;
 + (UIColor *)linkColor;
+
++ (UIFont *)timeFont;
++ (UIColor *)outgoingTimeColor;
++ (UIColor *)incomingTimeColor;
++ (NSDateFormatter *)timeFormatter;
 
 @end
 

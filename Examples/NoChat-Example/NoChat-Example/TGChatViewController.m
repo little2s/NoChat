@@ -64,6 +64,9 @@
 {
     NOCMessage *message = [[NOCMessage alloc] init];
     message.text = text;
+    message.outging = YES;
+    message.date = [NSDate date];
+    message.deliveryStatus = NOCMessageDeliveryStatusRead;
     [self appendMessage:message];
 }
 

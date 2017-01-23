@@ -8,12 +8,17 @@
 
 #import <NoChat/NoChat.h>
 
+@class NOCMessage;
+
 @interface TGBaseMessageCellLayout : NSObject <NOCChatItemCellLayout>
 
 @property (nonatomic, strong) NSString *reuseIdentifier;
 @property (nonatomic, strong) id<NOCChatItem> chatItem;
 @property (nonatomic, assign) CGFloat width;
 @property (nonatomic, assign) CGFloat height;
+
+@property (nonatomic, strong, readonly) NOCMessage *message;
+@property (nonatomic, assign, readonly) BOOL isOutgoing;
 
 @property (nonatomic, assign) UIEdgeInsets bubbleViewMargin;
 @property (nonatomic, assign) CGRect bubbleViewFrame;

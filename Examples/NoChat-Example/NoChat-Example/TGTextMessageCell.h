@@ -7,12 +7,16 @@
 //
 
 #import "TGBaseMessageCell.h"
+#import "TGDeliveryStatusView.h"
 
 @class YYLabel;
 
 @interface TGTextMessageCell : TGBaseMessageCell
 
+@property (nonatomic, strong) UIImageView *bubbleImageView;
 @property (nonatomic, strong) YYLabel *textLabel;
+@property (nonatomic, strong) UILabel *timeLabel;
+@property (nonatomic, strong) TGDeliveryStatusView *deliveryStatusView;
 
 @end
 
@@ -23,3 +27,4 @@
 - (void)cell:(TGTextMessageCell *)cell didLongPressLink:(NSURL *)linkURL;
 
 @end
+

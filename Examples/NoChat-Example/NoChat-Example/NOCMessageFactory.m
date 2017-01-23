@@ -20,6 +20,9 @@
         NOCMessage *message = [NOCMessage new];
         message.senderDisplayName = metaItem[@"senderDisplayName"];
         message.text = metaItem[@"text"];
+        message.date = metaItem[@"date"];
+        message.outging = arc4random() % 3 == 0;
+        message.deliveryStatus = message.outging ? NOCMessageDeliveryStatusRead : NOCMessageOutgoingStateIdle;
         [result addObject:message];
     }
     return result;
@@ -31,7 +34,7 @@
     for (NSInteger index = 0; index < number; index++) {
         NSDictionary *metaItem = @{
                                    @"senderDisplayName": [LoremIpsum name],
-                                   @"dateString": @"Dec 26 17:01",
+                                   @"date": [LoremIpsum date],
                                    @"text": [self richWords]
                                    };
         [result addObject:metaItem];
