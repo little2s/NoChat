@@ -303,7 +303,7 @@ static inline CGSize NOCSizeForAttributedString(NSAttributedString *attributedSt
     static UIFont *_timeFont = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        _timeFont = [UIFont italicSystemFontOfSize:11];
+        _timeFont = [UIFont italicSystemFontOfSize:12];
     });
     return _timeFont;
 }
