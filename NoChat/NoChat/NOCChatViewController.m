@@ -35,18 +35,25 @@
         self.autoLoadAboveChatItemsEnable = NO;
         self.autoLoadBelowChatItemsEnable = NO;
         self.autoLoadingFractionalThreshold = 0.05;
+        self.automaticallyAdjustsScrollViewInsets = NO; // use `chatCollectionContainerView` and `topLayoutGuide` instead
+        self.serialQueue = dispatch_queue_create("com.little2s.nochat.chatvc", DISPATCH_QUEUE_SERIAL);
     }
     return self;
+}
+
+- (void)loadView
+{
+    UIView *view = [[UIView alloc] init];
+    view.backgroundColor = [UIColor whiteColor];
+    self.view = view;
+    
+    [self setupSubviews];
+    [self setupLayoutConstraints];
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    self.view.backgroundColor = [UIColor whiteColor];
-    self.automaticallyAdjustsScrollViewInsets = NO; // use `chatCollectionContainerView` and `topLayoutGuide` instead
-    self.serialQueue = dispatch_queue_create("com.little2s.nochat.chatvc", DISPATCH_QUEUE_SERIAL);
-    [self setupSubviews];
-    [self setupLayoutConstraints];
     [self registerChatItemCells];
 }
 
