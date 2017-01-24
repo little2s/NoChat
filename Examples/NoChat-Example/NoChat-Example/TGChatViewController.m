@@ -12,10 +12,16 @@
 #import "TGTextMessageCellLayout.h"
 #import "TGChatInputView.h"
 
+#import "TGTitleView.h"
+#import "TGAvatarButton.h"
+
 #import "NOCMessage.h"
 #import "NOCMessageFactory.h"
 
 @interface TGChatViewController () <UINavigationControllerDelegate>
+
+@property (nonatomic, strong) TGTitleView *titleView;
+@property (nonatomic, strong) TGAvatarButton *avatarButton;
 
 @end
 
@@ -52,7 +58,8 @@
     [super viewDidLoad];
     self.backgroundView.image = [UIImage imageNamed:@"TGWallpaper"];
     self.navigationController.delegate = self;
-    
+    [self setupNavigationItems];
+
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleContentSizeCategoryDidChanged:) name:UIContentSizeCategoryDidChangeNotification object:nil];
     
     [self loadChatItems];
@@ -108,6 +115,19 @@
 }
 
 #pragma mark - Private
+
+- (void)setupNavigationItems
+{
+    self.titleView = [[TGTitleView alloc] init];
+    self.navigationItem.titleView = self.titleView;
+    
+    UIBarButtonItem *spacerItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
+    spacerItem.width = -12;
+    
+    self.avatarButton = [[TGAvatarButton alloc] init];
+    UIBarButtonItem *rightItem = [[UIBarButtonItem alloc] initWithCustomView:self.avatarButton];
+    self.navigationItem.rightBarButtonItems = @[spacerItem, rightItem];
+}
 
 - (void)loadChatItems
 {
