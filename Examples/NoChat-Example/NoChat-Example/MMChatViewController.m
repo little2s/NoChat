@@ -62,10 +62,29 @@
     [super viewDidLoad];
     self.backgroundView.image = [UIImage imageNamed:@"MMWallpaper"];
     self.navigationController.delegate = self;
+    UIBarButtonItem *rightItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"MMUserInfo"] style:UIBarButtonItemStylePlain target:nil action:nil];
+    self.navigationItem.rightBarButtonItem = rightItem;
+    self.title = @"Title";
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleContentSizeCategoryDidChanged:) name:UIContentSizeCategoryDidChangeNotification object:nil];
     
     [self loadChatItems];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    self.navigationController.navigationBar.barStyle = UIBarStyleBlack;
+    self.navigationController.navigationBar.barTintColor = [UIColor colorWithWhite:0.1 alpha:0.9];
+    self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    self.navigationController.navigationBar.barStyle = UIBarStyleDefault;
+    self.navigationController.navigationBar.barTintColor = nil;
+    self.navigationController.navigationBar.tintColor = nil;
+    [super viewWillDisappear:animated];
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
