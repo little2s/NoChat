@@ -62,8 +62,9 @@
 
 - (void)calculateLayout
 {
+    [super calculateLayout];
+    
     self.height = 0;
-    self.avatarImageViewFrame = CGRectZero;
     self.bubbleViewFrame = CGRectZero;
     self.bubbleImageViewFrame = CGRectZero;
     self.textLabelFrame = CGRectZero;
@@ -107,10 +108,6 @@
     CGFloat bubbleViewHeight = textLabelHeight + textMargin.top + textMargin.bottom;
     self.bubbleViewFrame = isOutgoing ? CGRectMake(self.width - bubbleMargin.right - bubbleViewWidth, bubbleMargin.top, bubbleViewWidth, bubbleViewHeight) : CGRectMake(bubbleMargin.left, bubbleMargin.top, bubbleViewWidth, bubbleViewHeight);
     self.bubbleImageViewFrame = CGRectMake(0, 0, bubbleViewWidth, bubbleViewHeight);
-    
-    CGFloat avatarWidth = self.avatarSize;
-    CGFloat avatarHeight = self.avatarSize;
-    self.avatarImageViewFrame = self.isOutgoing ? CGRectMake(self.width - 8 - avatarWidth, 8, avatarWidth, avatarHeight) : CGRectMake(8, 8, avatarWidth, avatarHeight);
     
     self.height = bubbleViewHeight;
 }

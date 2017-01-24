@@ -27,7 +27,9 @@
 
 - (void)calculateLayout
 {
-    NSAssert(NO, @"Impl in subclass");
+    CGFloat avatarWidth = self.avatarSize;
+    CGFloat avatarHeight = self.avatarSize;
+    self.avatarImageViewFrame = self.isOutgoing ? CGRectMake(self.width - 8 - avatarWidth, 11, avatarWidth, avatarHeight) : CGRectMake(8, 11, avatarWidth, avatarHeight);
 }
 
 - (NOCMessage *)message
