@@ -126,6 +126,9 @@ open class ChatViewController: UIViewController {
         collectionView.scrollsToTop = false
         collectionView.dataSource = self
         collectionView.delegate = self
+        if #available(iOS 10, *) {
+            collectionView.isPrefetchingEnabled = false
+        }
         collectionView.transform = inverted ? CGAffineTransform(a: 1, b: 0, c: 0, d: -1, tx: 0, ty: 0) : CGAffineTransform.identity
         chatItemsContainer.addSubview(self.collectionView)
         
