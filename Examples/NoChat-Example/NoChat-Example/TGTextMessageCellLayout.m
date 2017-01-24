@@ -105,7 +105,7 @@ static inline CGSize NOCSizeForAttributedString(NSAttributedString *attributedSt
     
     BOOL isOutgoing = self.isOutgoing;
     UIEdgeInsets bubbleMargin = self.bubbleViewMargin;
-    CGFloat prefrredMaxBubbleWidth = self.width * 0.75;
+    CGFloat prefrredMaxBubbleWidth = ceil(self.width * 0.75);
     CGFloat bubbleViewWidth = prefrredMaxBubbleWidth;
     
     // prelayout
@@ -147,7 +147,8 @@ static inline CGSize NOCSizeForAttributedString(NSAttributedString *attributedSt
         }
         
         // layout content in bubble
-        CGFloat textLabelHeight = [modifier heightForLineCount:self.textLayout.rowCount];
+        textLabelWidth = ceil(self.textLayout.textBoundingSize.width);
+        CGFloat textLabelHeight = ceil([modifier heightForLineCount:self.textLayout.rowCount]);
         self.textLabelFrame = CGRectMake(textMargin.left, textMargin.top, textLabelWidth, textLabelHeight);
         
         CGPoint tryPoint = CGPointMake(textLabelWidth - outgoingStateWidth - hPadding/2 - timeLabelWidth - hPadding, textLabelHeight - timeLabelHeight/2);
@@ -179,8 +180,8 @@ static inline CGSize NOCSizeForAttributedString(NSAttributedString *attributedSt
             self.deliveryStatusViewFrame = CGRectMake(x, y, outgoingStateWidth, outgoingStateHeight);
         }
     } else {
-        textLabelWidth = self.textLayout.textBoundingSize.width;
-        CGFloat textLabelHeight = [modifier heightForLineCount:self.textLayout.rowCount];
+        textLabelWidth = ceil(self.textLayout.textBoundingSize.width);
+        CGFloat textLabelHeight = ceil([modifier heightForLineCount:self.textLayout.rowCount]);
         
         bubbleViewWidth = textMargin.left + textLabelWidth + hPadding + timeLabelWidth + hPadding/2 +  outgoingStateWidth + textMargin.right;
         bubbleViewHeight = textLabelHeight + textMargin.top + textMargin.bottom;
