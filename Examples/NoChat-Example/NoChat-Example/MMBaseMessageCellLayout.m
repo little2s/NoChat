@@ -19,6 +19,8 @@
         _chatItem = chatItem;
         _width = width;
         _bubbleViewMargin = UIEdgeInsetsMake(8, 52, 8, 52);
+        _avatarSize = 40;
+        _avatarImage = self.isOutgoing ? [MMBaseMessageCellLayout outgoingAvatarImage] : [MMBaseMessageCellLayout incomingAvatarImage];
     }
     return self;
 }
@@ -36,6 +38,30 @@
 - (BOOL)isOutgoing
 {
     return self.message.isOutgoing;
+}
+
+@end
+
+@implementation MMBaseMessageCellLayout (MMStyle)
+
++ (UIImage *)outgoingAvatarImage
+{
+    static UIImage *_outgoingAvatarImage = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _outgoingAvatarImage = [UIImage imageNamed:@"MMAvatarOutgoing"];
+    });
+    return _outgoingAvatarImage;
+}
+
++ (UIImage *)incomingAvatarImage
+{
+    static UIImage *_incomingAvatarImage = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _incomingAvatarImage = [UIImage imageNamed:@"MMAvatarIncoming"];
+    });
+    return _incomingAvatarImage;
 }
 
 @end

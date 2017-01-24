@@ -23,6 +23,9 @@
         _messageView = [[UIView alloc] init];
         [self.contentView addSubview:_messageView];
         
+        _avatarImageView = [[UIImageView alloc] init];
+        [_messageView addSubview:_avatarImageView];
+        
         _bubbleView = [[UIView alloc] init];
         [_messageView addSubview:_bubbleView];
     }
@@ -33,7 +36,11 @@
 {
     [super setLayout:layout];
     self.messageView.frame = CGRectMake(0, 0, layout.width, layout.height);
-    self.bubbleView.frame = ((MMBaseMessageCellLayout *)layout).bubbleViewFrame;
+    
+    MMBaseMessageCellLayout *cellLayout = (MMBaseMessageCellLayout *)layout;
+    self.bubbleView.frame = cellLayout.bubbleViewFrame;
+    self.avatarImageView.frame = cellLayout.avatarImageViewFrame;
+    self.avatarImageView.image = cellLayout.avatarImage;
 }
 
 @end

@@ -22,8 +22,18 @@
 
 @property (nonatomic, assign) UIEdgeInsets bubbleViewMargin;
 @property (nonatomic, assign) CGRect bubbleViewFrame;
+@property (nonatomic, assign) CGFloat avatarSize;
+@property (nonatomic, assign) CGRect avatarImageViewFrame;
+@property (nonatomic, strong) UIImage *avatarImage;
 
 - (instancetype)initWithChatItem:(id<NOCChatItem>)chatItem cellWidth:(CGFloat)width;
 - (void)calculateLayout;
+
+@end
+
+@interface MMBaseMessageCellLayout (MMStyle)
+
++ (UIImage *)outgoingAvatarImage;
++ (UIImage *)incomingAvatarImage;
 
 @end

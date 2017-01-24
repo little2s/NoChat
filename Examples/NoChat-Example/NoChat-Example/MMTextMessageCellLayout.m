@@ -63,6 +63,7 @@
 - (void)calculateLayout
 {
     self.height = 0;
+    self.avatarImageViewFrame = CGRectZero;
     self.bubbleViewFrame = CGRectZero;
     self.bubbleImageViewFrame = CGRectZero;
     self.textLabelFrame = CGRectZero;
@@ -78,7 +79,7 @@
     
     BOOL isOutgoing = self.isOutgoing;
     UIEdgeInsets bubbleMargin = self.bubbleViewMargin;
-    CGFloat prefrredMaxBubbleWidth = self.width * 0.68;
+    CGFloat prefrredMaxBubbleWidth = ceil(self.width * 0.68);
     CGFloat bubbleViewWidth = prefrredMaxBubbleWidth;
     
     UIEdgeInsets textMargin = isOutgoing ? UIEdgeInsetsMake(12, 20, 20, 22) : UIEdgeInsetsMake(12, 22, 20, 20);
@@ -98,14 +99,18 @@
         return;
     }
     
-    textLabelWidth = self.textLayout.textBoundingSize.width;
-    CGFloat textLabelHeight = [modifier heightForLineCount:self.textLayout.rowCount];
+    textLabelWidth = ceil(self.textLayout.textBoundingSize.width);
+    CGFloat textLabelHeight = ceil([modifier heightForLineCount:self.textLayout.rowCount]);
     self.textLabelFrame = CGRectMake(textMargin.left, textMargin.top, textLabelWidth, textLabelHeight);
     
     bubbleViewWidth = textLabelWidth + textMargin.left + textMargin.right;
     CGFloat bubbleViewHeight = textLabelHeight + textMargin.top + textMargin.bottom;
     self.bubbleViewFrame = isOutgoing ? CGRectMake(self.width - bubbleMargin.right - bubbleViewWidth, bubbleMargin.top, bubbleViewWidth, bubbleViewHeight) : CGRectMake(bubbleMargin.left, bubbleMargin.top, bubbleViewWidth, bubbleViewHeight);
     self.bubbleImageViewFrame = CGRectMake(0, 0, bubbleViewWidth, bubbleViewHeight);
+    
+    CGFloat avatarWidth = self.avatarSize;
+    CGFloat avatarHeight = self.avatarSize;
+    self.avatarImageViewFrame = self.isOutgoing ? CGRectMake(self.width - 8 - avatarWidth, 8, avatarWidth, avatarHeight) : CGRectMake(8, 8, avatarWidth, avatarHeight);
     
     self.height = bubbleViewHeight;
 }

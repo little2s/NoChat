@@ -12,6 +12,7 @@
 
 @property (nonatomic, strong) UIView *messageView;
 @property (nonatomic, strong) UIView *bubbleView;
+@property (nonatomic, strong) UIImageView *avatarImageView;
 
 @property (nonatomic, assign, getter=isHighlight) BOOL hightlight;
 
