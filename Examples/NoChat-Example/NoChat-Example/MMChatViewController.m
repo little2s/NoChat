@@ -42,6 +42,16 @@
     [self.collectionView registerClass:[MMTextMessageCell class] forCellWithReuseIdentifier:[MMTextMessageCell reuseIdentifier]];
 }
 
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        self.inverted = NO;
+        self.chatInputContainerViewDefaultHeight = 50;
+    }
+    return self;
+}
+
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -111,8 +121,15 @@
 
 - (void)appendMessage:(NOCMessage *)message
 {
-    [self appendChatItems:@[message]];
-    [self scrollToBottom:YES];
+    dispatch_async(self.serialQueue, ^{
+        Class layoutClass = [[self class] cellLayoutClassForItemType:message.type];
+        id<NOCChatItemCellLayout> layout = [[layoutClass alloc] initWithChatItem:message cellWidth:self.cellWidth];
+        [self.layouts addObject:layout];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.collectionView insertItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:self.layouts.count-1 inSection:0]]];
+            [self scrollToBottom:YES];
+        });
+    });
 }
 
 - (void)handleContentSizeCategoryDidChanged:(NSNotification *)notification

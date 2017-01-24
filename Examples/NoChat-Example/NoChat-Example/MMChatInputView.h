@@ -23,7 +23,9 @@
 @property (nonatomic, strong) UIView *inputBar;
 @property (nonatomic, strong) UIToolbar *barBackgroundView;
 @property (nonatomic, strong) NOCGrowingTextView *textView;
-@property (nonatomic, strong) UIButton *sendButton;
+@property (nonatomic, strong) UIButton *micButton;
+@property (nonatomic, strong) UIButton *faceButton;
+@property (nonatomic, strong) UIButton *attachButton;
 
 @property (nonatomic, strong) NSLayoutConstraint *textViewTopConstraint;
 @property (nonatomic, strong) NSLayoutConstraint *textViewLeadingConstraint;

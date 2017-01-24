@@ -366,6 +366,7 @@
         self.updating = YES;
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.collectionView reloadData];
+            [self scrollToBottom:NO];
             dispatch_async(self.serialQueue, ^{
                 self.updating = NO;
             });

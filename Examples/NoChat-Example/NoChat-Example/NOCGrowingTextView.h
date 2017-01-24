@@ -15,6 +15,7 @@
 @optional
 - (void)growingTextViewDidBeginEditing:(NOCGrowingTextView *)textView;
 - (void)growingTextView:(NOCGrowingTextView *)textView didUpdateHeight:(CGFloat)height;
+- (void)growingTextView:(NOCGrowingTextView *)textView didSendText:(NSString *)text;
 
 @end
 

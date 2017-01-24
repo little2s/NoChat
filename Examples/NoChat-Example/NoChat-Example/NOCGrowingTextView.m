@@ -23,7 +23,7 @@
         _textInsets = UIEdgeInsetsMake(4.5, 8, 3.5, 8);
         _maximumHeight = 100;
         _minimumHeight = 28;
-        
+
         self.textContainerInset = _textInsets;
         self.textContainer.lineFragmentPadding = 0;
         self.layoutManager.allowsNonContiguousLayout = false;
@@ -95,6 +95,21 @@
 
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text
 {
+    if (textView != self) {
+        return YES;
+    }
+    
+    if (self.enablesReturnKeyAutomatically && [text isEqualToString:@"\n"]) {
+        NSString *str = [self.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        if (str.length > 0) {
+            if ([self.growingDelegate respondsToSelector:@selector(growingTextView:didSendText:)]) {
+                [self.growingDelegate growingTextView:self didSendText:str];
+            }
+            [self clear];
+        }
+        return NO;
+    }
+        
     return YES;
 }
 
