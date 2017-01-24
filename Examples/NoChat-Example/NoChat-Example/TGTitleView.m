@@ -48,18 +48,28 @@
 
 - (void)setTitle:(NSString *)title
 {
-    if (![title isEqualToString:_title]) {
-        _title = title;
+    if (![title isEqualToString:self.titleLabel.text]) {
+        self.titleLabel.text = title;
         [self updateLayouts];
     }
 }
 
+- (NSString *)title
+{
+    return self.titleLabel.text;
+}
+
 - (void)setDetail:(NSString *)detail
 {
-    if (![detail isEqualToString:_detail]) {
-        _detail = detail;
+    if (![detail isEqualToString:self.detailLabel.text]) {
+        self.detailLabel.text = detail;
         [self updateLayouts];
     }
+}
+
+- (NSString *)detail
+{
+    return self.detailLabel.text;
 }
 
 - (void)updateLayouts
