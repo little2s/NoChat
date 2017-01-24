@@ -11,9 +11,11 @@ import NoChat
 
 class ChatsViewController: UITableViewController {
     
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        guard let selectedCell = tableView.cellForRowAtIndexPath(indexPath),
-            title = selectedCell.textLabel?.text else {
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+
+        guard let selectedCell = tableView.cellForRow(at: indexPath),
+            let title = selectedCell.textLabel?.text else {
                 return
         }
         
@@ -65,7 +67,7 @@ class ChatsViewController: UITableViewController {
             break
         }
         
-        tableView.deselectRowAtIndexPath(indexPath, animated: true)
+        tableView.deselectRow(at: indexPath, animated: true)
     }
     
 }

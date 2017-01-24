@@ -11,7 +11,7 @@ import UIKit
 let imageFactory = ImageFactoryTG()
 
 class ImageFactoryTG {
-    func createImage(name: String) -> UIImage? {
-        return UIImage(named: name, inBundle: NSBundle(forClass: self.dynamicType), compatibleWithTraitCollection: nil)
+    func createImage(_ name: String) -> UIImage? {
+        return UIImage(named: name, in: Bundle(for: type(of: self)), compatibleWith: nil)
     }
 }

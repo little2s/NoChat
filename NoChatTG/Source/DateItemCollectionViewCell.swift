@@ -8,23 +8,23 @@
 
 import UIKit
 
-public class DateItemCollectionViewCell: UICollectionViewCell {
+open class DateItemCollectionViewCell: UICollectionViewCell {
     
-    public lazy var dateLabel: ColorLabel! = {
+    open lazy var dateLabel: ColorLabel! = {
         let label = ColorLabel()
         label.backgroundColor = UIColor(white: 0.2, alpha: 0.25)
         label.cornerRadius = 8
         label.hPadding = 10
         label.vPadding = 2
         label.font = self.font
-        label.textColor = UIColor.whiteColor()
+        label.textColor = UIColor.white
         return label
     }()
     
-    private lazy var font: UIFont = {
+    fileprivate lazy var font: UIFont = {
         let dateFont: UIFont
         if #available(iOS 8.2, *) {
-            dateFont = UIFont.systemFontOfSize(13, weight: UIFontWeightMedium)
+            dateFont = UIFont.systemFont(ofSize: 13, weight: UIFontWeightMedium)
         } else {
             dateFont = UIFont(name: "HelveticaNeue-Medium", size: 13)!
         }
@@ -41,20 +41,20 @@ public class DateItemCollectionViewCell: UICollectionViewCell {
         commonInit()
     }
     
-    private func commonInit() {
-        backgroundColor = UIColor.clearColor()
+    fileprivate func commonInit() {
+        backgroundColor = UIColor.clear
         contentView.addSubview(dateLabel)
     }
     
-    public override func layoutSubviews() {
+    open override func layoutSubviews() {
         super.layoutSubviews()
         dateLabel.center = contentView.center
     }
     
-    public override func snapshotViewAfterScreenUpdates(afterUpdates: Bool) -> UIView {
+    open override func snapshotView(afterScreenUpdates afterUpdates: Bool) -> UIView {
         UIGraphicsBeginImageContext(bounds.size)
         
-        drawRect(bounds)
+        draw(bounds)
         
         let snapshotImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()

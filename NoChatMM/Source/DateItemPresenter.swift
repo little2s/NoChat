@@ -9,37 +9,37 @@
 import Foundation
 import NoChat
 
-public class DateItemPresenter: ChatItemPresenterProtocol {
+open class DateItemPresenter: ChatItemPresenterProtocol {
     
-    static let dateFormatter: NSDateFormatter = {
-        let dateFormatter = NSDateFormatter()
+    static let dateFormatter: DateFormatter = {
+        let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "hh:mm a"
         return dateFormatter
     }()
     
     let dateItem: DateItem
     
-    public var dateString: String {
-        return DateItemPresenter.dateFormatter.stringFromDate(dateItem.date)
+    open var dateString: String {
+        return DateItemPresenter.dateFormatter.string(from: dateItem.date as Date)
     }
     
     public init(dateItem: DateItem) {
         self.dateItem = dateItem
     }
     
-    public static func registerCells(collectionView: UICollectionView) {
-        collectionView.registerClass(DateItemCollectionViewCell.self, forCellWithReuseIdentifier: "DateItemCollectionViewCell")
+    open static func registerCells(_ collectionView: UICollectionView) {
+        collectionView.register(DateItemCollectionViewCell.self, forCellWithReuseIdentifier: "DateItemCollectionViewCell")
     }
     
-    public func dequeueCell(collectionView collectionView: UICollectionView, indexPath: NSIndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("DateItemCollectionViewCell", forIndexPath: indexPath)
+    open func dequeueCell(collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "DateItemCollectionViewCell", for: indexPath)
         UIView.performWithoutAnimation {
             cell.contentView.transform = collectionView.transform
         }
         return cell
     }
     
-    public func configureCell(cell: UICollectionViewCell, decorationAttributes: ChatItemDecorationAttributesProtocol?) {
+    open func configureCell(_ cell: UICollectionViewCell, decorationAttributes: ChatItemDecorationAttributesProtocol?) {
         guard let dateCell = cell as? DateItemCollectionViewCell else {
             fatalError("Cell type not match")
         }
@@ -48,11 +48,11 @@ public class DateItemPresenter: ChatItemPresenterProtocol {
         dateCell.dateLabel.sizeToFit()
     }
     
-    public var canCalculateHeightInBackground: Bool {
+    open var canCalculateHeightInBackground: Bool {
         return true
     }
     
-    public func heightForCell(maximumWidth width: CGFloat, decorationAttributes: ChatItemDecorationAttributesProtocol?) -> CGFloat {
+    open func heightForCell(maximumWidth width: CGFloat, decorationAttributes: ChatItemDecorationAttributesProtocol?) -> CGFloat {
         return 24
     }
     

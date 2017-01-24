@@ -12,17 +12,17 @@ import NoChat
 // MARK: Enumerate
 @objc
 public enum MessageDeliveryStatus: Int, CustomStringConvertible { // can be KVO
-    case Delivering
-    case Delivered
-    case Failure
+    case delivering
+    case delivered
+    case failure
     
     public var description: String {
         switch self {
-        case .Delivering:
+        case .delivering:
             return "Delivering"
-        case .Delivered:
+        case .delivered:
             return "Delivered"
-        case .Failure:
+        case .failure:
             return "Failure"
         }
     }
@@ -30,14 +30,14 @@ public enum MessageDeliveryStatus: Int, CustomStringConvertible { // can be KVO
 
 @objc
 public enum MessageAttachmentTransferDirection: Int, CustomStringConvertible {
-    case Upload
-    case Download
+    case upload
+    case download
     
     public var description: String {
         switch self {
-        case .Upload:
+        case .upload:
             return "Upload"
-        case .Download:
+        case .download:
             return "Download"
         }
     }
@@ -45,20 +45,20 @@ public enum MessageAttachmentTransferDirection: Int, CustomStringConvertible {
 
 @objc
 public enum MessageAttachmentTransferStatus: Int, CustomStringConvertible {
-    case Idle
-    case Transfering
-    case Success
-    case Failure
+    case idle
+    case transfering
+    case success
+    case failure
     
     public var description: String {
         switch self {
-        case .Idle:
+        case .idle:
             return "Idle"
-        case .Transfering:
+        case .transfering:
             return "Transfering"
-        case .Success:
+        case .success:
             return "Success"
-        case .Failure:
+        case .failure:
             return "Failure"
         }
     }
@@ -77,7 +77,7 @@ public protocol MessageProtocol: ChatItemProtocol {
     var msgType: String { get }
     var senderId: String { get }
     var isIncoming: Bool { get }
-    var date: NSDate { get }
+    var date: Date { get }
     var deliveryStatus: MessageDeliveryStatus { get set }
     var attachments: [MessageAttachmentProtocol] { get }
     var content: String { get }

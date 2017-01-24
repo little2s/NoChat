@@ -26,48 +26,48 @@ import UIKit
 
 extension UIImage {
     
-    public func ntg_tintWithColor(color: UIColor) -> UIImage {
+    public func ntg_tintWithColor(_ color: UIColor) -> UIImage {
         let rect = CGRect(origin: CGPoint.zero, size: self.size)
         UIGraphicsBeginImageContextWithOptions(rect.size, false, self.scale)
         let context = UIGraphicsGetCurrentContext()
         color.setFill()
-        CGContextFillRect(context, rect)
-        self.drawInRect(rect, blendMode: .DestinationIn, alpha: 1)
+        context?.fill(rect)
+        self.draw(in: rect, blendMode: .destinationIn, alpha: 1)
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
-        return image.resizableImageWithCapInsets(self.capInsets)
+        return image!.resizableImage(withCapInsets: self.capInsets)
     }
     
-    public func ntg_blendWithColor(color: UIColor) -> UIImage {
+    public func ntg_blendWithColor(_ color: UIColor) -> UIImage {
         let rect = CGRect(origin: CGPoint.zero, size: self.size)
-        UIGraphicsBeginImageContextWithOptions(rect.size, false, UIScreen.mainScreen().scale)
+        UIGraphicsBeginImageContextWithOptions(rect.size, false, UIScreen.main.scale)
         let context = UIGraphicsGetCurrentContext()
-        CGContextTranslateCTM(context, 0, rect.height)
-        CGContextScaleCTM(context, 1.0, -1.0)
-        CGContextSetBlendMode(context, .Normal)
-        CGContextDrawImage(context, rect, self.CGImage)
-        CGContextClipToMask(context, rect, self.CGImage)
+        context?.translateBy(x: 0, y: rect.height)
+        context?.scaleBy(x: 1.0, y: -1.0)
+        context?.setBlendMode(.normal)
+        context?.draw(self.cgImage!, in: rect)
+        context?.clip(to: rect, mask: self.cgImage!)
         color.setFill()
-        CGContextAddRect(context, rect)
-        CGContextDrawPath(context, .Fill)
+        context?.addRect(rect)
+        context?.drawPath(using: .fill)
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
-        return image.resizableImageWithCapInsets(self.capInsets)
+        return image!.resizableImage(withCapInsets: self.capInsets)
     }
     
-    public static func ntg_imageWithColor(color: UIColor, size: CGSize) -> UIImage {
+    public static func ntg_imageWithColor(_ color: UIColor, size: CGSize) -> UIImage {
         let rect = CGRect(origin: CGPoint.zero, size: size)
         UIGraphicsBeginImageContextWithOptions(size, false, 0)
         color.setFill()
         UIRectFill(rect)
-        let image: UIImage = UIGraphicsGetImageFromCurrentImageContext()
+        let image: UIImage = UIGraphicsGetImageFromCurrentImageContext()!
         UIGraphicsEndImageContext()
         return image
     }
 }
 
 extension UIColor {
-    public func ntg_blendWithColor(color: UIColor) -> UIColor {
+    public func ntg_blendWithColor(_ color: UIColor) -> UIColor {
         var r1: CGFloat = 0, r2: CGFloat = 0
         var g1: CGFloat = 0, g2: CGFloat = 0
         var b1: CGFloat = 0, b2: CGFloat = 0

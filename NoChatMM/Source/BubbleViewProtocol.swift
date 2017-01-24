@@ -9,8 +9,8 @@
 import UIKit
 
 public enum ViewContext {
-    case Normal
-    case Sizing // You may skip some cell updates for faster sizing
+    case normal
+    case sizing // You may skip some cell updates for faster sizing
 }
 
 public protocol MaximumLayoutWidthSpecificable {
@@ -26,6 +26,6 @@ public protocol BubbleViewProtocol: MaximumLayoutWidthSpecificable, BackgroundSi
     var viewContext: ViewContext { get set }
     var messageViewModel: MessageViewModelProtocol! { get set }
     var selected: Bool { get set }
-    func bubbleSizeThatFits(size: CGSize) -> CGSize
-    func performBatchUpdates(updateClosure: () -> Void, animated: Bool, completion: (() -> ())?)
+    func bubbleSizeThatFits(_ size: CGSize) -> CGSize
+    func  performBatchUpdates(_ updateClosure: @escaping () -> Void, animated: Bool, completion: (() -> Void)?)
 }

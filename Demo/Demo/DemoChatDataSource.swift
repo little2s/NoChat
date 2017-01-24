@@ -21,21 +21,21 @@ class TGChatDataSource: ChatDataSourceProtocol {
     var chatItems: [ChatItemProtocol] = []
     weak var delegate: ChatDataSourceDelegateProtocol?
     
-    func loadNext(completion: () -> Void) {
+    func loadNext(_ completion: () -> Void) {
         completion()
     }
     
-    func loadPrevious(completion: () -> Void) {
+    func loadPrevious(_ completion: () -> Void) {
         completion()
     }
     
-    func adjustNumberOfMessages(preferredMaxCount preferredMaxCount: Int?, focusPosition: Double, completion:(didAdjust: Bool) -> Void) {
-        completion(didAdjust: false)
+    func adjustNumberOfMessages(preferredMaxCount: Int?, focusPosition: Double, completion:(_ didAdjust: Bool) -> Void) {
+        completion(false)
     }
     
     
     func addMessages(messages: [TGMessage]) {
-        chatItems.insertContentsOf(messages.reverse().map { $0 as ChatItemProtocol }, at: 0)
+        chatItems.insert(contentsOf: messages.reversed().map { $0 as ChatItemProtocol }, at: 0)
         delegate?.chatDataSourceDidUpdate(self)
     }
     
@@ -50,21 +50,21 @@ class MMChatDataSource: ChatDataSourceProtocol {
     var chatItems: [ChatItemProtocol] = []
     weak var delegate: ChatDataSourceDelegateProtocol?
     
-    func loadNext(completion: () -> Void) {
+    func loadNext(_ completion: () -> Void) {
         completion()
     }
     
-    func loadPrevious(completion: () -> Void) {
+    func loadPrevious(_ completion: () -> Void) {
         completion()
     }
     
-    func adjustNumberOfMessages(preferredMaxCount preferredMaxCount: Int?, focusPosition: Double, completion:(didAdjust: Bool) -> Void) {
-        completion(didAdjust: false)
+    func adjustNumberOfMessages(preferredMaxCount: Int?, focusPosition: Double, completion:(_ didAdjust: Bool) -> Void) {
+        completion(false)
     }
     
     
     func addMessages(messages: [MMMessage]) {
-        chatItems.appendContentsOf(messages.map { $0 as ChatItemProtocol })
+        chatItems.append(contentsOf: messages.map { $0 as ChatItemProtocol })
         delegate?.chatDataSourceDidUpdate(self)
     }
     
@@ -78,21 +78,21 @@ class SLKChatDataSource: ChatDataSourceProtocol {
     var chatItems: [ChatItemProtocol] = []
     weak var delegate: ChatDataSourceDelegateProtocol?
     
-    func loadNext(completion: () -> Void) {
+    func loadNext(_ completion: () -> Void) {
         completion()
     }
     
-    func loadPrevious(completion: () -> Void) {
+    func loadPrevious(_ completion: () -> Void) {
         completion()
     }
     
-    func adjustNumberOfMessages(preferredMaxCount preferredMaxCount: Int?, focusPosition: Double, completion:(didAdjust: Bool) -> Void) {
-        completion(didAdjust: false)
+    func adjustNumberOfMessages(preferredMaxCount: Int?, focusPosition: Double, completion:(_ didAdjust: Bool) -> Void) {
+        completion(false)
     }
     
     
     func addMessages(messages: [SLKMessage]) {
-        chatItems.insertContentsOf(messages.reverse().map { $0 as ChatItemProtocol }, at: 0)
+        chatItems.insert(contentsOf: messages.reversed().map { $0 as ChatItemProtocol }, at: 0)
         delegate?.chatDataSourceDidUpdate(self)
     }
     

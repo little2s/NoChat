@@ -10,20 +10,20 @@ import UIKit
 
 // MARK: TextBubbleViewStyle
 public protocol TextBubbleViewStyleProtocol {
-    func bubbleImage(viewModel viewModel: TextMessageViewModelProtocol, isSelected: Bool) -> UIImage
-    func textFont(viewModel viewModel: TextMessageViewModelProtocol, isSelected: Bool) -> UIFont
-    func textColor(viewModel viewModel: TextMessageViewModelProtocol, isSelected: Bool) -> UIColor
-    func textInsets(viewModel viewModel: TextMessageViewModelProtocol, isSelected: Bool) -> UIEdgeInsets
-    func linkAttributes(viewModel viewModel: TextMessageViewModelProtocol, isSelected: Bool) -> [String: AnyObject]
+    func bubbleImage(viewModel: TextMessageViewModelProtocol, isSelected: Bool) -> UIImage
+    func textFont(viewModel: TextMessageViewModelProtocol, isSelected: Bool) -> UIFont
+    func textColor(viewModel: TextMessageViewModelProtocol, isSelected: Bool) -> UIColor
+    func textInsets(viewModel: TextMessageViewModelProtocol, isSelected: Bool) -> UIEdgeInsets
+    func linkAttributes(viewModel: TextMessageViewModelProtocol, isSelected: Bool) -> [String: AnyObject]
 }
 
-public class TextBubbleViewStyle: TextBubbleViewStyleProtocol {
+open class TextBubbleViewStyle: TextBubbleViewStyleProtocol {
     public init() {}
     
     lazy var baseStyle = MessageCollectionViewCellStyle()
     
     // TODO: solve unknown select with text link
-    let blendBubbleColor = UIColor.blackColor().colorWithAlphaComponent(0.15)
+    let blendBubbleColor = UIColor.black.withAlphaComponent(0.15)
     lazy var selectedIncomingBubble: UIImage = {
         return self.baseStyle.incomingBubble
     }()
@@ -31,40 +31,41 @@ public class TextBubbleViewStyle: TextBubbleViewStyleProtocol {
         return self.baseStyle.outgoingBubble
     }()
     
-    lazy var incomingLinkAttributes:[String : AnyObject] = {
+    lazy var incomingLinkAttributes:[String : Any] = {
         return [
-            NSForegroundColorAttributeName: UIColor.blueColor(),
-            NSUnderlineStyleAttributeName : NSUnderlineStyle.StyleSingle.rawValue
+            NSForegroundColorAttributeName: UIColor.blue,
+            NSUnderlineStyleAttributeName : NSUnderlineStyle.styleSingle.rawValue
         ]
     }()
-    lazy var outgoingLinkAttributes:[String : AnyObject] = {
+    
+    lazy var outgoingLinkAttributes:[String : Any] = {
         return [
-            NSForegroundColorAttributeName: UIColor.blueColor(),
-            NSUnderlineStyleAttributeName : NSUnderlineStyle.StyleSingle.rawValue
+            NSForegroundColorAttributeName: UIColor.blue,
+            NSUnderlineStyleAttributeName : NSUnderlineStyle.styleSingle.rawValue
         ]
     }()
     
     let incomingTextInsets = UIEdgeInsets(top: 12, left: 18, bottom: 20, right: 14)
     let outgoingTextInsets = UIEdgeInsets(top: 12, left: 14, bottom: 20, right: 18)
     
-    let font = UIFont.systemFontOfSize(16)
-    public func textFont(viewModel viewModel: TextMessageViewModelProtocol, isSelected: Bool) -> UIFont {
+    let font = UIFont.systemFont(ofSize: 16)
+    open func textFont(viewModel: TextMessageViewModelProtocol, isSelected: Bool) -> UIFont {
         return font
     }
     
-    public func textColor(isIncoming: Bool) -> UIColor {
-        return UIColor.blackColor()
+    open func textColor(_ isIncoming: Bool) -> UIColor {
+        return UIColor.black
     }
     
-    public func textColor(viewModel viewModel: TextMessageViewModelProtocol, isSelected: Bool) -> UIColor {
-        return UIColor.blackColor()
+    open func textColor(viewModel: TextMessageViewModelProtocol, isSelected: Bool) -> UIColor {
+        return UIColor.black
     }
     
-    public func textInsets(viewModel viewModel: TextMessageViewModelProtocol, isSelected: Bool) -> UIEdgeInsets {
+    open func textInsets(viewModel: TextMessageViewModelProtocol, isSelected: Bool) -> UIEdgeInsets {
         return viewModel.isIncoming ? incomingTextInsets : outgoingTextInsets
     }
     
-    public func bubbleImage(viewModel viewModel: TextMessageViewModelProtocol, isSelected: Bool) -> UIImage {
+    open func bubbleImage(viewModel: TextMessageViewModelProtocol, isSelected: Bool) -> UIImage {
         var image: UIImage
         
         if isSelected {
@@ -76,46 +77,46 @@ public class TextBubbleViewStyle: TextBubbleViewStyleProtocol {
         return image
     }
     
-    public func linkAttributes(viewModel viewModel: TextMessageViewModelProtocol, isSelected: Bool) -> [String : AnyObject] {
+    open func linkAttributes(viewModel: TextMessageViewModelProtocol, isSelected: Bool) -> [String : AnyObject] {
         if viewModel.isIncoming {
-            return incomingLinkAttributes
+            return incomingLinkAttributes as [String : AnyObject]
         } else {
-            return outgoingLinkAttributes
+            return outgoingLinkAttributes as [String : AnyObject]
         }
     }
     
 }
 
 // MARK: TextBubbleView
-public class TextBubbleView: UIView, BubbleViewProtocol, UITextViewDelegate {
+open class TextBubbleView: UIView, BubbleViewProtocol, UITextViewDelegate {
     
-    public static var bubbleIdentifier: String {
+    open static var bubbleIdentifier: String {
         return "TextBubble"
     }
     
-    public var preferredMaxLayoutWidth: CGFloat = 0
+    open var preferredMaxLayoutWidth: CGFloat = 0
     var animationDuration: CFTimeInterval = 0.33
-    public var viewContext: ViewContext = .Normal {
+    open var viewContext: ViewContext = .normal {
         didSet {
-            if viewContext == .Sizing {
-                textView.dataDetectorTypes = .None
-                textView.selectable = false
+            if viewContext == .sizing {
+                textView.dataDetectorTypes = UIDataDetectorTypes()
+                textView.isSelectable = false
             } else {
-                textView.dataDetectorTypes = [.Link]
-                textView.selectable = true
+                textView.dataDetectorTypes = [.link]
+                textView.isSelectable = true
             }
         }
     }
     
     let style = TextBubbleViewStyle()
     
-    public var messageViewModel: MessageViewModelProtocol! {
+    open var messageViewModel: MessageViewModelProtocol! {
         didSet {
             updateViews()
         }
     }
     
-    public var selected: Bool = false {
+    open var selected: Bool = false {
         didSet {
             if oldValue != self.selected {
                 updateViews()
@@ -133,38 +134,38 @@ public class TextBubbleView: UIView, BubbleViewProtocol, UITextViewDelegate {
         self.commonInit()
     }
     
-    private func commonInit() {
+    fileprivate func commonInit() {
         self.addSubview(bubbleImageView)
         self.addSubview(textView)
         textView.delegate = self
     }
     
-    private lazy var bubbleImageView: UIImageView = {
+    fileprivate lazy var bubbleImageView: UIImageView = {
         let imageView = UIImageView()
         return imageView
     }()
     
-    private var textView: UITextView = {
+    fileprivate var textView: UITextView = {
         let textView = ChatTextView()
-        textView.backgroundColor = UIColor.clearColor()
-        textView.editable = false
-        textView.selectable = true
-        textView.dataDetectorTypes = [.Link]
+        textView.backgroundColor = UIColor.clear
+        textView.isEditable = false
+        textView.isSelectable = true
+        textView.dataDetectorTypes = [.link]
         textView.scrollsToTop = false
-        textView.scrollEnabled = false
+        textView.isScrollEnabled = false
         textView.bounces = false
         textView.bouncesZoom = false
         textView.showsHorizontalScrollIndicator = false
         textView.showsVerticalScrollIndicator = false
         textView.layoutManager.allowsNonContiguousLayout = true
-        textView.exclusiveTouch = true
-        textView.textContainerInset = UIEdgeInsetsZero
+        textView.isExclusiveTouch = true
+        textView.textContainerInset = UIEdgeInsets.zero
         textView.textContainer.lineFragmentPadding = 0
         return textView
     }()
     
-    private(set) var isUpdating: Bool = false
-    public func performBatchUpdates(updateClosure: () -> Void, animated: Bool, completion: (() -> Void)?) {
+    fileprivate(set) var isUpdating: Bool = false
+    open func performBatchUpdates(_ updateClosure: @escaping () -> Void, animated: Bool, completion: (() -> Void)?) {
         isUpdating = true
         let updateAndRefreshViews = {
             updateClosure()
@@ -175,7 +176,7 @@ public class TextBubbleView: UIView, BubbleViewProtocol, UITextViewDelegate {
             }
         }
         if animated {
-            UIView.animateWithDuration(animationDuration, animations: updateAndRefreshViews, completion: { (finished) -> Void in
+            UIView.animate(withDuration: animationDuration, animations: updateAndRefreshViews, completion: { (finished) -> Void in
                 completion?()
             })
         } else {
@@ -184,14 +185,14 @@ public class TextBubbleView: UIView, BubbleViewProtocol, UITextViewDelegate {
     }
     
     func updateViews() {
-        if viewContext == .Sizing { return }
+        if viewContext == .sizing { return }
         if isUpdating { return }
         guard let viewModel = messageViewModel as? TextMessageViewModel else { return }
         let textColor = style.textColor(viewModel: viewModel, isSelected: selected)
         let bubbleImage = style.bubbleImage(viewModel: viewModel, isSelected: selected)
         let linkAttributes = style.linkAttributes(viewModel: viewModel, isSelected: selected)
         
-        if !textView.attributedText.isEqualToAttributedString(viewModel.attributedText)  {
+        if !textView.attributedText.isEqual(to: viewModel.attributedText)  {
             textView.attributedText = viewModel.attributedText
         }
         
@@ -207,19 +208,19 @@ public class TextBubbleView: UIView, BubbleViewProtocol, UITextViewDelegate {
         setNeedsLayout()
     }
     
-    public func bubbleSizeThatFits(size: CGSize) -> CGSize {
+    open func bubbleSizeThatFits(_ size: CGSize) -> CGSize {
         return calculateTextBubbleLayout(preferredMaxLayoutWidth: size.width).size
     }
     
     // MARK:  Layout
-    public override func layoutSubviews() {
+    open override func layoutSubviews() {
         super.layoutSubviews()
         let layout = calculateTextBubbleLayout(preferredMaxLayoutWidth: preferredMaxLayoutWidth)
         textView.ntg_rect = layout.textFrame
         bubbleImageView.ntg_rect = layout.bubbleFrame
     }
     
-    private func calculateTextBubbleLayout(preferredMaxLayoutWidth preferredMaxLayoutWidth: CGFloat) -> TextBubbleLayoutModel {
+    fileprivate func calculateTextBubbleLayout(preferredMaxLayoutWidth: CGFloat) -> TextBubbleLayoutModel {
         guard let viewModel = messageViewModel as? TextMessageViewModel else {
             fatalError("View model not match!")
         }
@@ -238,12 +239,12 @@ public class TextBubbleView: UIView, BubbleViewProtocol, UITextViewDelegate {
         return layoutModel
     }
     
-    public var canCalculateSizeInBackground: Bool {
+    open var canCalculateSizeInBackground: Bool {
         return true
     }
     
     // MARK: UITextViewDelegate
-    public func textView(textView: UITextView, shouldInteractWithURL URL: NSURL, inRange characterRange: NSRange) -> Bool {
+    open func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange) -> Bool {
         guard let viewModel = messageViewModel as? TextMessageViewModel else {
             fatalError("View model not match!")
         }
@@ -255,7 +256,7 @@ public class TextBubbleView: UIView, BubbleViewProtocol, UITextViewDelegate {
 }
 
 // MARK: Layout model
-private final class TextBubbleLayoutModel {
+final class TextBubbleLayoutModel {
     let layoutContext: LayoutContext
     var textFrame: CGRect = CGRect.zero
     var bubbleFrame: CGRect = CGRect.zero
@@ -295,10 +296,10 @@ private final class TextBubbleLayoutModel {
         size = bubbleSize
     }
     
-    private func textSizeThatFitsWidth(width: CGFloat) -> CGSize {
-        return layoutContext.attributedText.boundingRectWithSize(
-            CGSize(width: width, height: CGFloat.max),
-            options: [.UsesLineFragmentOrigin, .UsesFontLeading],
+    fileprivate func textSizeThatFitsWidth(_ width: CGFloat) -> CGSize {
+        return layoutContext.attributedText.boundingRect(
+            with: CGSize(width: width, height: CGFloat.greatestFiniteMagnitude),
+            options: [.usesLineFragmentOrigin, .usesFontLeading],
             context: nil
         ).size.ntg_round()
     }
@@ -312,7 +313,7 @@ extension TextBubbleLayoutModel.LayoutContext: Equatable, Hashable {
     }
 }
 
-private func == (lhs: TextBubbleLayoutModel.LayoutContext, rhs: TextBubbleLayoutModel.LayoutContext) -> Bool {
+func == (lhs: TextBubbleLayoutModel.LayoutContext, rhs: TextBubbleLayoutModel.LayoutContext) -> Bool {
     return lhs.attributedText.string == rhs.attributedText.string &&
         lhs.textInsets == rhs.textInsets &&
         lhs.font == rhs.font &&

@@ -12,7 +12,7 @@ import NoChatMM
 
 class MMChatViewController: ChatViewController {
     
-    let messageLayoutCache = NSCache()
+    let messageLayoutCache = NSCache<AnyObject, AnyObject>()
     
     override func viewDidLoad() {
         inverted = false
@@ -21,7 +21,7 @@ class MMChatViewController: ChatViewController {
         
         wallpaperView.image = UIImage(named: "MMWallpaper")!
         
-        let rightItem = UIBarButtonItem(image: UIImage(named: "MMUserInfo")!, style: .Plain, target: self, action: #selector(didTapRightItem))
+        let rightItem = UIBarButtonItem(image: UIImage(named: "MMUserInfo")!, style: .plain, target: self, action: #selector(didTapRightItem))
         navigationItem.rightBarButtonItem = rightItem
     }
     
@@ -30,16 +30,16 @@ class MMChatViewController: ChatViewController {
         
     }
     
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
     
-        navigationController?.navigationBar.barStyle = .Black
+        navigationController?.navigationBar.barStyle = .black
         navigationController?.navigationBar.barTintColor = UIColor(white: 0.1, alpha: 0.9)
-        navigationController?.navigationBar.tintColor = UIColor.whiteColor()
+        navigationController?.navigationBar.tintColor = UIColor.white
     }
     
-    override func viewWillDisappear(animated: Bool) {
-        navigationController?.navigationBar.barStyle = .Default
+    override func viewWillDisappear(_ animated: Bool) {
+        navigationController?.navigationBar.barStyle = .default
         navigationController?.navigationBar.barTintColor = nil
         navigationController?.navigationBar.tintColor = nil
         super.viewWillDisappear(animated)
@@ -66,7 +66,7 @@ class MMChatViewController: ChatViewController {
         let inputController = NoChatMM.ChatInputViewController()
         
         inputController.onSendText = { [weak self] text in
-            self?.sendText(text)
+            self?.sendText(text: text)
         }
         
         return inputController
@@ -75,23 +75,23 @@ class MMChatViewController: ChatViewController {
 }
 
 extension MMChatViewController {
-    override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+    override func viewWillTransition(to: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         messageLayoutCache.removeAllObjects()
-        super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
+        super.viewWillTransition(to: to, with: coordinator)
     }
 }
 
 extension MMChatViewController {
     func sendText(text: String) {
         let message = MMMessageFactory.createTextMessage(text: text, senderId: "outgoing", isIncoming: false)
-        (self.chatDataSource as! MMChatDataSource).addMessages([message])
+        (self.chatDataSource as! MMChatDataSource).addMessages(messages: [message])
     }
 }
 
 
 
 class MMTextMessageViewModel: TextMessageViewModel {
-    override func getAvatar(completionHandler completionHandler: (UIImage? -> Void)?) {
+    override func getAvatar(completionHandler: ((UIImage?) -> Void)?) {
         if message.senderId == "incoming" {
             let image = UIImage(named: "MMAvatarIncoming")
             completionHandler?(image)
@@ -106,7 +106,7 @@ class MMTextMessageViewModelBuilder: MessageViewModelBuilderProtocol {
     
     private let messageViewModelBuilder = MessageViewModelBuilder()
     
-    func createMessageViewModel(message message: MessageProtocol) -> MessageViewModelProtocol {
+    func createMessageViewModel(message: MessageProtocol) -> MessageViewModelProtocol {
         let messageViewModel = messageViewModelBuilder.createMessageViewModel(message: message)
         let textMessageViewModel = MMTextMessageViewModel(text: message.content, messageViewModel: messageViewModel)
         return textMessageViewModel
