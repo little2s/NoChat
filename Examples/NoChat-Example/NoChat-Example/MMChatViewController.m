@@ -68,7 +68,21 @@
     [self loadChatItems];
 }
 
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+    [super scrollViewDidScroll:scrollView];
+    
+    if (scrollView == self.collectionView && scrollView.isTracking) {
+        [self.chatInputView endInputting:YES];
+    }
+}
+
 #pragma mark - MMChatInputViewDelegate
+
+- (void)didChatInputViewStartInputting:(MMChatInputView *)chatInputView
+{
+    [self scrollToBottom:YES];
+}
 
 - (void)chatInputView:(MMChatInputView *)chatInputView didSendText:(NSString *)text
 {

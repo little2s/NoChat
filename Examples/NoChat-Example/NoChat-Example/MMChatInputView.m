@@ -89,7 +89,14 @@
 - (void)growingTextView:(NOCGrowingTextView *)textView didSendText:(NSString *)text
 {
     if ([self.delegate respondsToSelector:@selector(chatInputView:didSendText:)]) {
-        [(id<MMChatInputViewDelegate>)self.delegate chatInputView:self didSendText:text];
+        [((id<MMChatInputViewDelegate>)self.delegate) chatInputView:self didSendText:text];
+    }
+}
+
+- (void)growingTextViewDidBeginEditing:(NOCGrowingTextView *)textView
+{
+    if ([self.delegate respondsToSelector:@selector(didChatInputViewStartInputting:)]) {
+        [((id<MMChatInputViewDelegate>)self.delegate) didChatInputViewStartInputting:self];
     }
 }
 

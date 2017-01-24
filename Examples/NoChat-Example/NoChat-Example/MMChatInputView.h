@@ -14,6 +14,7 @@
 @protocol MMChatInputViewDelegate <NOCChatInputViewDelegate>
 
 @optional
+- (void)didChatInputViewStartInputting:(MMChatInputView *)chatInputView;
 - (void)chatInputView:(MMChatInputView *)chatInputView didSendText:(NSString *)text;
 
 @end
