@@ -9,59 +9,25 @@
 #import "MMTextMessageCellLayout.h"
 #import "NOCMessage.h"
 
-@implementation MMTextMessageCellLayout
+@implementation MMTextMessageCellLayout {
+    NSMutableAttributedString *_attributedText;
+}
 
 - (instancetype)initWithChatItem:(id<NOCChatItem>)chatItem cellWidth:(CGFloat)width
 {
     self = [super initWithChatItem:chatItem cellWidth:width];
     if (self) {
         self.reuseIdentifier = @"MMTextMessageCell";
+        [self setupAttributedText];
+        [self setupBubbleImage];
+        [self calculateLayout];
     }
     return self;
 }
 
-- (void)calculateLayout
+- (void)setupAttributedText
 {
-    self.height = 0;
-    self.bubbleViewFrame = CGRectZero;
-    self.textLabelFrame = CGRectZero;
-    self.textLayout = nil;
-    
-    NSAttributedString *text = [self attributedString];
-    if (text.length == 0) {
-        return;
-    }
-    
-    UIEdgeInsets margin = self.bubbleViewMargin;
-    CGFloat bubbleViewWidth = self.width - margin.left - margin.right;
-    CGFloat textLabelWidth = bubbleViewWidth;
-    
-    MMTextLinePositionModifier *modifier = [[MMTextLinePositionModifier alloc] init];
-    modifier.font = [MMTextMessageCellLayout textFont];
-    modifier.paddingTop = 2;
-    modifier.paddingBottom = 2;
-    
-    YYTextContainer *container = [[YYTextContainer alloc] init];
-    container.size = CGSizeMake(textLabelWidth, CGFLOAT_MAX);
-    container.linePositionModifier = modifier;
-    
-    self.textLayout = [YYTextLayout layoutWithContainer:container text:text];
-    if (!self.textLayout) {
-        return;
-    }
-    
-    CGFloat textLabelHeight = [modifier heightForLineCount:self.textLayout.rowCount];
-    self.textLabelFrame = CGRectMake(0, 0, textLabelWidth, textLabelHeight);
-    
-    CGFloat bubbleViewHeight = textLabelHeight;
-    self.bubbleViewFrame = CGRectMake(margin.left, margin.top, bubbleViewWidth, bubbleViewHeight);
-    
-    self.height = bubbleViewHeight + margin.top + margin.bottom;
-}
-
-- (NSAttributedString *)attributedString
-{
-    NSString *text = ((NOCMessage *)self.chatItem).text;
+    NSString *text = self.message.text;
     NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithString:text attributes:@{ NSFontAttributeName: [MMTextMessageCellLayout textFont], NSForegroundColorAttributeName: [MMTextMessageCellLayout textColor] }];
     
     YYTextBorder *highlightBorder = [YYTextBorder new];
@@ -85,12 +51,108 @@
         }
     }
     
-    return attrString;
+    _attributedText = attrString;
+}
+
+- (void)setupBubbleImage
+{
+    _bubbleImage = self.isOutgoing ? [MMTextMessageCellLayout outgoingBubbleImage] : [MMTextMessageCellLayout incomingBubbleImage];
+    _highlightBubbleImage = self.isOutgoing ?[MMTextMessageCellLayout highlightOutgoingBubbleImage] : [MMTextMessageCellLayout highlightIncomingBubbleImage];
+}
+
+- (void)calculateLayout
+{
+    self.height = 0;
+    self.bubbleViewFrame = CGRectZero;
+    self.bubbleImageViewFrame = CGRectZero;
+    self.textLabelFrame = CGRectZero;
+    self.textLayout = nil;
+    
+    NSMutableAttributedString *text = _attributedText;
+    if (text.length == 0) {
+        return;
+    }
+    
+    // dynamic font support
+    [text yy_setAttribute:NSFontAttributeName value:[MMTextMessageCellLayout textFont]];
+    
+    BOOL isOutgoing = self.isOutgoing;
+    UIEdgeInsets bubbleMargin = self.bubbleViewMargin;
+    CGFloat prefrredMaxBubbleWidth = self.width * 0.68;
+    CGFloat bubbleViewWidth = prefrredMaxBubbleWidth;
+    
+    UIEdgeInsets textMargin = isOutgoing ? UIEdgeInsetsMake(12, 20, 20, 22) : UIEdgeInsetsMake(12, 22, 20, 20);
+    CGFloat textLabelWidth = bubbleViewWidth - textMargin.left - textMargin.right;
+    
+    MMTextLinePositionModifier *modifier = [[MMTextLinePositionModifier alloc] init];
+    modifier.font = [MMTextMessageCellLayout textFont];
+    modifier.paddingTop = 2;
+    modifier.paddingBottom = 2;
+    
+    YYTextContainer *container = [[YYTextContainer alloc] init];
+    container.size = CGSizeMake(textLabelWidth, CGFLOAT_MAX);
+    container.linePositionModifier = modifier;
+    
+    self.textLayout = [YYTextLayout layoutWithContainer:container text:text];
+    if (!self.textLayout) {
+        return;
+    }
+    
+    textLabelWidth = self.textLayout.textBoundingSize.width;
+    CGFloat textLabelHeight = [modifier heightForLineCount:self.textLayout.rowCount];
+    self.textLabelFrame = CGRectMake(textMargin.left, textMargin.top, textLabelWidth, textLabelHeight);
+    
+    bubbleViewWidth = textLabelWidth + textMargin.left + textMargin.right;
+    CGFloat bubbleViewHeight = textLabelHeight + textMargin.top + textMargin.bottom;
+    self.bubbleViewFrame = isOutgoing ? CGRectMake(self.width - bubbleMargin.right - bubbleViewWidth, bubbleMargin.top, bubbleViewWidth, bubbleViewHeight) : CGRectMake(bubbleMargin.left, bubbleMargin.top, bubbleViewWidth, bubbleViewHeight);
+    self.bubbleImageViewFrame = CGRectMake(0, 0, bubbleViewWidth, bubbleViewHeight);
+    
+    self.height = bubbleViewHeight;
 }
 
 @end
 
 @implementation MMTextMessageCellLayout (MMStyle)
+
++ (UIImage *)outgoingBubbleImage
+{
+    static UIImage *_outgoingBubbleImage = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _outgoingBubbleImage = [UIImage imageNamed:@"MMBubbleOutgoing"];
+    });
+    return _outgoingBubbleImage;
+}
+
++ (UIImage *)highlightOutgoingBubbleImage
+{
+    static UIImage *_highlightOutgoingBubbleImage = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _highlightOutgoingBubbleImage = [UIImage imageNamed:@"MMBubbleOutgoingHL"];
+    });
+    return _highlightOutgoingBubbleImage;
+}
+
++ (UIImage *)incomingBubbleImage
+{
+    static UIImage *_incomingBubbleImage = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _incomingBubbleImage = [UIImage imageNamed:@"MMBubbleIncoming"];
+    });
+    return _incomingBubbleImage;
+}
+
++ (UIImage *)highlightIncomingBubbleImage
+{
+    static UIImage *_highlightIncomingBubbleImage = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _highlightIncomingBubbleImage = [UIImage imageNamed:@"MMBubbleIncomingHL"];
+    });
+    return _highlightIncomingBubbleImage;
+}
 
 + (UIFont *)textFont
 {

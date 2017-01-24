@@ -11,12 +11,22 @@
 
 @interface MMTextMessageCellLayout : MMBaseMessageCellLayout
 
+
+@property (nonatomic, strong) UIImage *bubbleImage;
+@property (nonatomic, strong) UIImage *highlightBubbleImage;
+
+@property (nonatomic, assign) CGRect bubbleImageViewFrame;
 @property (nonatomic, assign) CGRect textLabelFrame;
 @property (nonatomic, strong) YYTextLayout *textLayout;
 
 @end
 
 @interface MMTextMessageCellLayout (MMStyle)
+
++ (UIImage *)outgoingBubbleImage;
++ (UIImage *)highlightOutgoingBubbleImage;
++ (UIImage *)incomingBubbleImage;
++ (UIImage *)highlightIncomingBubbleImage;
 
 + (UIFont *)textFont;
 + (UIColor *)textColor;

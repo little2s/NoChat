@@ -18,8 +18,7 @@
         _reuseIdentifier = @"MMBaseMessageCell";
         _chatItem = chatItem;
         _width = width;
-        _bubbleViewMargin = UIEdgeInsetsMake(8, 16, 8, 16);
-        [self calculateLayout];
+        _bubbleViewMargin = UIEdgeInsetsMake(8, 52, 8, 52);
     }
     return self;
 }
@@ -27,6 +26,16 @@
 - (void)calculateLayout
 {
     NSAssert(NO, @"Impl in subclass");
+}
+
+- (NOCMessage *)message
+{
+    return (NOCMessage *)self.chatItem;
+}
+
+- (BOOL)isOutgoing
+{
+    return self.message.isOutgoing;
 }
 
 @end

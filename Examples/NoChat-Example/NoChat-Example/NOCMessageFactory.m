@@ -21,8 +21,8 @@
         message.senderDisplayName = metaItem[@"senderDisplayName"];
         message.text = metaItem[@"text"];
         message.date = metaItem[@"date"];
-        message.outging = arc4random() % 3 == 0;
-        message.deliveryStatus = message.outging ? NOCMessageDeliveryStatusRead : NOCMessageOutgoingStateIdle;
+        message.outgoing = arc4random() % 3 == 0;
+        message.deliveryStatus = message.outgoing ? NOCMessageDeliveryStatusRead : NOCMessageOutgoingStateIdle;
         [result addObject:message];
     }
     return result;

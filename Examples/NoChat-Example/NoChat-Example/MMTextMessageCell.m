@@ -21,6 +21,10 @@
     self = [super initWithFrame:frame];
     if (self) {
         __weak typeof(self) weakSelf = self;
+        
+        _bubbleImageView = [[UIImageView alloc] init];
+        [self.bubbleView addSubview:_bubbleImageView];
+        
         _textLabel = [[YYLabel alloc] init];
         _textLabel.displaysAsynchronously = YES;
         _textLabel.ignoreCommonProperties = YES;
@@ -46,8 +50,14 @@
 - (void)setLayout:(id<NOCChatItemCellLayout>)layout
 {
     [super setLayout:layout];
-    self.textLabel.frame = ((MMTextMessageCellLayout *)layout).textLabelFrame;
-    self.textLabel.textLayout = ((MMTextMessageCellLayout *)layout).textLayout;
+
+    MMTextMessageCellLayout *cellLayout = (MMTextMessageCellLayout *)layout;
+    
+    self.bubbleImageView.frame = cellLayout.bubbleImageViewFrame;
+    self.bubbleImageView.image = self.isHighlight ? cellLayout.highlightBubbleImage : cellLayout.bubbleImage;
+    
+    self.textLabel.frame = cellLayout.textLabelFrame;
+    self.textLabel.textLayout = cellLayout.textLayout;
 }
 
 @end

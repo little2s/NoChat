@@ -27,7 +27,7 @@ typedef NS_ENUM(NSUInteger, NOCMessageDeliveryStatus) {
 @property (nonatomic, copy) NSDate *date;
 @property (nonatomic, copy) NSString *text;
 
-@property (nonatomic, assign, getter=isOutgoing) BOOL outging;
+@property (nonatomic, assign, getter=isOutgoing) BOOL outgoing;
 @property (nonatomic, assign) NOCMessageDeliveryStatus deliveryStatus;
 
 @end

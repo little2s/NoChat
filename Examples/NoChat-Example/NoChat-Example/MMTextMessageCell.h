@@ -12,6 +12,7 @@
 
 @interface MMTextMessageCell : MMBaseMessageCell
 
+@property (nonatomic, strong) UIImageView *bubbleImageView;
 @property (nonatomic, strong) YYLabel *textLabel;
 
 @end
