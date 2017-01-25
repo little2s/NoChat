@@ -25,7 +25,7 @@
         _titleLabel = [[UILabel alloc] init];
         _titleLabel.translatesAutoresizingMaskIntoConstraints = NO;
         _titleLabel.text = @"Title";
-        _titleLabel.font = [UIFont noc_mediumSystemFontOfSize:16];
+        _titleLabel.font = [UIFont noc_mediumSystemFontOfSize:17];
         _titleLabel.textColor = [UIColor blackColor];
         [self addSubview:_titleLabel];
         
