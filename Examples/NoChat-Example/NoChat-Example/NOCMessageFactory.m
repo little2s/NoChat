@@ -18,11 +18,10 @@
     NSMutableArray *result = [[NSMutableArray alloc] init];
     for (NSDictionary *metaItem in metaItems) {
         NOCMessage *message = [NOCMessage new];
-        message.senderDisplayName = metaItem[@"senderDisplayName"];
         message.text = metaItem[@"text"];
         message.date = metaItem[@"date"];
         message.outgoing = arc4random() % 3 == 0;
-        message.deliveryStatus = message.outgoing ? NOCMessageDeliveryStatusRead : NOCMessageOutgoingStateIdle;
+        message.deliveryStatus = message.outgoing ? NOCMessageDeliveryStatusRead : NOCMessageDeliveryStatusIdle;
         [result addObject:message];
     }
     return result;

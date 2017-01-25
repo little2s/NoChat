@@ -15,13 +15,18 @@
 #import "TGTitleView.h"
 #import "TGAvatarButton.h"
 
+#import "NOCUser.h"
+#import "NOCChat.h"
 #import "NOCMessage.h"
-#import "NOCMessageFactory.h"
 
-@interface TGChatViewController () <UINavigationControllerDelegate>
+#import "NOCMessageManager.h"
+
+@interface TGChatViewController () <UINavigationControllerDelegate, NOCMessageManagerDelegate>
 
 @property (nonatomic, strong) TGTitleView *titleView;
 @property (nonatomic, strong) TGAvatarButton *avatarButton;
+
+@property (nonatomic, strong) NOCMessageManager *messageManager;
 
 @end
 
@@ -48,9 +53,20 @@
     [self.collectionView registerClass:[TGTextMessageCell class] forCellWithReuseIdentifier:[TGTextMessageCell reuseIdentifier]];
 }
 
+- (instancetype)initWithChat:(NOCChat *)chat
+{
+    self = [super init];
+    if (self) {
+        self.chat = chat;
+        self.messageManager = [NOCMessageManager manager];
+    }
+    return self;
+}
+
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [self.messageManager removeDelegate:self];
 }
 
 - (void)viewDidLoad
@@ -62,7 +78,8 @@
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleContentSizeCategoryDidChanged:) name:UIContentSizeCategoryDidChangeNotification object:nil];
     
-    [self loadChatItems];
+    [self.messageManager addDelegate:self];
+    [self loadMessages];
 }
 
 #pragma mark - TGChatInputViewDelegate
@@ -71,10 +88,7 @@
 {
     NOCMessage *message = [[NOCMessage alloc] init];
     message.text = text;
-    message.outgoing = YES;
-    message.date = [NSDate date];
-    message.deliveryStatus = NOCMessageDeliveryStatusRead;
-    [self appendMessage:message];
+    [self sendMessage:message];
 }
 
 - (void)chatInputView:(TGChatInputView *)chatInputView didTapAttachButton:(UIButton *)attachButton
@@ -114,11 +128,46 @@
     }];
 }
 
+#pragma mark - NOCMessageManagerDelegate
+
+- (void)didReceiveMessages:(NSArray *)messages chatId:(NSString *)chatId
+{
+    if ([chatId isEqualToString:self.chat.chatId]) {
+        [self appendChatItems:messages];
+    }
+}
+
 #pragma mark - Private
+
+- (void)loadMessages
+{
+    __weak typeof(self) weakSelf = self;
+    [self.messageManager fetchMessagesWithChatId:self.chat.chatId handler:^(NSArray *messages) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        [strongSelf reloadChatItems:messages];
+        if (!strongSelf.collectionView.isTracking) {
+            [strongSelf scrollToBottom:YES];
+        }
+    }];
+}
+
+- (void)sendMessage:(NOCMessage *)message
+{
+    message.senderId = [NOCUser currentUser].userId;
+    message.outgoing = YES;
+    message.date = [NSDate date];
+    message.deliveryStatus = NOCMessageDeliveryStatusRead;
+    
+    [self appendChatItems:@[message]];
+    [self scrollToBottom:YES];
+    [self.messageManager sendMessage:message];
+}
 
 - (void)setupNavigationItems
 {
     self.titleView = [[TGTitleView alloc] init];
+    self.titleView.title = self.chat.title;
+    self.titleView.detail = self.chat.detail;
     self.navigationItem.titleView = self.titleView;
     
     UIBarButtonItem *spacerItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
@@ -127,20 +176,6 @@
     self.avatarButton = [[TGAvatarButton alloc] init];
     UIBarButtonItem *rightItem = [[UIBarButtonItem alloc] initWithCustomView:self.avatarButton];
     self.navigationItem.rightBarButtonItems = @[spacerItem, rightItem];
-}
-
-- (void)loadChatItems
-{
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSArray *chatItems = [NOCMessageFactory fetchMessagesWithNumber:20];
-        [self reloadChatItems:chatItems];
-    });
-}
-
-- (void)appendMessage:(NOCMessage *)message
-{
-    [self appendChatItems:@[message]];
-    [self scrollToBottom:YES];
 }
 
 - (void)handleContentSizeCategoryDidChanged:(NSNotification *)notification

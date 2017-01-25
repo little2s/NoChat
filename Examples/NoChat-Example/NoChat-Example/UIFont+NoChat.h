@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface UIFont (NOChat)
+@interface UIFont (NoChat)
 
 + (UIFont *)noc_mediumSystemFontOfSize:(CGFloat)fontSize;
 

@@ -35,8 +35,9 @@
         self.autoLoadAboveChatItemsEnable = NO;
         self.autoLoadBelowChatItemsEnable = NO;
         self.autoLoadingFractionalThreshold = 0.05;
-        self.automaticallyAdjustsScrollViewInsets = NO; // use `chatCollectionContainerView` and `topLayoutGuide` instead
         self.serialQueue = dispatch_queue_create("com.little2s.nochat.chatvc", DISPATCH_QUEUE_SERIAL);
+        self.hidesBottomBarWhenPushed = YES;
+        self.automaticallyAdjustsScrollViewInsets = NO; // use `chatCollectionContainerView` and `topLayoutGuide` instead
     }
     return self;
 }

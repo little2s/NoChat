@@ -6,9 +6,9 @@
 //  Copyright © 2016年 little2s. All rights reserved.
 //
 
-#import "UIFont+NOChat.h"
+#import "UIFont+NoChat.h"
 
-@implementation UIFont (NOChat)
+@implementation UIFont (NoChat)
 
 + (UIFont *)noc_mediumSystemFontOfSize:(CGFloat)fontSize
 {

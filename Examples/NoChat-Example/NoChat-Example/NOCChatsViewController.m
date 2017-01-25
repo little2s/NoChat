@@ -7,6 +7,10 @@
 //
 
 #import "NOCChatsViewController.h"
+#import "NOCChat.h"
+
+#import "TGChatViewController.h"
+#import "MMChatViewController.h"
 
 @interface NOCChatsViewController ()
 
@@ -22,26 +26,33 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSString *className = nil;
+    NOCChat *chat = [self botChat];
     NSInteger row = indexPath.row;
-    switch (row) {
-        case 0: {
-            className = @"TGChatViewController";
-            break;
-        }
-        case 1: {
-            className = @"MMChatViewController";
-            break;
-        }
-        default:
-            abort();
+    UIViewController *chatVC = nil;
+    if (row == 0) {
+        chatVC = [[TGChatViewController alloc] initWithChat:chat];
+    } else if (row == 1) {
+        chatVC = [[MMChatViewController alloc] initWithChat:chat];
     }
-    Class clz = NSClassFromString(className);
-    UIViewController *nextViewController = [[clz alloc] init];
-    nextViewController.hidesBottomBarWhenPushed = YES;
-    [self.navigationController pushViewController:nextViewController animated:YES];
-    
+    if (chatVC) {
+        [self.navigationController pushViewController:chatVC animated:YES];
+    }
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+
+- (NOCChat *)botChat
+{
+    static NOCChat *_botChat = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _botChat = [[NOCChat alloc] init];
+        _botChat.type = @"bot";
+        _botChat.targetId = @"89757";
+        _botChat.chatId = [NSString stringWithFormat:@"%@_%@", _botChat.type, _botChat.targetId];
+        _botChat.title = @"Gothons From Planet Percal #25";
+        _botChat.detail = @"bot";
+    });
+    return _botChat;
 }
 
 @end

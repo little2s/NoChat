@@ -14,10 +14,15 @@
 {
     self = [super init];
     if (self) {
-        _uniqueIdentifier = [NSUUID new].UUIDString;
+        _msgId = [NSUUID new].UUIDString;
         _type = @"Text";
     }
     return self;
+}
+
+- (NSString *)uniqueIdentifier
+{
+    return self.msgId;
 }
 
 @end

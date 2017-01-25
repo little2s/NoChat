@@ -12,8 +12,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol NOCChatItem <NSObject>
 
-@property (nonatomic, readonly, copy) NSString *uniqueIdentifier;
-@property (nonatomic, readonly, copy) NSString *type;
+@required
+- (NSString *)uniqueIdentifier;
+- (NSString *)type;
 
 @end
 

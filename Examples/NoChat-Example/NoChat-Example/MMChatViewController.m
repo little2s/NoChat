@@ -12,10 +12,15 @@
 #import "MMTextMessageCellLayout.h"
 #import "MMChatInputView.h"
 
+#import "NOCUser.h"
+#import "NOCChat.h"
 #import "NOCMessage.h"
-#import "NOCMessageFactory.h"
 
-@interface MMChatViewController () <UINavigationControllerDelegate>
+#import "NOCMessageManager.h"
+
+@interface MMChatViewController () <UINavigationControllerDelegate, NOCMessageManagerDelegate>
+
+@property (nonatomic, strong) NOCMessageManager *messageManager;
 
 @end
 
@@ -42,10 +47,12 @@
     [self.collectionView registerClass:[MMTextMessageCell class] forCellWithReuseIdentifier:[MMTextMessageCell reuseIdentifier]];
 }
 
-- (instancetype)init
+- (instancetype)initWithChat:(NOCChat *)chat
 {
     self = [super init];
     if (self) {
+        self.chat = chat;
+        self.messageManager = [NOCMessageManager manager];
         self.inverted = NO;
         self.chatInputContainerViewDefaultHeight = 50;
     }
@@ -55,6 +62,7 @@
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [self.messageManager removeDelegate:self];
 }
 
 - (void)viewDidLoad
@@ -64,11 +72,12 @@
     self.navigationController.delegate = self;
     UIBarButtonItem *rightItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"MMUserInfo"] style:UIBarButtonItemStylePlain target:nil action:nil];
     self.navigationItem.rightBarButtonItem = rightItem;
-    self.title = @"Title";
+    self.title = self.chat.title;
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleContentSizeCategoryDidChanged:) name:UIContentSizeCategoryDidChangeNotification object:nil];
     
-    [self loadChatItems];
+    [self.messageManager addDelegate:self];
+    [self loadMessages];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -107,10 +116,7 @@
 {
     NOCMessage *message = [[NOCMessage alloc] init];
     message.text = text;
-    message.date = [NSDate date];
-    message.deliveryStatus = NOCMessageDeliveryStatusRead;
-    message.outgoing = YES;
-    [self appendMessage:message];
+    [self sendMessage:message];
 }
 
 #pragma mark - MMTextMessageCellDelegate
@@ -145,18 +151,36 @@
     }];
 }
 
-#pragma mark - Private
+#pragma mark - NOCMessageManagerDelegate
 
-- (void)loadChatItems
+- (void)didReceiveMessages:(NSArray *)messages chatId:(NSString *)chatId
 {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSArray *chatItems = [NOCMessageFactory fetchMessagesWithNumber:20];
-        [self reloadChatItems:chatItems];
-    });
+    if ([chatId isEqualToString:self.chat.chatId]) {
+        [self appendChatItems:messages];
+    }
 }
 
-- (void)appendMessage:(NOCMessage *)message
+#pragma mark - Private
+
+- (void)loadMessages
 {
+    __weak typeof(self) weakSelf = self;
+    [self.messageManager fetchMessagesWithChatId:self.chat.chatId handler:^(NSArray *messages) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        [strongSelf reloadChatItems:messages];
+        if (!strongSelf.collectionView.isTracking) {
+            [strongSelf scrollToBottom:YES];
+        }
+    }];
+}
+
+- (void)sendMessage:(NOCMessage *)message
+{
+    message.senderId = [NOCUser currentUser].userId;
+    message.date = [NSDate date];
+    message.deliveryStatus = NOCMessageDeliveryStatusRead;
+    message.outgoing = YES;
+    
     dispatch_async(self.serialQueue, ^{
         Class layoutClass = [[self class] cellLayoutClassForItemType:message.type];
         id<NOCChatItemCellLayout> layout = [[layoutClass alloc] initWithChatItem:message cellWidth:self.cellWidth];

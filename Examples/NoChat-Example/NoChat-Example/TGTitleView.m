@@ -27,6 +27,7 @@
         _titleLabel.text = @"Title";
         _titleLabel.font = [UIFont noc_mediumSystemFontOfSize:17];
         _titleLabel.textColor = [UIColor blackColor];
+        _titleLabel.textAlignment = NSTextAlignmentCenter;
         [self addSubview:_titleLabel];
         
         _detailLabel = [[UILabel alloc] init];
@@ -34,6 +35,7 @@
         _detailLabel.text = @"detail";
         _detailLabel.font = [UIFont systemFontOfSize:12];
         _detailLabel.textColor = [UIColor grayColor];
+        _detailLabel.textAlignment = NSTextAlignmentCenter;
         [self addSubview:_detailLabel];
         
         [self setupRegularLayouts];
@@ -87,17 +89,15 @@
     CGSize titleLabelSize = [self.titleLabel sizeThatFits:unlimitSize];
     CGSize detailLabelSize = [self.detailLabel sizeThatFits:unlimitSize];
     
-    CGFloat titleViewWidth = MAX(titleLabelSize.width, detailLabelSize.width);
+    CGFloat titleViewWidth = MIN(200, MAX(titleLabelSize.width, detailLabelSize.width));
     CGFloat titleViewHeight = 44;
     self.frame = CGRectMake(0, 0, titleViewWidth, titleViewHeight);
     
-    CGFloat titleLabelX = titleViewWidth/2 - titleLabelSize.width/2;
     CGFloat titleLabelY = 4;
-    self.titleLabel.frame = CGRectMake(titleLabelX, titleLabelY, titleLabelSize.width, titleLabelSize.height);
+    self.titleLabel.frame = CGRectMake(0, titleLabelY, titleViewWidth, titleLabelSize.height);
     
-    CGFloat detailLabelX = titleViewWidth/2 - detailLabelSize.width/2;
     CGFloat detailLabelY = titleViewHeight - 4 - detailLabelSize.height;
-    self.detailLabel.frame = CGRectMake(detailLabelX, detailLabelY, detailLabelSize.width, detailLabelSize.height);
+    self.detailLabel.frame = CGRectMake(0, detailLabelY, titleViewWidth, detailLabelSize.height);
 }
 
 - (void)setupCompactLayouts
@@ -106,7 +106,7 @@
     CGSize titleLabelSize = [self.titleLabel sizeThatFits:unlimitSize];
     CGSize detailLabelSize = [self.detailLabel sizeThatFits:unlimitSize];
     
-    CGFloat titleViewWidth = titleLabelSize.width + 8 + detailLabelSize.width;
+    CGFloat titleViewWidth = MIN(350, titleLabelSize.width + 8 + detailLabelSize.width);
     CGFloat titleViewHeight = 40;
     self.frame = CGRectMake(0, 0, titleViewWidth, titleViewHeight);
     

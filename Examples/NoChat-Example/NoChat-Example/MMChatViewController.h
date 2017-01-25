@@ -8,6 +8,12 @@
 
 #import <NoChat/NoChat.h>
 
+@class NOCChat;
+
 @interface MMChatViewController : NOCChatViewController
+
+@property (nonatomic, strong) NOCChat *chat;
+
+- (instancetype)initWithChat:(NOCChat *)chat;
 
 @end
