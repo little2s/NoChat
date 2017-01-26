@@ -24,14 +24,31 @@
     self.navigationController.view.backgroundColor = [UIColor whiteColor];
 }
 
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return 2;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"NOCChatCell" forIndexPath:indexPath];
+    if (indexPath.row == 0) {
+        cell.textLabel.text = @"Telegram";
+        cell.imageView.image = [UIImage imageNamed:@"TGIcon"];
+    } else if (indexPath.row == 1) {
+        cell.textLabel.text = @"WeChat";
+        cell.imageView.image = [UIImage imageNamed:@"MMIcon"];
+    }
+    return cell;
+}
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     NOCChat *chat = [self botChat];
-    NSInteger row = indexPath.row;
     UIViewController *chatVC = nil;
-    if (row == 0) {
+    if (indexPath.row == 0) {
         chatVC = [[TGChatViewController alloc] initWithChat:chat];
-    } else if (row == 1) {
+    } else if (indexPath.row == 1) {
         chatVC = [[MMChatViewController alloc] initWithChat:chat];
     }
     if (chatVC) {

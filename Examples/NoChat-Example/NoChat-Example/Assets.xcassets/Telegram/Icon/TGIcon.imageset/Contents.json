@@ -2,12 +2,11 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "chats.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
-      "filename" : "chats@2x.png",
+      "filename" : "TGIcon@2x.png",
       "scale" : "2x"
     },
     {
@@ -18,8 +17,5 @@
   "info" : {
     "version" : 1,
     "author" : "xcode"
-  },
-  "properties" : {
-    "template-rendering-intent" : "original"
   }
 }
