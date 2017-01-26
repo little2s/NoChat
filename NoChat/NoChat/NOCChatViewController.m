@@ -137,19 +137,39 @@
         
         CGFloat minChatInputContainerViewHeight = [self chatInputContainerViewDefaultHeight];
         self.chatInputContainerViewHeightConstraint.constant = MAX(minChatInputContainerViewHeight, newHeight);
+        
+        CGPoint newContentOffset;
+        UIEdgeInsets newContentInset;
         if (!self.inverted) {
-            CGFloat topPadding = self.collectionView.contentInset.top;
-            CGFloat bottomPadding = self.collectionView.contentInset.bottom;
-            CGFloat dY = self.collectionView.contentOffset.y + dH;
-            CGFloat minY = 0 - topPadding;
-            CGFloat maxY = minY + self.collectionView.contentSize.height + topPadding + bottomPadding;
-            CGPoint oldContentOffset = self.collectionView.contentOffset;
-            CGFloat newContentOffsetX = oldContentOffset.x;
-            CGFloat newContentOffsetY = MAX(minY, MIN(maxY, dY));
-            self.collectionView.contentOffset = CGPointMake(newContentOffsetX, newContentOffsetY);
+            UIEdgeInsets oldContentInset = self.collectionView.contentInset;
+            newContentInset = UIEdgeInsetsMake(self.chatCollectionViewContentInset.top, self.chatCollectionViewContentInset.left, self.chatCollectionViewContentInset.bottom + newHeight, self.chatCollectionViewContentInset.right);
+            UIEdgeInsets contentInset = dH > 0 ? oldContentInset : newContentInset;
+            newContentOffset = [self contentOffsetWithContentInset:contentInset dH:dH];
+        } else {
+            UIEdgeInsets oldContentInset = self.collectionView.contentInset;
+            newContentInset = UIEdgeInsetsMake(self.chatCollectionViewContentInset.top + newHeight, self.chatCollectionViewContentInset.left, self.chatCollectionViewContentInset.bottom, self.chatCollectionViewContentInset.right);
+            UIEdgeInsets contentInset = dH > 0 ? newContentInset : oldContentInset;
+            newContentOffset = [self contentOffsetWithContentInset:contentInset dH:-dH];
         }
+        
+        self.collectionView.contentOffset = newContentOffset;
+        self.collectionView.contentInset = newContentInset;
+        
         [self.view layoutIfNeeded];
     }
+}
+
+- (CGPoint)contentOffsetWithContentInset:(UIEdgeInsets)contentInset dH:(CGFloat)dH
+{
+    CGFloat topPadding = contentInset.top;
+    CGFloat bottomPadding = contentInset.bottom;
+    CGFloat dY = self.collectionView.contentOffset.y + dH;
+    CGFloat minY = 0 - topPadding;
+    CGFloat maxY = minY + self.collectionView.contentSize.height + topPadding + bottomPadding;
+    CGPoint oldContentOffset = self.collectionView.contentOffset;
+    CGFloat newContentOffsetX = oldContentOffset.x;
+    CGFloat newContentOffsetY = MAX(minY, MIN(maxY, dY));
+    return CGPointMake(newContentOffsetX, newContentOffsetY);
 }
 
 #pragma mark - UIScrollViewDelegate
@@ -240,7 +260,8 @@
     NOCChatCollectionViewLayout *collectionViewLayout = [[NOCChatCollectionViewLayout alloc] init];
     NOCChatCollectionView *collectionView = [[NOCChatCollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:collectionViewLayout];
     collectionView.translatesAutoresizingMaskIntoConstraints = NO;
-    collectionView.contentInset = self.chatCollectionViewContentInset;
+    UIEdgeInsets contentInset = self.isInverted ? UIEdgeInsetsMake(self.chatCollectionViewContentInset.top + self.chatInputContainerViewDefaultHeight, self.chatCollectionViewContentInset.left, self.chatCollectionViewContentInset.bottom, self.chatCollectionViewContentInset.right) : UIEdgeInsetsMake(self.chatCollectionViewContentInset.top, self.chatCollectionViewContentInset.left, self.chatCollectionViewContentInset.bottom + self.chatInputContainerViewDefaultHeight, self.chatCollectionViewContentInset.right);
+    collectionView.contentInset = contentInset;
     collectionView.scrollIndicatorInsets = self.chatCollectionViewScrollIndicatorInsets;
     collectionView.dataSource = self;
     collectionView.delegate = self;
@@ -285,13 +306,12 @@
     [self pinSubview:self.proxyScrollView toSuperview:self.view];
     
     [NSLayoutConstraint constraintWithItem:self.topLayoutGuide attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.chatCollectionContainerView attribute:NSLayoutAttributeTop multiplier:1 constant:0].active = YES;
-    [NSLayoutConstraint constraintWithItem:self.proxyScrollView attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self.chatCollectionContainerView attribute:NSLayoutAttributeLeading multiplier:1 constant:0].active = YES;
-    [NSLayoutConstraint constraintWithItem:self.chatInputContainerView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.chatCollectionContainerView attribute:NSLayoutAttributeBottom multiplier:1 constant:0].active = YES;
-    [NSLayoutConstraint constraintWithItem:self.proxyScrollView attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:self.chatCollectionContainerView attribute:NSLayoutAttributeTrailing multiplier:1 constant:0].active = YES;
+    [NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self.chatCollectionContainerView attribute:NSLayoutAttributeLeading multiplier:1 constant:0].active = YES;
+    [NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.chatCollectionContainerView attribute:NSLayoutAttributeBottom multiplier:1 constant:0].active = YES;
+    [NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:self.chatCollectionContainerView attribute:NSLayoutAttributeTrailing multiplier:1 constant:0].active = YES;
     
     [self pinSubview:self.collectionView toSuperview:self.chatCollectionContainerView];
     
-    [NSLayoutConstraint constraintWithItem:self.chatInputContainerView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.chatCollectionContainerView attribute:NSLayoutAttributeBottom multiplier:1 constant:0].active = YES;
     [NSLayoutConstraint constraintWithItem:self.chatInputContainerView attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeLeading multiplier:1 constant:0].active = YES;
     [NSLayoutConstraint constraintWithItem:self.chatInputContainerView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeBottom multiplier:1 constant:0].active = YES;
     [NSLayoutConstraint constraintWithItem:self.chatInputContainerView attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeTrailing multiplier:1 constant:0].active = YES;
