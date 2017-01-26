@@ -19,6 +19,8 @@
 @property (nonatomic, strong) NSHashTable *delegates;
 @property (nonatomic, strong) NOCClient *client;
 
+@property (nonatomic, strong) NSMutableDictionary *messages;
+
 @end
 
 @implementation NOCMessageManager
@@ -40,6 +42,7 @@
         _delegates = [NSHashTable weakObjectsHashTable];
         _client = [[NOCClient alloc] initWithUserId:[NOCUser currentUser].userId];
         _client.delegate = self;
+        _messages = [[NSMutableDictionary alloc] init];
     }
     return self;
 }
@@ -51,11 +54,17 @@
 
 - (void)fetchMessagesWithChatId:(NSString *)chatId handler:(void (^)(NSArray *messages))handler
 {
-    
+    NSArray *msgs = self.messages[chatId];
+    if (msgs.count) {
+        handler(msgs);
+    }
 }
 
 - (void)sendMessage:(NOCMessage *)message toChat:(NOCChat *)chat
 {
+    NSString *chatId = chat.chatId;
+    [self saveMessage:message chatId:chatId];
+    
     NSDictionary *dict = @{
         @"from": message.senderId,
         @"to": chat.targetId,
@@ -63,6 +72,7 @@
         @"text": message.text,
         @"ctype": chat.type
     };
+    
     [self.client sendMessage:dict];
 }
 
@@ -91,20 +101,32 @@
         return;
     }
     
+    NOCMessage *msg = [[NOCMessage alloc] init];
+    msg.senderId = senderId;
+    msg.type = type;
+    msg.text = text;
+    msg.outgoing = NO;
+    msg.date = [NSDate date];
+    
+    NSString *chatId = [NSString stringWithFormat:@"%@_%@", chatType, senderId];
+    
+    [self saveMessage:msg chatId:chatId];
+    
     for (id<NOCMessageManagerDelegate> delegate in self.delegates.allObjects) {
         if ([delegate respondsToSelector:@selector(didReceiveMessages:chatId:)]) {
-            NOCMessage *msg = [[NOCMessage alloc] init];
-            msg.senderId = senderId;
-            msg.type = type;
-            msg.text = text;
-            msg.outgoing = NO;
-            msg.date = [NSDate date];
-            
-            NSString *chatId = [NSString stringWithFormat:@"%@_%@", chatType, senderId];
-            
             [delegate didReceiveMessages:@[msg] chatId:chatId];
         }
     }
+}
+
+- (void)saveMessage:(NOCMessage *)msg chatId:(NSString *)chatId
+{
+    NSMutableArray *msgs = self.messages[chatId];
+    if (!msgs) {
+        msgs = [[NSMutableArray alloc] init];
+        self.messages[chatId] = msgs;
+    }
+    [msgs addObject:msg];
 }
 
 @end
