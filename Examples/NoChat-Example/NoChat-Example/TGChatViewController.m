@@ -10,6 +10,10 @@
 
 #import "TGTextMessageCell.h"
 #import "TGTextMessageCellLayout.h"
+#import "TGDateMessageCell.h"
+#import "TGDateMessageCellLayout.h"
+#import "TGSystemMessageCell.h"
+#import "TGSystemMessageCellLayout.h"
 #import "TGChatInputView.h"
 
 #import "TGTitleView.h"
@@ -38,6 +42,10 @@
 {
     if ([type isEqualToString:@"Text"]) {
         return [TGTextMessageCellLayout class];
+    } else if ([type isEqualToString:@"Date"]) {
+        return [TGDateMessageCellLayout class];
+    } else if ([type isEqualToString:@"System"]) {
+        return [TGSystemMessageCellLayout class];
     } else {
         return nil;
     }
@@ -51,6 +59,8 @@
 - (void)registerChatItemCells
 {
     [self.collectionView registerClass:[TGTextMessageCell class] forCellWithReuseIdentifier:[TGTextMessageCell reuseIdentifier]];
+    [self.collectionView registerClass:[TGDateMessageCell class] forCellWithReuseIdentifier:[TGDateMessageCell reuseIdentifier]];
+    [self.collectionView registerClass:[TGSystemMessageCell class] forCellWithReuseIdentifier:[TGSystemMessageCell reuseIdentifier]];
 }
 
 - (instancetype)initWithChat:(NOCChat *)chat

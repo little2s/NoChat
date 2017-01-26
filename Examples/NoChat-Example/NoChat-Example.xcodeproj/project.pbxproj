@@ -13,6 +13,15 @@
 		E06574051E38454300D2FBB2 /* NOCMessageManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E06574041E38454300D2FBB2 /* NOCMessageManager.m */; };
 		E06574081E38455300D2FBB2 /* NOCChatManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E06574071E38455300D2FBB2 /* NOCChatManager.m */; };
 		E065740C1E3845D500D2FBB2 /* NOCUser.m in Sources */ = {isa = PBXBuildFile; fileRef = E065740B1E3845D500D2FBB2 /* NOCUser.m */; };
+		E06574481E39E95000D2FBB2 /* TGSystemMessageCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E06574471E39E95000D2FBB2 /* TGSystemMessageCell.m */; };
+		E065744B1E39E96800D2FBB2 /* TGDateMessageCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E065744A1E39E96800D2FBB2 /* TGDateMessageCell.m */; };
+		E065744E1E39E97900D2FBB2 /* MMDateMessageCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E065744D1E39E97900D2FBB2 /* MMDateMessageCell.m */; };
+		E06574511E39E98700D2FBB2 /* MMSystemMessageCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E06574501E39E98700D2FBB2 /* MMSystemMessageCell.m */; };
+		E06574541E39E99D00D2FBB2 /* TGDateMessageCellLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = E06574531E39E99D00D2FBB2 /* TGDateMessageCellLayout.m */; };
+		E06574571E39E9B100D2FBB2 /* TGSystemMessageCellLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = E06574561E39E9B100D2FBB2 /* TGSystemMessageCellLayout.m */; };
+		E065745A1E39E9C400D2FBB2 /* MMDateMessageCellLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = E06574591E39E9C400D2FBB2 /* MMDateMessageCellLayout.m */; };
+		E065745D1E39E9D600D2FBB2 /* MMSystemMessageCellLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = E065745C1E39E9D600D2FBB2 /* MMSystemMessageCellLayout.m */; };
+		E06574681E3A18F000D2FBB2 /* NSAttributedString+NoChat.m in Sources */ = {isa = PBXBuildFile; fileRef = E06574671E3A18F000D2FBB2 /* NSAttributedString+NoChat.m */; };
 		E08123EB1E358486005CFF8C /* TGDeliveryStatusView.m in Sources */ = {isa = PBXBuildFile; fileRef = E08123EA1E358486005CFF8C /* TGDeliveryStatusView.m */; };
 		E09B24881E0E322E00E9345B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E09B24871E0E322E00E9345B /* main.m */; };
 		E09B248B1E0E322E00E9345B /* NOCAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E09B248A1E0E322E00E9345B /* NOCAppDelegate.m */; };
@@ -68,6 +77,24 @@
 		E06574071E38455300D2FBB2 /* NOCChatManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NOCChatManager.m; sourceTree = "<group>"; };
 		E065740A1E3845D500D2FBB2 /* NOCUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NOCUser.h; sourceTree = "<group>"; };
 		E065740B1E3845D500D2FBB2 /* NOCUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NOCUser.m; sourceTree = "<group>"; };
+		E06574461E39E95000D2FBB2 /* TGSystemMessageCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TGSystemMessageCell.h; sourceTree = "<group>"; };
+		E06574471E39E95000D2FBB2 /* TGSystemMessageCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TGSystemMessageCell.m; sourceTree = "<group>"; };
+		E06574491E39E96800D2FBB2 /* TGDateMessageCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TGDateMessageCell.h; sourceTree = "<group>"; };
+		E065744A1E39E96800D2FBB2 /* TGDateMessageCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TGDateMessageCell.m; sourceTree = "<group>"; };
+		E065744C1E39E97900D2FBB2 /* MMDateMessageCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMDateMessageCell.h; sourceTree = "<group>"; };
+		E065744D1E39E97900D2FBB2 /* MMDateMessageCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMDateMessageCell.m; sourceTree = "<group>"; };
+		E065744F1E39E98700D2FBB2 /* MMSystemMessageCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMSystemMessageCell.h; sourceTree = "<group>"; };
+		E06574501E39E98700D2FBB2 /* MMSystemMessageCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMSystemMessageCell.m; sourceTree = "<group>"; };
+		E06574521E39E99D00D2FBB2 /* TGDateMessageCellLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TGDateMessageCellLayout.h; sourceTree = "<group>"; };
+		E06574531E39E99D00D2FBB2 /* TGDateMessageCellLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TGDateMessageCellLayout.m; sourceTree = "<group>"; };
+		E06574551E39E9B100D2FBB2 /* TGSystemMessageCellLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TGSystemMessageCellLayout.h; sourceTree = "<group>"; };
+		E06574561E39E9B100D2FBB2 /* TGSystemMessageCellLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TGSystemMessageCellLayout.m; sourceTree = "<group>"; };
+		E06574581E39E9C400D2FBB2 /* MMDateMessageCellLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMDateMessageCellLayout.h; sourceTree = "<group>"; };
+		E06574591E39E9C400D2FBB2 /* MMDateMessageCellLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMDateMessageCellLayout.m; sourceTree = "<group>"; };
+		E065745B1E39E9D600D2FBB2 /* MMSystemMessageCellLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMSystemMessageCellLayout.h; sourceTree = "<group>"; };
+		E065745C1E39E9D600D2FBB2 /* MMSystemMessageCellLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMSystemMessageCellLayout.m; sourceTree = "<group>"; };
+		E06574661E3A18F000D2FBB2 /* NSAttributedString+NoChat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSAttributedString+NoChat.h"; sourceTree = "<group>"; };
+		E06574671E3A18F000D2FBB2 /* NSAttributedString+NoChat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSAttributedString+NoChat.m"; sourceTree = "<group>"; };
 		E08123E91E358486005CFF8C /* TGDeliveryStatusView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TGDeliveryStatusView.h; sourceTree = "<group>"; };
 		E08123EA1E358486005CFF8C /* TGDeliveryStatusView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TGDeliveryStatusView.m; sourceTree = "<group>"; };
 		E09B24831E0E322E00E9345B /* NoChat-Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "NoChat-Example.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -164,6 +191,50 @@
 			name = "Title View";
 			sourceTree = "<group>";
 		};
+		E06574421E39E71C00D2FBB2 /* System */ = {
+			isa = PBXGroup;
+			children = (
+				E06574461E39E95000D2FBB2 /* TGSystemMessageCell.h */,
+				E06574471E39E95000D2FBB2 /* TGSystemMessageCell.m */,
+				E06574551E39E9B100D2FBB2 /* TGSystemMessageCellLayout.h */,
+				E06574561E39E9B100D2FBB2 /* TGSystemMessageCellLayout.m */,
+			);
+			name = System;
+			sourceTree = "<group>";
+		};
+		E06574431E39E72500D2FBB2 /* Date */ = {
+			isa = PBXGroup;
+			children = (
+				E06574491E39E96800D2FBB2 /* TGDateMessageCell.h */,
+				E065744A1E39E96800D2FBB2 /* TGDateMessageCell.m */,
+				E06574521E39E99D00D2FBB2 /* TGDateMessageCellLayout.h */,
+				E06574531E39E99D00D2FBB2 /* TGDateMessageCellLayout.m */,
+			);
+			name = Date;
+			sourceTree = "<group>";
+		};
+		E06574441E39E73300D2FBB2 /* System */ = {
+			isa = PBXGroup;
+			children = (
+				E065744F1E39E98700D2FBB2 /* MMSystemMessageCell.h */,
+				E06574501E39E98700D2FBB2 /* MMSystemMessageCell.m */,
+				E065745B1E39E9D600D2FBB2 /* MMSystemMessageCellLayout.h */,
+				E065745C1E39E9D600D2FBB2 /* MMSystemMessageCellLayout.m */,
+			);
+			name = System;
+			sourceTree = "<group>";
+		};
+		E06574451E39E73A00D2FBB2 /* Date */ = {
+			isa = PBXGroup;
+			children = (
+				E065744C1E39E97900D2FBB2 /* MMDateMessageCell.h */,
+				E065744D1E39E97900D2FBB2 /* MMDateMessageCell.m */,
+				E06574581E39E9C400D2FBB2 /* MMDateMessageCellLayout.h */,
+				E06574591E39E9C400D2FBB2 /* MMDateMessageCellLayout.m */,
+			);
+			name = Date;
+			sourceTree = "<group>";
+		};
 		E09B247A1E0E322E00E9345B = {
 			isa = PBXGroup;
 			children = (
@@ -242,6 +313,8 @@
 		E09B24D21E0E359800E9345B /* WeChat */ = {
 			isa = PBXGroup;
 			children = (
+				E06574451E39E73A00D2FBB2 /* Date */,
+				E06574441E39E73300D2FBB2 /* System */,
 				E0C29E611E33B7BB001A793F /* Cell */,
 				E0C29E601E33B7B6001A793F /* Input */,
 				E0C29E441E33136E001A793F /* MMChatViewController.h */,
@@ -268,6 +341,8 @@
 			children = (
 				E0C29E581E33AFD4001A793F /* UIFont+NoChat.h */,
 				E0C29E591E33AFD4001A793F /* UIFont+NoChat.m */,
+				E06574661E3A18F000D2FBB2 /* NSAttributedString+NoChat.h */,
+				E06574671E3A18F000D2FBB2 /* NSAttributedString+NoChat.m */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
@@ -308,6 +383,8 @@
 		E0C29E5E1E33B79F001A793F /* Cell */ = {
 			isa = PBXGroup;
 			children = (
+				E06574431E39E72500D2FBB2 /* Date */,
+				E06574421E39E71C00D2FBB2 /* System */,
 				E0C29E691E33BE8E001A793F /* Base */,
 				E0C29E681E33BE89001A793F /* Text */,
 			);
@@ -521,12 +598,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				E0C29E461E33136E001A793F /* MMChatViewController.m in Sources */,
+				E065745A1E39E9C400D2FBB2 /* MMDateMessageCellLayout.m in Sources */,
+				E06574681E3A18F000D2FBB2 /* NSAttributedString+NoChat.m in Sources */,
 				E08123EB1E358486005CFF8C /* TGDeliveryStatusView.m in Sources */,
+				E065745D1E39E9D600D2FBB2 /* MMSystemMessageCellLayout.m in Sources */,
 				E0C29E841E346A78001A793F /* TGClockProgressView.m in Sources */,
 				E0C29E721E345AFE001A793F /* MMChatInputView.m in Sources */,
 				E0C29E491E3313C2001A793F /* NOCMessage.m in Sources */,
 				E0C29E671E33BA7A001A793F /* TGTextMessageCellLayout.m in Sources */,
 				E06574051E38454300D2FBB2 /* NOCMessageManager.m in Sources */,
+				E065744E1E39E97900D2FBB2 /* MMDateMessageCell.m in Sources */,
 				E06574021E3840F300D2FBB2 /* NOCChat.m in Sources */,
 				E0C29E7A1E345BB1001A793F /* MMBaseMessageCellLayout.m in Sources */,
 				E0C29E541E33AC43001A793F /* NOCGrowingTextView.m in Sources */,
@@ -535,10 +616,15 @@
 				E06574081E38455300D2FBB2 /* NOCChatManager.m in Sources */,
 				E09B248B1E0E322E00E9345B /* NOCAppDelegate.m in Sources */,
 				E0C29E571E33ACF6001A793F /* NOCKeyboardManager.m in Sources */,
+				E06574541E39E99D00D2FBB2 /* TGDateMessageCellLayout.m in Sources */,
+				E065744B1E39E96800D2FBB2 /* TGDateMessageCell.m in Sources */,
 				E02351541E37462500AE57D2 /* TGAvatarButton.m in Sources */,
 				E0C29E6C1E33BEBB001A793F /* TGBaseMessageCell.m in Sources */,
+				E06574511E39E98700D2FBB2 /* MMSystemMessageCell.m in Sources */,
+				E06574481E39E95000D2FBB2 /* TGSystemMessageCell.m in Sources */,
 				E0C29E431E331359001A793F /* TGChatViewController.m in Sources */,
 				E0C29E771E345B99001A793F /* MMBaseMessageCell.m in Sources */,
+				E06574571E39E9B100D2FBB2 /* TGSystemMessageCellLayout.m in Sources */,
 				E09B24881E0E322E00E9345B /* main.m in Sources */,
 				E0C29E5D1E33B68A001A793F /* TGChatInputView.m in Sources */,
 				E0C29E801E345BDC001A793F /* MMTextMessageCell.m in Sources */,

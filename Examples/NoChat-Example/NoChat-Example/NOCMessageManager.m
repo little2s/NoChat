@@ -57,13 +57,33 @@
     NSArray *msgs = self.messages[chatId];
     if (msgs.count) {
         handler(msgs);
+    } else {
+        NSMutableArray *arr = [NSMutableArray new];
+        
+        NOCMessage *msg = [[NOCMessage alloc] init];
+        msg.date = [NSDate date];
+        msg.type = @"Date";
+        [arr addObject:msg];
+        
+        if ([chatId isEqualToString:@"bot_89757"]) {
+            NOCMessage *msg1 = [[NOCMessage alloc] init];
+            msg1.date = [NSDate date];
+            msg1.text = @"Welcome to Gothons From Planet Percal #25! Please input `/start` to play!";
+            msg1.type = @"System";
+            [arr addObject:msg1];
+            
+        }
+
+        [self saveMessages:arr chatId:chatId];
+        
+        handler(arr);
     }
 }
 
 - (void)sendMessage:(NOCMessage *)message toChat:(NOCChat *)chat
 {
     NSString *chatId = chat.chatId;
-    [self saveMessage:message chatId:chatId];
+    [self saveMessages:@[message] chatId:chatId];
     
     NSDictionary *dict = @{
         @"from": message.senderId,
@@ -110,7 +130,7 @@
     
     NSString *chatId = [NSString stringWithFormat:@"%@_%@", chatType, senderId];
     
-    [self saveMessage:msg chatId:chatId];
+    [self saveMessages:@[msg] chatId:chatId];
     
     for (id<NOCMessageManagerDelegate> delegate in self.delegates.allObjects) {
         if ([delegate respondsToSelector:@selector(didReceiveMessages:chatId:)]) {
@@ -119,14 +139,14 @@
     }
 }
 
-- (void)saveMessage:(NOCMessage *)msg chatId:(NSString *)chatId
+- (void)saveMessages:(NSArray *)messages chatId:(NSString *)chatId
 {
     NSMutableArray *msgs = self.messages[chatId];
     if (!msgs) {
         msgs = [[NSMutableArray alloc] init];
         self.messages[chatId] = msgs;
     }
-    [msgs addObject:msg];
+    [msgs addObjectsFromArray:messages];
 }
 
 @end

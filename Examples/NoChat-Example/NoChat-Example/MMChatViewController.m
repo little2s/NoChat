@@ -10,6 +10,10 @@
 
 #import "MMTextMessageCell.h"
 #import "MMTextMessageCellLayout.h"
+#import "MMDateMessageCell.h"
+#import "MMDateMessageCellLayout.h"
+#import "MMSystemMessageCell.h"
+#import "MMSystemMessageCellLayout.h"
 #import "MMChatInputView.h"
 
 #import "NOCUser.h"
@@ -32,6 +36,10 @@
 {
     if ([type isEqualToString:@"Text"]) {
         return [MMTextMessageCellLayout class];
+    } else if ([type isEqualToString:@"Date"]) {
+        return [MMDateMessageCellLayout class];
+    } else if ([type isEqualToString:@"System"]) {
+        return [MMSystemMessageCellLayout class];
     } else {
         return nil;
     }
@@ -45,6 +53,8 @@
 - (void)registerChatItemCells
 {
     [self.collectionView registerClass:[MMTextMessageCell class] forCellWithReuseIdentifier:[MMTextMessageCell reuseIdentifier]];
+    [self.collectionView registerClass:[MMDateMessageCell class] forCellWithReuseIdentifier:[MMDateMessageCell reuseIdentifier]];
+    [self.collectionView registerClass:[MMSystemMessageCell class] forCellWithReuseIdentifier:[MMSystemMessageCell reuseIdentifier]];
 }
 
 - (instancetype)initWithChat:(NOCChat *)chat

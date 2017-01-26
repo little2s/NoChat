@@ -8,12 +8,7 @@
 
 #import "TGTextMessageCellLayout.h"
 #import "NOCMessage.h"
-
-static inline CGSize NOCSizeForAttributedString(NSAttributedString *attributedString, CGFloat width)
-{
-    CGRect rect = [attributedString boundingRectWithSize:CGSizeMake(width, CGFLOAT_MAX) options:(NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading) context:nil];
-    return CGRectIntegral(rect).size;
-}
+#import "NSAttributedString+NoChat.h"
 
 @implementation TGTextMessageCellLayout {
     NSMutableAttributedString *_attributedText;
@@ -109,7 +104,8 @@ static inline CGSize NOCSizeForAttributedString(NSAttributedString *attributedSt
     CGFloat bubbleViewWidth = prefrredMaxBubbleWidth;
     
     // prelayout
-    CGSize timeLabelSize = NOCSizeForAttributedString(self.attributedTime, CGFLOAT_MAX);
+    CGSize unlimitSize = CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX);
+    CGSize timeLabelSize = [self.attributedTime noc_sizeThatFits:unlimitSize];
     CGFloat timeLabelWidth = timeLabelSize.width;
     CGFloat timeLabelHeight = 15;
     
