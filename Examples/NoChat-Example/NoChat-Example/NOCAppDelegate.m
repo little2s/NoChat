@@ -7,6 +7,9 @@
 //
 
 #import "NOCAppDelegate.h"
+#import "NOCMessageManager.h"
+
+#import <NOCProtoKit/NOCProtoKit.h>
 
 @interface NOCAppDelegate ()
 
@@ -16,6 +19,9 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    [[NOCMessageManager manager] play];
+    [[NOCEngine shared] play];
+    
     return YES;
 }
 

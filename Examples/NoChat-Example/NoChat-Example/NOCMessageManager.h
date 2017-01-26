@@ -26,9 +26,10 @@
 
 + (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;
+- (void)play;
 
 - (void)fetchMessagesWithChatId:(NSString *)chatId handler:(void (^)(NSArray *messages))handler;
-- (void)sendMessage:(NOCMessage *)message;
+- (void)sendMessage:(NOCMessage *)message toChat:(NOCChat *)chat;
 
 - (void)addDelegate:(id<NOCMessageManagerDelegate>)delegate;
 - (void)removeDelegate:(id<NOCMessageManagerDelegate>)delegate;

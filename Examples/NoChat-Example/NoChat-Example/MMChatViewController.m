@@ -109,7 +109,9 @@
 
 - (void)didChatInputViewStartInputting:(MMChatInputView *)chatInputView
 {
-    [self scrollToBottom:YES];
+    if (self.layouts.count) {
+        [self scrollToBottom:YES];
+    }
 }
 
 - (void)chatInputView:(MMChatInputView *)chatInputView didSendText:(NSString *)text
@@ -157,6 +159,9 @@
 {
     if ([chatId isEqualToString:self.chat.chatId]) {
         [self appendChatItems:messages];
+        if (self.layouts.count) {
+            [self scrollToBottom:YES];
+        }
     }
 }
 
@@ -187,9 +192,13 @@
         [self.layouts addObject:layout];
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.collectionView insertItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:self.layouts.count-1 inSection:0]]];
-            [self scrollToBottom:YES];
+            if (self.layouts.count) {
+                [self scrollToBottom:YES];
+            }
         });
     });
+    
+    [self.messageManager sendMessage:message toChat:self.chat];
 }
 
 - (void)handleContentSizeCategoryDidChanged:(NSNotification *)notification

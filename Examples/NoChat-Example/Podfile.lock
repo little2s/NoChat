@@ -1,25 +1,24 @@
 PODS:
-  - LoremIpsum (1.0.0)
   - NoChat (0.3.0)
-  - pop (1.0.9)
+  - NOCProtoKit (0.3.0)
   - YYText (1.0.7)
 
 DEPENDENCIES:
-  - LoremIpsum
   - NoChat (from `../../`)
-  - pop
+  - NOCProtoKit (from `../`)
   - YYText
 
 EXTERNAL SOURCES:
   NoChat:
     :path: "../../"
+  NOCProtoKit:
+    :path: "../"
 
 SPEC CHECKSUMS:
-  LoremIpsum: 9029c55d36501b2ee0b05cc9ecda11d3a0479160
   NoChat: dcf284bca854ff105335ef652f55706a57e31671
-  pop: f667631a5108a2e60d9e8797c9b32ddaf2080bce
+  NOCProtoKit: 053fd23bbbd1a1019522ada11112f61244908229
   YYText: 5c461d709e24d55a182d1441c41dc639a18a4849
 
-PODFILE CHECKSUM: 7c39a94617da8a405d281b7c8c3a29f70705f976
+PODFILE CHECKSUM: 72f3ad4113f220831a7d41f3f2d24b8796646c50
 
 COCOAPODS: 1.2.0.beta.1

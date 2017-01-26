@@ -159,8 +159,11 @@
     message.deliveryStatus = NOCMessageDeliveryStatusRead;
     
     [self appendChatItems:@[message]];
-    [self scrollToBottom:YES];
-    [self.messageManager sendMessage:message];
+    if (self.layouts.count) {
+        [self scrollToBottom:YES];
+    }
+    
+    [self.messageManager sendMessage:message toChat:self.chat];
 }
 
 - (void)setupNavigationItems

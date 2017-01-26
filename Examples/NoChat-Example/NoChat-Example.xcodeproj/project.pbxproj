@@ -23,7 +23,6 @@
 		E0C29E431E331359001A793F /* TGChatViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C29E421E331359001A793F /* TGChatViewController.m */; };
 		E0C29E461E33136E001A793F /* MMChatViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C29E451E33136E001A793F /* MMChatViewController.m */; };
 		E0C29E491E3313C2001A793F /* NOCMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C29E481E3313C2001A793F /* NOCMessage.m */; };
-		E0C29E4C1E3313DD001A793F /* NOCMessageFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C29E4B1E3313DD001A793F /* NOCMessageFactory.m */; };
 		E0C29E541E33AC43001A793F /* NOCGrowingTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C29E531E33AC43001A793F /* NOCGrowingTextView.m */; };
 		E0C29E571E33ACF6001A793F /* NOCKeyboardManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C29E561E33ACF6001A793F /* NOCKeyboardManager.m */; };
 		E0C29E5A1E33AFD4001A793F /* UIFont+NoChat.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C29E591E33AFD4001A793F /* UIFont+NoChat.m */; };
@@ -40,6 +39,19 @@
 		E0C29E841E346A78001A793F /* TGClockProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C29E831E346A78001A793F /* TGClockProgressView.m */; };
 		F693803BAF5DB0048DB9FF9D /* libPods-NoChat-Example.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F96FB2058286FA8CA65A92EB /* libPods-NoChat-Example.a */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		E065743E1E38DA1C00D2FBB2 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		5F4683890547AED21B7FE846 /* Pods-NoChat-Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NoChat-Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-NoChat-Example/Pods-NoChat-Example.debug.xcconfig"; sourceTree = "<group>"; };
@@ -74,8 +86,6 @@
 		E0C29E451E33136E001A793F /* MMChatViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMChatViewController.m; sourceTree = "<group>"; };
 		E0C29E471E3313C2001A793F /* NOCMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NOCMessage.h; sourceTree = "<group>"; };
 		E0C29E481E3313C2001A793F /* NOCMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NOCMessage.m; sourceTree = "<group>"; };
-		E0C29E4A1E3313DD001A793F /* NOCMessageFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NOCMessageFactory.h; sourceTree = "<group>"; };
-		E0C29E4B1E3313DD001A793F /* NOCMessageFactory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NOCMessageFactory.m; sourceTree = "<group>"; };
 		E0C29E521E33AC43001A793F /* NOCGrowingTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NOCGrowingTextView.h; sourceTree = "<group>"; };
 		E0C29E531E33AC43001A793F /* NOCGrowingTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NOCGrowingTextView.m; sourceTree = "<group>"; };
 		E0C29E551E33ACF6001A793F /* NOCKeyboardManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NOCKeyboardManager.h; sourceTree = "<group>"; };
@@ -154,15 +164,6 @@
 			name = "Title View";
 			sourceTree = "<group>";
 		};
-		E06574091E3845BC00D2FBB2 /* Legacy */ = {
-			isa = PBXGroup;
-			children = (
-				E0C29E4A1E3313DD001A793F /* NOCMessageFactory.h */,
-				E0C29E4B1E3313DD001A793F /* NOCMessageFactory.m */,
-			);
-			name = Legacy;
-			sourceTree = "<group>";
-		};
 		E09B247A1E0E322E00E9345B = {
 			isa = PBXGroup;
 			children = (
@@ -184,7 +185,6 @@
 		E09B24851E0E322E00E9345B /* NoChat-Example */ = {
 			isa = PBXGroup;
 			children = (
-				E06574091E3845BC00D2FBB2 /* Legacy */,
 				E09B24BF1E0E336300E9345B /* AppDelegate */,
 				E09B24C01E0E336C00E9345B /* Storyboards */,
 				E0C29E511E33A789001A793F /* Models */,
@@ -409,6 +409,7 @@
 				E09B24811E0E322E00E9345B /* Resources */,
 				E10A743732B9D0FC0B7DC197 /* [CP] Embed Pods Frameworks */,
 				FDE115F8456AA97B5F3C01C1 /* [CP] Copy Pods Resources */,
+				E065743E1E38DA1C00D2FBB2 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -531,7 +532,6 @@
 				E0C29E541E33AC43001A793F /* NOCGrowingTextView.m in Sources */,
 				E02351581E3749FE00AE57D2 /* TGTitleView.m in Sources */,
 				E065740C1E3845D500D2FBB2 /* NOCUser.m in Sources */,
-				E0C29E4C1E3313DD001A793F /* NOCMessageFactory.m in Sources */,
 				E06574081E38455300D2FBB2 /* NOCChatManager.m in Sources */,
 				E09B248B1E0E322E00E9345B /* NOCAppDelegate.m in Sources */,
 				E0C29E571E33ACF6001A793F /* NOCKeyboardManager.m in Sources */,

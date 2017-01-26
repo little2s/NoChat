@@ -1,0 +1,353 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		E065741C1E38858B00D2FBB2 /* NOCProtoKit.h in Headers */ = {isa = PBXBuildFile; fileRef = E065741A1E38858B00D2FBB2 /* NOCProtoKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E06574241E38863400D2FBB2 /* NOCClient.h in Headers */ = {isa = PBXBuildFile; fileRef = E06574221E38863400D2FBB2 /* NOCClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E06574251E38863400D2FBB2 /* NOCClient.m in Sources */ = {isa = PBXBuildFile; fileRef = E06574231E38863400D2FBB2 /* NOCClient.m */; };
+		E065742C1E38892300D2FBB2 /* NOCDispatcher.h in Headers */ = {isa = PBXBuildFile; fileRef = E065742A1E38892300D2FBB2 /* NOCDispatcher.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E065742D1E38892300D2FBB2 /* NOCDispatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = E065742B1E38892300D2FBB2 /* NOCDispatcher.m */; };
+		E06574301E38A26100D2FBB2 /* NOCGame.h in Headers */ = {isa = PBXBuildFile; fileRef = E065742E1E38A26100D2FBB2 /* NOCGame.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E06574311E38A26100D2FBB2 /* NOCGame.m in Sources */ = {isa = PBXBuildFile; fileRef = E065742F1E38A26100D2FBB2 /* NOCGame.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		E06574171E38858B00D2FBB2 /* NOCProtoKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = NOCProtoKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		E065741A1E38858B00D2FBB2 /* NOCProtoKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NOCProtoKit.h; sourceTree = "<group>"; };
+		E065741B1E38858B00D2FBB2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E06574221E38863400D2FBB2 /* NOCClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NOCClient.h; sourceTree = "<group>"; };
+		E06574231E38863400D2FBB2 /* NOCClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NOCClient.m; sourceTree = "<group>"; };
+		E065742A1E38892300D2FBB2 /* NOCDispatcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NOCDispatcher.h; sourceTree = "<group>"; };
+		E065742B1E38892300D2FBB2 /* NOCDispatcher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NOCDispatcher.m; sourceTree = "<group>"; };
+		E065742E1E38A26100D2FBB2 /* NOCGame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NOCGame.h; sourceTree = "<group>"; };
+		E065742F1E38A26100D2FBB2 /* NOCGame.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NOCGame.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		E06574131E38858B00D2FBB2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		E065740D1E38858B00D2FBB2 = {
+			isa = PBXGroup;
+			children = (
+				E06574191E38858B00D2FBB2 /* NOCProtoKit */,
+				E06574181E38858B00D2FBB2 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		E06574181E38858B00D2FBB2 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E06574171E38858B00D2FBB2 /* NOCProtoKit.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E06574191E38858B00D2FBB2 /* NOCProtoKit */ = {
+			isa = PBXGroup;
+			children = (
+				E06574271E38868000D2FBB2 /* Client */,
+				E06574281E3888DF00D2FBB2 /* Dispatcher */,
+				E06574291E3888E800D2FBB2 /* Game */,
+				E06574261E38863F00D2FBB2 /* Supporting Files */,
+			);
+			path = NOCProtoKit;
+			sourceTree = "<group>";
+		};
+		E06574261E38863F00D2FBB2 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				E065741A1E38858B00D2FBB2 /* NOCProtoKit.h */,
+				E065741B1E38858B00D2FBB2 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		E06574271E38868000D2FBB2 /* Client */ = {
+			isa = PBXGroup;
+			children = (
+				E06574221E38863400D2FBB2 /* NOCClient.h */,
+				E06574231E38863400D2FBB2 /* NOCClient.m */,
+			);
+			name = Client;
+			sourceTree = "<group>";
+		};
+		E06574281E3888DF00D2FBB2 /* Dispatcher */ = {
+			isa = PBXGroup;
+			children = (
+				E065742A1E38892300D2FBB2 /* NOCDispatcher.h */,
+				E065742B1E38892300D2FBB2 /* NOCDispatcher.m */,
+			);
+			name = Dispatcher;
+			sourceTree = "<group>";
+		};
+		E06574291E3888E800D2FBB2 /* Game */ = {
+			isa = PBXGroup;
+			children = (
+				E065742E1E38A26100D2FBB2 /* NOCGame.h */,
+				E065742F1E38A26100D2FBB2 /* NOCGame.m */,
+			);
+			name = Game;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		E06574141E38858B00D2FBB2 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E06574241E38863400D2FBB2 /* NOCClient.h in Headers */,
+				E06574301E38A26100D2FBB2 /* NOCGame.h in Headers */,
+				E065741C1E38858B00D2FBB2 /* NOCProtoKit.h in Headers */,
+				E065742C1E38892300D2FBB2 /* NOCDispatcher.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		E06574161E38858B00D2FBB2 /* NOCProtoKit */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E065741F1E38858B00D2FBB2 /* Build configuration list for PBXNativeTarget "NOCProtoKit" */;
+			buildPhases = (
+				E06574121E38858B00D2FBB2 /* Sources */,
+				E06574131E38858B00D2FBB2 /* Frameworks */,
+				E06574141E38858B00D2FBB2 /* Headers */,
+				E06574151E38858B00D2FBB2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = NOCProtoKit;
+			productName = NOCProtoKit;
+			productReference = E06574171E38858B00D2FBB2 /* NOCProtoKit.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E065740E1E38858B00D2FBB2 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0820;
+				ORGANIZATIONNAME = little2s;
+				TargetAttributes = {
+					E06574161E38858B00D2FBB2 = {
+						CreatedOnToolsVersion = 8.2.1;
+						DevelopmentTeam = YGG9VRRGFV;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = E06574111E38858B00D2FBB2 /* Build configuration list for PBXProject "NOCProtoKit" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = E065740D1E38858B00D2FBB2;
+			productRefGroup = E06574181E38858B00D2FBB2 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E06574161E38858B00D2FBB2 /* NOCProtoKit */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E06574151E38858B00D2FBB2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E06574121E38858B00D2FBB2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E06574251E38863400D2FBB2 /* NOCClient.m in Sources */,
+				E065742D1E38892300D2FBB2 /* NOCDispatcher.m in Sources */,
+				E06574311E38A26100D2FBB2 /* NOCGame.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		E065741D1E38858B00D2FBB2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		E065741E1E38858B00D2FBB2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		E06574201E38858B00D2FBB2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = YGG9VRRGFV;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = NOCProtoKit/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.little2s.NOCProtoKit;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		E06574211E38858B00D2FBB2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = YGG9VRRGFV;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = NOCProtoKit/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.little2s.NOCProtoKit;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		E06574111E38858B00D2FBB2 /* Build configuration list for PBXProject "NOCProtoKit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E065741D1E38858B00D2FBB2 /* Debug */,
+				E065741E1E38858B00D2FBB2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E065741F1E38858B00D2FBB2 /* Build configuration list for PBXNativeTarget "NOCProtoKit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E06574201E38858B00D2FBB2 /* Debug */,
+				E06574211E38858B00D2FBB2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = E065740E1E38858B00D2FBB2 /* Project object */;
+}
