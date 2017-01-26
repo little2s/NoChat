@@ -173,7 +173,7 @@
     [self.messageManager fetchMessagesWithChatId:self.chat.chatId handler:^(NSArray *messages) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
         [strongSelf reloadChatItems:messages];
-        if (!strongSelf.collectionView.isTracking) {
+        if (!strongSelf.collectionView.isTracking && strongSelf.layouts.count) {
             [strongSelf scrollToBottom:YES];
         }
     }];

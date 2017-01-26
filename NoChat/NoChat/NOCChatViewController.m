@@ -42,19 +42,12 @@
     return self;
 }
 
-- (void)loadView
-{
-    UIView *view = [[UIView alloc] init];
-    view.backgroundColor = [UIColor whiteColor];
-    self.view = view;
-    
-    [self setupSubviews];
-    [self setupLayoutConstraints];
-}
-
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    self.view.backgroundColor = [UIColor whiteColor];
+    [self setupSubviews];
+    [self setupLayoutConstraints];
     [self registerChatItemCells];
 }
 
@@ -337,7 +330,7 @@
 
 - (CGFloat)cellWidth
 {
-    return self.view.bounds.size.width - self.collectionView.contentInset.left - self.collectionView.contentInset.right;
+    return self.view.bounds.size.width;
 }
 
 @end
@@ -367,7 +360,6 @@
         self.updating = YES;
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.collectionView reloadData];
-            [self scrollToBottom:NO];
             dispatch_async(self.serialQueue, ^{
                 self.updating = NO;
             });
