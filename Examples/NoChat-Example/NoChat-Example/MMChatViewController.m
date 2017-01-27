@@ -168,10 +168,11 @@
 - (void)didReceiveMessages:(NSArray *)messages chatId:(NSString *)chatId
 {
     if ([chatId isEqualToString:self.chat.chatId]) {
-        [self appendChatItems:messages];
-        if (self.layouts.count) {
-            [self scrollToBottom:YES];
-        }
+        [self appendChatItems:messages completion:^(BOOL finished) {
+            if (self.layouts.count) {
+                [self scrollToBottom:YES];
+            }
+        }];
     }
 }
 
@@ -182,10 +183,11 @@
     __weak typeof(self) weakSelf = self;
     [self.messageManager fetchMessagesWithChatId:self.chat.chatId handler:^(NSArray *messages) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
-        [strongSelf reloadChatItems:messages];
-        if (!strongSelf.collectionView.isTracking && strongSelf.layouts.count) {
-            [strongSelf scrollToBottom:YES];
-        }
+        [strongSelf loadChatItems:messages completion:^(BOOL finished) {
+            if (!strongSelf.collectionView.isTracking && strongSelf.layouts.count) {
+                [strongSelf scrollToBottom:NO];
+            }
+        }];
     }];
 }
 
@@ -200,15 +202,14 @@
         Class layoutClass = [[self class] cellLayoutClassForItemType:message.type];
         id<NOCChatItemCellLayout> layout = [[layoutClass alloc] initWithChatItem:message cellWidth:self.cellWidth];
         [self.layouts addObject:layout];
-        dispatch_async(dispatch_get_main_queue(), ^{
+        dispatch_sync(dispatch_get_main_queue(), ^{
             [self.collectionView insertItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:self.layouts.count-1 inSection:0]]];
             if (self.layouts.count) {
                 [self scrollToBottom:YES];
             }
+            [self.messageManager sendMessage:message toChat:self.chat];
         });
     });
-    
-    [self.messageManager sendMessage:message toChat:self.chat];
 }
 
 - (void)handleContentSizeCategoryDidChanged:(NSNotification *)notification
@@ -217,7 +218,7 @@
         return;
     }
     [self.collectionView.collectionViewLayout invalidateLayout];
-    [self updateChatItemsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.layouts.count)]];
+    [self reloadChatItemsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.layouts.count)] completion:nil];
 }
 
 @end

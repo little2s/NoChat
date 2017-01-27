@@ -143,7 +143,7 @@
 - (void)didReceiveMessages:(NSArray *)messages chatId:(NSString *)chatId
 {
     if ([chatId isEqualToString:self.chat.chatId]) {
-        [self appendChatItems:messages];
+        [self appendChatItems:messages completion:nil];
     }
 }
 
@@ -154,10 +154,11 @@
     __weak typeof(self) weakSelf = self;
     [self.messageManager fetchMessagesWithChatId:self.chat.chatId handler:^(NSArray *messages) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
-        [strongSelf reloadChatItems:messages];
-        if (!strongSelf.collectionView.isTracking && strongSelf.layouts.count) {
-            [strongSelf scrollToBottom:YES];
-        }
+        [strongSelf loadChatItems:messages completion:^(BOOL finished) {
+            if (!strongSelf.collectionView.isTracking && strongSelf.layouts.count) {
+                [strongSelf scrollToBottom:YES];
+            }
+        }];
     }];
 }
 
@@ -168,12 +169,14 @@
     message.date = [NSDate date];
     message.deliveryStatus = NOCMessageDeliveryStatusRead;
     
-    [self appendChatItems:@[message]];
-    if (self.layouts.count) {
-        [self scrollToBottom:YES];
-    }
-    
-    [self.messageManager sendMessage:message toChat:self.chat];
+    __weak typeof(self) weakSelf = self;
+    [self appendChatItems:@[message] completion:^(BOOL finished) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (strongSelf.layouts.count) {
+            [strongSelf scrollToBottom:YES];
+        }
+        [strongSelf.messageManager sendMessage:message toChat:strongSelf.chat];
+    }];
 }
 
 - (void)setupNavigationItems
@@ -197,7 +200,7 @@
         return;
     }
     [self.collectionView.collectionViewLayout invalidateLayout];
-    [self updateChatItemsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.layouts.count)]];
+    [self reloadChatItemsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.layouts.count)] completion:nil];
 }
 
 @end
