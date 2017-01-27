@@ -14,8 +14,6 @@
 #import "NOCChatInputView.h"
 #import "NOCChatItem.h"
 
-#define kAnimationDuration 0.3
-
 @interface NOCChatViewController ()
 
 @property (nonatomic, strong) NSLayoutConstraint *chatInputContainerViewHeightConstraint;
@@ -553,20 +551,10 @@ typedef NS_ENUM(NSUInteger, NOCChatCellVerticalEdge) {
 {
     NOCChatCollectionView *collectionView = self.collectionView;
     
-    // Note that we don't rely on collectionView's contentSize. This is because it won't be valid after performBatchUpdates or reloadData
-    // After reload data, collectionViewLayout.collectionViewContentSize won't be even valid, so you may want to refresh the layout manually
     CGFloat offsetY = -collectionView.contentInset.top;
     CGPoint contentOffset = CGPointMake(collectionView.contentOffset.x, offsetY);
-    
-    // Don't use setContentOffset(:animated). If animated, contentOffset property will be updated along with the animation for each frame update
-    // If a message is inserted while scrolling is happening (as in very fast typing), we want to take the "final" content offset (not the "real time" one) to check if we should scroll to bottom again
-    if (animated) {
-        [UIView animateWithDuration:kAnimationDuration animations:^{
-            collectionView.contentOffset = contentOffset;
-        }];
-    } else {
-        collectionView.contentOffset = contentOffset;
-    }
+
+    [collectionView setContentOffset:contentOffset animated:animated];
 }
 
 - (BOOL)isCloseToCollectionViewBottom
@@ -608,15 +596,7 @@ typedef NS_ENUM(NSUInteger, NOCChatCellVerticalEdge) {
     CGFloat offsetY = MAX(-collectionView.contentInset.top, contentHeight-boundsHeight+collectionView.contentInset.bottom);
     CGPoint contentOffset = CGPointMake(collectionView.contentOffset.x, offsetY);
     
-    // Don't use setContentOffset(:animated). If animated, contentOffset property will be updated along with the animation for each frame update
-    // If a message is inserted while scrolling is happening (as in very fast typing), we want to take the "final" content offset (not the "real time" one) to check if we should scroll to bottom again
-    if (animated) {
-        [UIView animateWithDuration:kAnimationDuration animations:^{
-            collectionView.contentOffset = contentOffset;
-        }];
-    } else {
-        collectionView.contentOffset = contentOffset;
-    }
+    [collectionView setContentOffset:contentOffset animated:animated];
 }
 
 - (BOOL)isIndexPathOfCollectionViewVisible:(NSIndexPath *)indexPath atEdge:(NOCChatCellVerticalEdge)edge
