@@ -23,10 +23,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, weak) UIView *chatInputContainerView;
 @property (nullable, nonatomic, weak) NOCChatInputView *chatInputView;
 
-@property (nullable, nonatomic, strong, readonly) NSArray<id<NOCChatItem>> *chatItems;
 @property (nullable, nonatomic, strong) NSMutableArray<id<NOCChatItemCellLayout>> *layouts;
-@property (nonatomic, strong) dispatch_queue_t serialQueue;
-@property (nonatomic, assign, getter=isUpdating) BOOL updating;
+@property (nonatomic, strong) dispatch_queue_t serialQueue; // queue for changes
 
 @property (nonatomic, assign, getter=isInverted) BOOL inverted;
 @property (nonatomic, assign) UIEdgeInsets chatCollectionViewContentInset;
@@ -37,7 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, assign, getter=isAutoLoadAboveChatItemsEnable) BOOL autoLoadAboveChatItemsEnable;
 @property (nonatomic, assign, getter=isAutoLoadBelowChatItemsEnable) BOOL autoLoadBelowChatItemsEnable;
-@property (nonatomic, assign) CGFloat autoLoadingFractionalThreshold;
+@property (nonatomic, assign) CGFloat autoLoadingFractionalThreshold; // in [0, 1]
 
 + (nullable Class)cellLayoutClassForItemType:(NSString *)type;
 + (nullable Class)chatInputViewClass;
@@ -46,18 +44,20 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)loadAboveChatItems;
 - (void)loadBelowChatItems;
 
+- (void)didTapStatusBar;
+
 @end
 
 @interface NOCChatViewController (NOCChanges)
 
-- (void)reloadChatItems:(NSArray<id<NOCChatItem>> *)chatItems;
-- (void)appendChatItems:(NSArray<id<NOCChatItem>> *)chatItems;
+- (void)loadChatItems:(NSArray<id<NOCChatItem>> *)chatItems completion:(nullable void (^)(BOOL finished))completion;
+- (void)appendChatItems:(NSArray<id<NOCChatItem>> *)chatItems completion:(nullable void (^)(BOOL finished))completion;
 
 - (NSUInteger)indexOfChatItem:(id<NOCChatItem>)chatItem;
 
-- (void)insertChatItems:(NSArray<id<NOCChatItem>> *)chatItems atIndexes:(NSIndexSet *)indexes;
-- (void)deleteChatItemsAtIndexes:(NSIndexSet *)indexes;
-- (void)updateChatItemsAtIndexes:(NSIndexSet *)indexes;
+- (void)insertChatItems:(NSArray<id<NOCChatItem>> *)chatItems atIndexes:(NSIndexSet *)indexes completion:(nullable void (^)(BOOL finished))completion;
+- (void)deleteChatItemsAtIndexes:(NSIndexSet *)indexes completion:(nullable void (^)(BOOL finished))completion;
+- (void)reloadChatItemsAtIndexes:(NSIndexSet *)indexes completion:(nullable void (^)(BOOL finished))completion;
 
 @end
 

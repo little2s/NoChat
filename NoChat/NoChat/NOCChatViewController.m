@@ -14,6 +14,8 @@
 #import "NOCChatInputView.h"
 #import "NOCChatItem.h"
 
+#define kAnimationDuration 0.3
+
 @interface NOCChatViewController ()
 
 @property (nonatomic, strong) NSLayoutConstraint *chatInputContainerViewHeightConstraint;
@@ -35,7 +37,8 @@
         self.autoLoadAboveChatItemsEnable = NO;
         self.autoLoadBelowChatItemsEnable = NO;
         self.autoLoadingFractionalThreshold = 0.05;
-        self.serialQueue = dispatch_queue_create("com.little2s.nochat.chatvc", DISPATCH_QUEUE_SERIAL);
+        dispatch_queue_attr_t attr = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_DEFAULT, 0);
+        self.serialQueue = dispatch_queue_create("com.little2s.nochat.chatvc.changes", attr);
         self.hidesBottomBarWhenPushed = YES;
         self.automaticallyAdjustsScrollViewInsets = NO; // use `chatCollectionContainerView` and `topLayoutGuide` instead
     }
@@ -55,18 +58,19 @@
 {
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
     
-    [self.collectionView.collectionViewLayout invalidateLayout];
+    if (self.layouts.count == 0) {
+        return;
+    }
     
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-        for (id<NOCChatItemCellLayout> layout in self.layouts) {
+    [self.collectionView.collectionViewLayout invalidateLayout];
+    dispatch_async(self.serialQueue, ^{
+        [self.layouts enumerateObjectsUsingBlock:^(id<NOCChatItemCellLayout> layout, NSUInteger idx, BOOL *stop) {
             layout.width = size.width;
             [layout calculateLayout];
-        }
-        if (self.layouts.count > 0) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self.collectionView reloadData];
-            });
-        }
+        }];
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [self.collectionView reloadData];
+        });
     });
 }
 
@@ -74,27 +78,37 @@
 
 + (Class)cellLayoutClassForItemType:(NSString *)type
 {
+    NSAssert(NO, @"ERROR: required method not implemented: %s", __PRETTY_FUNCTION__);
     return nil;
 }
 
 + (Class)chatInputViewClass
 {
-    return [NOCChatInputView class];
+    NSAssert(NO, @"ERROR: required method not implemented: %s", __PRETTY_FUNCTION__);
+    return nil;
 }
 
 - (void)registerChatItemCells
 {
-    [self.collectionView registerClass:[NOCChatItemCell class] forCellWithReuseIdentifier:[NOCChatItemCell reuseIdentifier]];
+    NSAssert(NO, @"ERROR: required method not implemented: %s", __PRETTY_FUNCTION__);
 }
 
 - (void)loadAboveChatItems
 {
-    
+    // implement in subclass
 }
 
 - (void)loadBelowChatItems
 {
-    
+    // implement in subclass
+}
+
+- (void)didTapStatusBar
+{
+    BOOL shouldScrollToTop = ![self isScrolledAtTop];
+    if (shouldScrollToTop) {
+        [self scrollToTop:YES];
+    }
 }
 
 #pragma mark - UICollectionViewDataSource
@@ -177,11 +191,7 @@
 - (BOOL)scrollViewShouldScrollToTop:(UIScrollView *)scrollView
 {
     NSAssert(scrollView == self.proxyScrollView, @"Other scroll views should not set `scrollsToTop` true");
-    
-    BOOL shouldScrollToTop = ![self isScrolledAtTop];
-    if (shouldScrollToTop) {
-        [self scrollToTop:YES];
-    }
+    [self didTapStatusBar];
     return NO;
 }
 
@@ -196,10 +206,6 @@
 
 - (void)autoLoadMoreContentIfNeeded
 {
-    if (self.isUpdating) {
-        return;
-    }
-    
     if (self.isAutoLoadAboveChatItemsEnable && [self isCloseToTop]) {
         [self loadAboveChatItems];
     }
@@ -360,14 +366,11 @@
 
 @implementation NOCChatViewController (NOCChanges)
 
-- (void)reloadChatItems:(NSArray<id<NOCChatItem>> *)chatItems
+- (void)loadChatItems:(NSArray<id<NOCChatItem>> *)chatItems completion:(nullable void (^)(BOOL))completion
 {
     dispatch_async(self.serialQueue, ^{
-        if (self.isUpdating) {
-            return;
-        }
-        
         [self.layouts removeAllObjects];
+        
         [chatItems enumerateObjectsUsingBlock:^(id<NOCChatItem> chatItem, NSUInteger idx, BOOL *stop) {
             Class layoutClass = [[self class] cellLayoutClassForItemType:chatItem.type];
             id<NOCChatItemCellLayout> layout = [[layoutClass alloc] initWithChatItem:chatItem cellWidth:self.cellWidth];
@@ -378,20 +381,19 @@
             }
         }];
 
-        self.updating = YES;
-        dispatch_async(dispatch_get_main_queue(), ^{
+        dispatch_sync(dispatch_get_main_queue(), ^{
             [self.collectionView reloadData];
-            dispatch_async(self.serialQueue, ^{
-                self.updating = NO;
-            });
+            if (completion) {
+                completion(YES);
+            }
         });
     });
 }
 
-- (void)appendChatItems:(NSArray<id<NOCChatItem>> *)chatItems
+- (void)appendChatItems:(NSArray<id<NOCChatItem>> *)chatItems completion:(nullable void (^)(BOOL))completion
 {
     NSIndexSet *indexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(self.layouts.count, chatItems.count)];
-    [self insertChatItems:chatItems atIndexes:indexes];
+    [self insertChatItems:chatItems atIndexes:indexes completion:completion];
 }
 
 - (NSUInteger)indexOfChatItem:(id<NOCChatItem>)chatItem
@@ -406,12 +408,10 @@
     return result;
 }
 
-- (void)insertChatItems:(NSArray<id<NOCChatItem>> *)chatItems atIndexes:(NSIndexSet *)indexes
+- (void)insertChatItems:(NSArray<id<NOCChatItem>> *)chatItems atIndexes:(NSIndexSet *)indexes completion:(nullable void (^)(BOOL))completion
 {
-    NSAssert(chatItems.count == indexes.count, @"");
-    
     dispatch_async(self.serialQueue, ^{
-        if (self.isUpdating) {
+        if (!chatItems.count == indexes.count) {
             return;
         }
         
@@ -427,33 +427,18 @@
             i++;
         }];
         
-        self.updating = YES;
-        dispatch_async(dispatch_get_main_queue(), ^{
+        dispatch_sync(dispatch_get_main_queue(), ^{
             NOCChatCollectionView *collectionView = self.collectionView;
             [collectionView performBatchUpdates:^{
                 [collectionView insertItemsAtIndexPaths:insertedPaths];
-            } completion:^(BOOL finished) {
-                if (finished) {
-                    dispatch_async(self.serialQueue, ^{
-                        self.updating = NO;
-                    });
-                } else {
-                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), self.serialQueue, ^{
-                        self.updating = NO;
-                    });
-                }
-            }];
+            } completion:completion];
         });
     });
 }
 
-- (void)deleteChatItemsAtIndexes:(NSIndexSet *)indexes
+- (void)deleteChatItemsAtIndexes:(NSIndexSet *)indexes completion:(nullable void (^)(BOOL))completion
 {
     dispatch_async(self.serialQueue, ^{
-        if (self.isUpdating) {
-            return;
-        }
-        
         NSMutableArray *indexPaths = [[NSMutableArray alloc] init];
         [indexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
             NSUInteger index = self.isInverted ? self.layouts.count - 1 - idx : idx;
@@ -461,33 +446,18 @@
             [indexPaths addObject:[NSIndexPath indexPathForItem:index inSection:0]];
         }];
         
-        self.updating = YES;
-        dispatch_async(dispatch_get_main_queue(), ^{
+        dispatch_sync(dispatch_get_main_queue(), ^{
             NOCChatCollectionView *collectionView = self.collectionView;
             [collectionView performBatchUpdates:^{
                 [collectionView deleteItemsAtIndexPaths:indexPaths];
-            } completion:^(BOOL finished) {
-                if (finished) {
-                    dispatch_async(self.serialQueue, ^{
-                        self.updating = NO;
-                    });
-                } else {
-                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), self.serialQueue, ^{
-                        self.updating = NO;
-                    });
-                }
-            }];
+            } completion:completion];
         });
     });
 }
 
-- (void)updateChatItemsAtIndexes:(NSIndexSet *)indexes
+- (void)reloadChatItemsAtIndexes:(NSIndexSet *)indexes completion:(nullable void (^)(BOOL))completion
 {
     dispatch_async(self.serialQueue, ^{
-        if (self.isUpdating) {
-            return;
-        }
-        
         NSMutableArray *indexPaths = [[NSMutableArray alloc] init];
         [indexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
             NSUInteger index = self.isInverted ? self.layouts.count - 1 - idx : idx;
@@ -497,22 +467,11 @@
             [indexPaths addObject:[NSIndexPath indexPathForItem:index inSection:0]];
         }];
         
-        self.updating = YES;
-        dispatch_async(dispatch_get_main_queue(), ^{
+        dispatch_sync(dispatch_get_main_queue(), ^{
             NOCChatCollectionView *collectionView = self.collectionView;
             [collectionView performBatchUpdates:^{
                 [collectionView reloadItemsAtIndexPaths:indexPaths];
-            } completion:^(BOOL finished) {
-                if (finished) {
-                    dispatch_async(self.serialQueue, ^{
-                        self.updating = NO;
-                    });
-                } else {
-                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), self.serialQueue, ^{
-                        self.updating = NO;
-                    });
-                }
-            }];
+            } completion:completion];
         });
     });
 }
@@ -593,8 +552,21 @@ typedef NS_ENUM(NSUInteger, NOCChatCellVerticalEdge) {
 - (void)scrollToCollectionViewTop:(BOOL)animated
 {
     NOCChatCollectionView *collectionView = self.collectionView;
-    NSIndexPath *firstIndexPath = [NSIndexPath indexPathForItem:0 inSection:0];
-    [collectionView scrollToItemAtIndexPath:firstIndexPath atScrollPosition:UICollectionViewScrollPositionTop animated:animated];
+    
+    // Note that we don't rely on collectionView's contentSize. This is because it won't be valid after performBatchUpdates or reloadData
+    // After reload data, collectionViewLayout.collectionViewContentSize won't be even valid, so you may want to refresh the layout manually
+    CGFloat offsetY = -collectionView.contentInset.top;
+    CGPoint contentOffset = CGPointMake(collectionView.contentOffset.x, offsetY);
+    
+    // Don't use setContentOffset(:animated). If animated, contentOffset property will be updated along with the animation for each frame update
+    // If a message is inserted while scrolling is happening (as in very fast typing), we want to take the "final" content offset (not the "real time" one) to check if we should scroll to bottom again
+    if (animated) {
+        [UIView animateWithDuration:kAnimationDuration animations:^{
+            collectionView.contentOffset = contentOffset;
+        }];
+    } else {
+        collectionView.contentOffset = contentOffset;
+    }
 }
 
 - (BOOL)isCloseToCollectionViewBottom
@@ -631,10 +603,20 @@ typedef NS_ENUM(NSUInteger, NOCChatCellVerticalEdge) {
         return;
     }
     
-    NSInteger sectionIndex = [collectionView numberOfSections] - 1;
-    NSInteger itemIndex = [collectionView numberOfItemsInSection:sectionIndex] - 1;
-    NSIndexPath *lastIndexPath = [NSIndexPath indexPathForItem:itemIndex inSection:sectionIndex];
-    [collectionView scrollToItemAtIndexPath:lastIndexPath atScrollPosition:UICollectionViewScrollPositionBottom animated:animated];
+    // Note that we don't rely on collectionView's contentSize. This is because it won't be valid after performBatchUpdates or reloadData
+    // After reload data, collectionViewLayout.collectionViewContentSize won't be even valid, so you may want to refresh the layout manually
+    CGFloat offsetY = MAX(-collectionView.contentInset.top, contentHeight-boundsHeight+collectionView.contentInset.bottom);
+    CGPoint contentOffset = CGPointMake(collectionView.contentOffset.x, offsetY);
+    
+    // Don't use setContentOffset(:animated). If animated, contentOffset property will be updated along with the animation for each frame update
+    // If a message is inserted while scrolling is happening (as in very fast typing), we want to take the "final" content offset (not the "real time" one) to check if we should scroll to bottom again
+    if (animated) {
+        [UIView animateWithDuration:kAnimationDuration animations:^{
+            collectionView.contentOffset = contentOffset;
+        }];
+    } else {
+        collectionView.contentOffset = contentOffset;
+    }
 }
 
 - (BOOL)isIndexPathOfCollectionViewVisible:(NSIndexPath *)indexPath atEdge:(NOCChatCellVerticalEdge)edge
