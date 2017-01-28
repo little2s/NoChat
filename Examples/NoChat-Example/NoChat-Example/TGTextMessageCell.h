@@ -23,8 +23,7 @@
 @protocol TGTextMessageCellDelegate <NOCChatItemCellDelegate>
 
 @optional
-- (void)cell:(TGTextMessageCell *)cell didTapLink:(NSURL *)linkURL;
-- (void)cell:(TGTextMessageCell *)cell didLongPressLink:(NSURL *)linkURL;
+- (void)cell:(TGTextMessageCell *)cell didTapLink:(NSDictionary *)linkInfo;
 
 @end
 

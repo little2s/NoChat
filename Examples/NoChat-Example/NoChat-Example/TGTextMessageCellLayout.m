@@ -33,27 +33,21 @@
     NSString *text = self.message.text;
     NSMutableAttributedString *attributedText = [[NSMutableAttributedString alloc] initWithString:text attributes:@{ NSFontAttributeName: [TGTextMessageCellLayout textFont], NSForegroundColorAttributeName: [TGTextMessageCellLayout textColor] }];
     
-    YYTextBorder *highlightBorder = [YYTextBorder new];
-    highlightBorder.insets = UIEdgeInsetsZero;
-    highlightBorder.cornerRadius = 3;
-    highlightBorder.fillColor = [UIColor colorWithWhite:0.85 alpha:1];
-    
-    NSDataDetector *detecor = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
-    NSArray *linkResults = [detecor matchesInString:attributedText.string options:kNilOptions range:NSMakeRange(0, attributedText.length)];
-    for (NSTextCheckingResult *linkResult in linkResults) {
-        if (linkResult.range.location == NSNotFound && linkResult.range.length <= 1) {
-            continue;
-        }
-        if ([attributedText attribute:YYTextHighlightAttributeName atIndex:linkResult.range.length effectiveRange:NULL] == nil) {
-            [attributedText addAttributes:@{ NSForegroundColorAttributeName: [TGTextMessageCellLayout linkColor], NSUnderlineStyleAttributeName: @(NSUnderlineStyleSingle), NSUnderlineColorAttributeName: [TGTextMessageCellLayout linkColor] } range:linkResult.range];
-            
-            YYTextHighlight *highlight = [YYTextHighlight new];
-            [highlight setBackgroundBorder:highlightBorder];
-            highlight.userInfo = @{ @"url": [attributedText.string substringWithRange:linkResult.range] };
-            [attributedText addAttribute:YYTextHighlightAttributeName value:highlight range:linkResult.range];
-        }
+    if ([text isEqualToString:@"/start"]) {
+        [attributedText yy_setColor:[TGTextMessageCellLayout linkColor] range:attributedText.yy_rangeOfAll];
+        
+        YYTextBorder *highlightBorder = [YYTextBorder new];
+        highlightBorder.insets = UIEdgeInsetsMake(-2, 0, -2, 0);
+        highlightBorder.cornerRadius = 2;
+        highlightBorder.fillColor = [TGTextMessageCellLayout linkBackgroundColor];
+        
+        YYTextHighlight *highlight = [YYTextHighlight new];
+        [highlight setBackgroundBorder:highlightBorder];
+        highlight.userInfo = @{ @"command": text };
+        
+        [attributedText yy_setTextHighlight:highlight range:attributedText.yy_rangeOfAll];
     }
-    
+
     _attributedText = attributedText;
 }
 
@@ -296,6 +290,16 @@
 + (UIColor *)linkColor
 {
     return [UIColor blueColor];
+}
+
++ (UIColor *)linkBackgroundColor
+{
+    static UIColor *_linkBackgroundColor = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _linkBackgroundColor = [UIColor colorWithRed:191/255.0 green:223/255.0 blue:254/255.0 alpha:1];
+    });
+    return _linkBackgroundColor;
 }
 
 + (UIFont *)timeFont

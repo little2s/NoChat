@@ -133,15 +133,11 @@
 
 #pragma mark - MMTextMessageCellDelegate
 
-- (void)cell:(MMTextMessageCell *)cell didTapLink:(NSURL *)linkURL
+- (void)cell:(MMTextMessageCell *)cell didTapLink:(NSDictionary *)linkInfo
 {
     [self.chatInputView endInputting:YES];
-    NSLog(@"did tap link: %@", linkURL);
-}
-
-- (void)cell:(MMTextMessageCell *)cell didLongPressLink:(NSURL *)linkURL
-{
-    NSLog(@"did long press link: %@", linkURL);
+    
+    NSLog(@"did tap command: %@", linkInfo);
 }
 
 #pragma mark - UINavigationControllerDelegate

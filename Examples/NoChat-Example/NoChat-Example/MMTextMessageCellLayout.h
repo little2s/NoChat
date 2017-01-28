@@ -31,6 +31,7 @@
 + (UIFont *)textFont;
 + (UIColor *)textColor;
 + (UIColor *)linkColor;
++ (UIColor *)linkBackgroundColor;
 
 @end
 

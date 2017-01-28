@@ -101,22 +101,13 @@
     [self sendMessage:message];
 }
 
-- (void)chatInputView:(TGChatInputView *)chatInputView didTapAttachButton:(UIButton *)attachButton
-{
-    NSLog(@"did tap attach button");
-}
-
 #pragma mark - TGTextMessageCellDelegate
 
-- (void)cell:(TGTextMessageCell *)cell didTapLink:(NSURL *)linkURL
+- (void)cell:(TGTextMessageCell *)cell didTapLink:(NSDictionary *)linkInfo
 {
     [self.chatInputView endInputting:YES];
-    NSLog(@"did tap link: %@", linkURL);
-}
-
-- (void)cell:(TGTextMessageCell *)cell didLongPressLink:(NSURL *)linkURL
-{
-    NSLog(@"did long press link: %@", linkURL);
+    
+    NSLog(@"did tap link: %@", linkInfo);
 }
 
 #pragma mark - UINavigationControllerDelegate

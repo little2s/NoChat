@@ -26,21 +26,22 @@
         [self.bubbleView addSubview:_bubbleImageView];
         
         _textLabel = [[YYLabel alloc] init];
+        _textLabel.textVerticalAlignment = YYTextVerticalAlignmentTop;
         _textLabel.displaysAsynchronously = YES;
         _textLabel.ignoreCommonProperties = YES;
+        _textLabel.fadeOnAsynchronouslyDisplay = NO;
+        _textLabel.fadeOnHighlight = NO;
         _textLabel.highlightTapAction = ^(UIView *containerView, NSAttributedString *text, NSRange range, CGRect rect) {
+            if (range.location >= text.length) return;
+            YYTextHighlight *highlight = [text yy_attribute:YYTextHighlightAttributeName atIndex:range.location];
+            NSDictionary *info = highlight.userInfo;
+            if (info.count == 0) return;
+            
             __strong typeof(weakSelf) strongSelf = weakSelf;
-            [text enumerateAttribute:YYTextHighlightAttributeName inRange:range options:0 usingBlock:^(YYTextHighlight *textHighlight, NSRange range, BOOL *stop) {
-                if (textHighlight && textHighlight.userInfo) {
-                    NSURL *linkURL = textHighlight.userInfo[@"url"];
-                    if (linkURL) {
-                        id<MMTextMessageCellDelegate> delegate = (id<MMTextMessageCellDelegate>) strongSelf.delegate;
-                        if (delegate && [delegate respondsToSelector:@selector(cell:didTapLink:)]) {
-                            [delegate cell:strongSelf didTapLink:linkURL];
-                        }
-                    }
-                }
-            }];
+            id<MMTextMessageCellDelegate> delegate = (id<MMTextMessageCellDelegate>) strongSelf.delegate;
+            if ([delegate respondsToSelector:@selector(cell:didTapLink:)]) {
+                [delegate cell:strongSelf didTapLink:info];
+            }
         };
         [self.bubbleView addSubview:_textLabel];
     }

@@ -38,6 +38,7 @@
 + (UIFont *)textFont;
 + (UIColor *)textColor;
 + (UIColor *)linkColor;
++ (UIColor *)linkBackgroundColor;
 
 + (UIFont *)timeFont;
 + (UIColor *)outgoingTimeColor;

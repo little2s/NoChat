@@ -20,7 +20,6 @@
 @protocol MMTextMessageCellDelegate <NOCChatItemCellDelegate>
 
 @optional
-- (void)cell:(MMTextMessageCell *)cell didTapLink:(NSURL *)linkURL;
-- (void)cell:(MMTextMessageCell *)cell didLongPressLink:(NSURL *)linkURL;
+- (void)cell:(MMTextMessageCell *)cell didTapLink:(NSDictionary *)linkInfo;
 
 @end

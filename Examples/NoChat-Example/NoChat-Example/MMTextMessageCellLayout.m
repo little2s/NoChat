@@ -30,25 +30,19 @@
     NSString *text = self.message.text;
     NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithString:text attributes:@{ NSFontAttributeName: [MMTextMessageCellLayout textFont], NSForegroundColorAttributeName: [MMTextMessageCellLayout textColor] }];
     
-    YYTextBorder *highlightBorder = [YYTextBorder new];
-    highlightBorder.insets = UIEdgeInsetsZero;
-    highlightBorder.cornerRadius = 3;
-    highlightBorder.fillColor = [UIColor colorWithWhite:0.85 alpha:1];
-    
-    NSDataDetector *detecor = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
-    NSArray *linkResults = [detecor matchesInString:attrString.string options:kNilOptions range:NSMakeRange(0, attrString.length)];
-    for (NSTextCheckingResult *linkResult in linkResults) {
-        if (linkResult.range.location == NSNotFound && linkResult.range.length <= 1) {
-            continue;
-        }
-        if ([attrString attribute:YYTextHighlightAttributeName atIndex:linkResult.range.length effectiveRange:NULL] == nil) {
-            [attrString addAttributes:@{ NSForegroundColorAttributeName: [MMTextMessageCellLayout linkColor], NSUnderlineStyleAttributeName: @(NSUnderlineStyleSingle), NSUnderlineColorAttributeName: [MMTextMessageCellLayout linkColor] } range:linkResult.range];
-            
-            YYTextHighlight *highlight = [YYTextHighlight new];
-            [highlight setBackgroundBorder:highlightBorder];
-            highlight.userInfo = @{ @"url": [attrString.string substringWithRange:linkResult.range] };
-            [attrString addAttribute:YYTextHighlightAttributeName value:highlight range:linkResult.range];
-        }
+    if ([text isEqualToString:@"/start"]) {
+        [attrString yy_setColor:[MMTextMessageCellLayout linkColor] range:attrString.yy_rangeOfAll];
+        
+        YYTextBorder *highlightBorder = [YYTextBorder new];
+        highlightBorder.insets = UIEdgeInsetsMake(-2, 0, -2, 0);
+        highlightBorder.cornerRadius = 2;
+        highlightBorder.fillColor = [MMTextMessageCellLayout linkBackgroundColor];
+        
+        YYTextHighlight *highlight = [YYTextHighlight new];
+        [highlight setBackgroundBorder:highlightBorder];
+        highlight.userInfo = @{ @"command": text };
+        
+        [attrString yy_setTextHighlight:highlight range:attrString.yy_rangeOfAll];
     }
     
     _attributedText = attrString;
@@ -169,6 +163,16 @@
 + (UIColor *)linkColor
 {
     return [UIColor blueColor];
+}
+
++ (UIColor *)linkBackgroundColor
+{
+    static UIColor *_linkBackgroundColor = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _linkBackgroundColor = [UIColor colorWithRed:191/255.0 green:223/255.0 blue:254/255.0 alpha:1];
+    });
+    return _linkBackgroundColor;
 }
 
 @end
