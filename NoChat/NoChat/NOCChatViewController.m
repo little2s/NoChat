@@ -32,9 +32,7 @@
         self.chatCollectionViewContentInset = UIEdgeInsetsMake(8, 0, 8, 0);
         self.chatCollectionViewScrollIndicatorInsets = UIEdgeInsetsZero;
         self.chatInputContainerViewDefaultHeight = 45;
-        self.autoLoadAboveChatItemsEnable = NO;
-        self.autoLoadBelowChatItemsEnable = NO;
-        self.autoLoadingFractionalThreshold = 0.05;
+        self.scrollFractionalThreshold = 0.05;
         dispatch_queue_attr_t attr = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_DEFAULT, 0);
         self.serialQueue = dispatch_queue_create("com.little2s.nochat.chatvc.changes", attr);
         self.hidesBottomBarWhenPushed = YES;
@@ -89,16 +87,6 @@
 - (void)registerChatItemCells
 {
     NSAssert(NO, @"ERROR: required method not implemented: %s", __PRETTY_FUNCTION__);
-}
-
-- (void)loadAboveChatItems
-{
-    // implement in subclass
-}
-
-- (void)loadBelowChatItems
-{
-    // implement in subclass
 }
 
 - (void)didTapStatusBar
@@ -193,24 +181,7 @@
     return NO;
 }
 
-- (void)scrollViewDidScroll:(UIScrollView *)scrollView
-{
-    if (scrollView == self.collectionView) {
-        [self autoLoadMoreContentIfNeeded];
-    }
-}
-
 #pragma mark - Private
-
-- (void)autoLoadMoreContentIfNeeded
-{
-    if (self.isAutoLoadAboveChatItemsEnable && [self isCloseToTop]) {
-        [self loadAboveChatItems];
-    }
-    if (self.isAutoLoadBelowChatItemsEnable && [self isCloseToBottom]) {
-        [self loadBelowChatItems];
-    }
-}
 
 - (void)setupSubviews
 {
@@ -530,7 +501,7 @@ typedef NS_ENUM(NSUInteger, NOCChatCellVerticalEdge) {
     NOCChatCollectionView *collectionView = self.collectionView;
     if (collectionView.contentSize.height > 0) {
         CGFloat minY = CGRectGetMinY([self collectionViewVisibleRect]);
-        return (minY / collectionView.contentSize.height) < self.autoLoadingFractionalThreshold;
+        return (minY / collectionView.contentSize.height) < self.scrollFractionalThreshold;
     } else {
         return YES;
     }
@@ -562,7 +533,7 @@ typedef NS_ENUM(NSUInteger, NOCChatCellVerticalEdge) {
     NOCChatCollectionView *collectionView = self.collectionView;
     if (collectionView.contentSize.height > 0) {
         CGFloat maxY = CGRectGetMaxY([self collectionViewVisibleRect]);
-        return (maxY / collectionView.contentSize.height) > (1 - self.autoLoadingFractionalThreshold);
+        return (maxY / collectionView.contentSize.height) > (1 - self.scrollFractionalThreshold);
     } else {
         return YES;
     }

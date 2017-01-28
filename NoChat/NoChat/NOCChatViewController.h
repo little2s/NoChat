@@ -30,19 +30,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) UIEdgeInsets chatCollectionViewContentInset;
 @property (nonatomic, assign) UIEdgeInsets chatCollectionViewScrollIndicatorInsets;
 @property (nonatomic, assign) CGFloat chatInputContainerViewDefaultHeight;
+@property (nonatomic, assign) CGFloat scrollFractionalThreshold; // in [0, 1]
 
 @property (nonatomic, assign, readonly) CGFloat cellWidth;
-
-@property (nonatomic, assign, getter=isAutoLoadAboveChatItemsEnable) BOOL autoLoadAboveChatItemsEnable;
-@property (nonatomic, assign, getter=isAutoLoadBelowChatItemsEnable) BOOL autoLoadBelowChatItemsEnable;
-@property (nonatomic, assign) CGFloat autoLoadingFractionalThreshold; // in [0, 1]
 
 + (nullable Class)cellLayoutClassForItemType:(NSString *)type;
 + (nullable Class)chatInputViewClass;
 - (void)registerChatItemCells;
-
-- (void)loadAboveChatItems;
-- (void)loadBelowChatItems;
 
 - (void)didTapStatusBar;
 

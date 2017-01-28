@@ -107,9 +107,7 @@
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
-{
-    [super scrollViewDidScroll:scrollView];
-    
+{    
     if (scrollView == self.collectionView && scrollView.isTracking) {
         [self.chatInputView endInputting:YES];
     }
