@@ -83,7 +83,8 @@
         _client = [[NOCClient alloc] initWithUserId:kUserId];
         _client.delegate = self;
         _targetId = nil;
-        _queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+        dispatch_queue_attr_t attr = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_DEFAULT, 0);
+        _queue = dispatch_queue_create("com.little2s.nocprotokit.game.engine", attr);
     }
     return self;
 }
@@ -281,6 +282,9 @@
 {
     self.code = [NSString stringWithFormat:@"%@%@%@", [self rand], [self rand], [self rand]];
     self.guesses = 0;
+    
+    NSLog(@"laser_weapon_armory code: %@", self.code);
+    
     NSArray *msg = @[
         @"You do a dive roll into the Weapon Armory, crouch and scan the room for more Gothons that might behiding.",
         @"It's dead quiet, too quiet.",
@@ -427,6 +431,9 @@
 - (void)offset0:(NSString *)text
 {
     self.goodPod = [self rand];
+    
+    NSLog(@"escape_pod goodPod: %@", self.goodPod);
+    
     NSArray *msg = @[
         @"You rush through the ship desperately trying to make it to the escape pod before the whole ship explodes.",
         @"It seems like hardly any Gothons are on the ship, so your run is clear of interference.",
