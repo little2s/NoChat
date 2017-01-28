@@ -23,7 +23,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, weak) UIView *chatInputContainerView;
 @property (nullable, nonatomic, weak) NOCChatInputView *chatInputView;
 
-@property (nullable, nonatomic, strong) NSMutableArray<id<NOCChatItemCellLayout>> *layouts;
+@property (nullable, nonatomic, strong) NSLayoutConstraint *chatInputContainerViewHeightConstraint;
+
+@property (nonatomic, strong) NSMutableArray<id<NOCChatItemCellLayout>> *layouts;
 @property (nonatomic, strong) dispatch_queue_t serialQueue; // queue for changes
 
 @property (nonatomic, assign, getter=isInverted) BOOL inverted;

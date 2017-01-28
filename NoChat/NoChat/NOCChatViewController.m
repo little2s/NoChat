@@ -16,8 +16,6 @@
 
 @interface NOCChatViewController ()
 
-@property (nonatomic, strong) NSLayoutConstraint *chatInputContainerViewHeightConstraint;
-
 @end
 
 @implementation NOCChatViewController
