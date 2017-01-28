@@ -137,7 +137,14 @@
 {
     [self.chatInputView endInputting:YES];
     
-    NSLog(@"did tap command: %@", linkInfo);
+    NSString *command = linkInfo[@"command"];
+    if (!command) {
+        return;
+    }
+    
+    NOCMessage *message = [[NOCMessage alloc] init];
+    message.text = command;
+    [self sendMessage:message];
 }
 
 #pragma mark - UINavigationControllerDelegate
