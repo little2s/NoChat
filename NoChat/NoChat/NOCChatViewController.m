@@ -132,31 +132,33 @@
 - (void)chatInputView:(NOCChatInputView *)chatInputView didUpdateHeight:(CGFloat)newHeight oldHeight:(CGFloat)oldHeight
 {
     CGFloat dH = newHeight - oldHeight;
-    if (fabs(dH) > 1) {
-        [self stopScrollIfNeeded];
-        
-        CGFloat minChatInputContainerViewHeight = [self chatInputContainerViewDefaultHeight];
-        self.chatInputContainerViewHeightConstraint.constant = MAX(minChatInputContainerViewHeight, newHeight);
-        
-        CGPoint newContentOffset;
-        UIEdgeInsets newContentInset;
-        if (!self.inverted) {
-            UIEdgeInsets oldContentInset = self.collectionView.contentInset;
-            newContentInset = UIEdgeInsetsMake(self.chatCollectionViewContentInset.top, self.chatCollectionViewContentInset.left, self.chatCollectionViewContentInset.bottom + newHeight, self.chatCollectionViewContentInset.right);
-            UIEdgeInsets contentInset = dH > 0 ? oldContentInset : newContentInset;
-            newContentOffset = [self contentOffsetWithContentInset:contentInset dH:dH];
-        } else {
-            UIEdgeInsets oldContentInset = self.collectionView.contentInset;
-            newContentInset = UIEdgeInsetsMake(self.chatCollectionViewContentInset.top + newHeight, self.chatCollectionViewContentInset.left, self.chatCollectionViewContentInset.bottom, self.chatCollectionViewContentInset.right);
-            UIEdgeInsets contentInset = dH > 0 ? newContentInset : oldContentInset;
-            newContentOffset = [self contentOffsetWithContentInset:contentInset dH:-dH];
-        }
-        
-        self.collectionView.contentOffset = newContentOffset;
-        self.collectionView.contentInset = newContentInset;
-        
-        [self.view layoutIfNeeded];
+    if (fabs(dH) < 1) {
+        return;
     }
+    
+    [self stopScrollIfNeeded];
+    
+    CGFloat minChatInputContainerViewHeight = [self chatInputContainerViewDefaultHeight];
+    self.chatInputContainerViewHeightConstraint.constant = MAX(minChatInputContainerViewHeight, newHeight);
+    
+    CGPoint newContentOffset;
+    UIEdgeInsets newContentInset;
+    if (!self.inverted) {
+        UIEdgeInsets oldContentInset = self.collectionView.contentInset;
+        newContentInset = UIEdgeInsetsMake(self.chatCollectionViewContentInset.top, self.chatCollectionViewContentInset.left, self.chatCollectionViewContentInset.bottom + newHeight, self.chatCollectionViewContentInset.right);
+        UIEdgeInsets contentInset = dH > 0 ? oldContentInset : newContentInset;
+        newContentOffset = [self contentOffsetWithContentInset:contentInset dH:dH];
+    } else {
+        UIEdgeInsets oldContentInset = self.collectionView.contentInset;
+        newContentInset = UIEdgeInsetsMake(self.chatCollectionViewContentInset.top + newHeight, self.chatCollectionViewContentInset.left, self.chatCollectionViewContentInset.bottom, self.chatCollectionViewContentInset.right);
+        UIEdgeInsets contentInset = dH > 0 ? newContentInset : oldContentInset;
+        newContentOffset = [self contentOffsetWithContentInset:contentInset dH:-dH];
+    }
+    
+    self.collectionView.contentOffset = newContentOffset;
+    self.collectionView.contentInset = newContentInset;
+    
+    [self.view layoutIfNeeded];
 }
 
 - (CGPoint)contentOffsetWithContentInset:(UIEdgeInsets)contentInset dH:(CGFloat)dH
@@ -179,6 +181,21 @@
     NSAssert(scrollView == self.proxyScrollView, @"Other scroll views should not set `scrollsToTop` true");
     [self didTapStatusBar];
     return NO;
+}
+
+#pragma mark - Getters
+
+- (NSMutableArray<id<NOCChatItemCellLayout>> *)layouts
+{
+    if (!_layouts) {
+        _layouts = [[NSMutableArray alloc] init];
+    }
+    return _layouts;
+}
+
+- (CGFloat)cellWidth
+{
+    return self.view.bounds.size.width;
 }
 
 #pragma mark - Private
@@ -303,30 +320,6 @@
     NSLayoutConstraint *bottomLC = [NSLayoutConstraint constraintWithItem:subview attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:superview attribute:NSLayoutAttributeBottom multiplier:1 constant:0];
     NSLayoutConstraint *trailingLC = [NSLayoutConstraint constraintWithItem:subview attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:superview attribute:NSLayoutAttributeTrailing multiplier:1 constant:0];
     [NSLayoutConstraint activateConstraints:@[topLC, leadingLC, bottomLC, trailingLC]];
-}
-
-#pragma mark - Getters
-
-- (NSArray<id<NOCChatItem>> *)chatItems
-{
-    NSMutableArray *items = [[NSMutableArray alloc] init];
-    [self.layouts enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL * stop) {
-        [items addObject:((id<NOCChatItemCellLayout>)obj).chatItem];
-    }];
-    return [items copy];
-}
-
-- (NSMutableArray<id<NOCChatItemCellLayout>> *)layouts
-{
-    if (!_layouts) {
-        _layouts = [[NSMutableArray alloc] init];
-    }
-    return _layouts;
-}
-
-- (CGFloat)cellWidth
-{
-    return self.view.bounds.size.width;
 }
 
 @end
