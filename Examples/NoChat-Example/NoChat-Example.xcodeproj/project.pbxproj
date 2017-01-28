@@ -11,7 +11,6 @@
 		E02351581E3749FE00AE57D2 /* TGTitleView.m in Sources */ = {isa = PBXBuildFile; fileRef = E02351571E3749FE00AE57D2 /* TGTitleView.m */; };
 		E06574021E3840F300D2FBB2 /* NOCChat.m in Sources */ = {isa = PBXBuildFile; fileRef = E06574011E3840F300D2FBB2 /* NOCChat.m */; };
 		E06574051E38454300D2FBB2 /* NOCMessageManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E06574041E38454300D2FBB2 /* NOCMessageManager.m */; };
-		E06574081E38455300D2FBB2 /* NOCChatManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E06574071E38455300D2FBB2 /* NOCChatManager.m */; };
 		E065740C1E3845D500D2FBB2 /* NOCUser.m in Sources */ = {isa = PBXBuildFile; fileRef = E065740B1E3845D500D2FBB2 /* NOCUser.m */; };
 		E06574481E39E95000D2FBB2 /* TGSystemMessageCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E06574471E39E95000D2FBB2 /* TGSystemMessageCell.m */; };
 		E065744B1E39E96800D2FBB2 /* TGDateMessageCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E065744A1E39E96800D2FBB2 /* TGDateMessageCell.m */; };
@@ -73,8 +72,6 @@
 		E06574011E3840F300D2FBB2 /* NOCChat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NOCChat.m; sourceTree = "<group>"; };
 		E06574031E38454300D2FBB2 /* NOCMessageManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NOCMessageManager.h; sourceTree = "<group>"; };
 		E06574041E38454300D2FBB2 /* NOCMessageManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NOCMessageManager.m; sourceTree = "<group>"; };
-		E06574061E38455300D2FBB2 /* NOCChatManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NOCChatManager.h; sourceTree = "<group>"; };
-		E06574071E38455300D2FBB2 /* NOCChatManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NOCChatManager.m; sourceTree = "<group>"; };
 		E065740A1E3845D500D2FBB2 /* NOCUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NOCUser.h; sourceTree = "<group>"; };
 		E065740B1E3845D500D2FBB2 /* NOCUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NOCUser.m; sourceTree = "<group>"; };
 		E06574461E39E95000D2FBB2 /* TGSystemMessageCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TGSystemMessageCell.h; sourceTree = "<group>"; };
@@ -326,8 +323,6 @@
 		E0C29E4D1E33A763001A793F /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
-				E06574061E38455300D2FBB2 /* NOCChatManager.h */,
-				E06574071E38455300D2FBB2 /* NOCChatManager.m */,
 				E06574031E38454300D2FBB2 /* NOCMessageManager.h */,
 				E06574041E38454300D2FBB2 /* NOCMessageManager.m */,
 				E0C29E551E33ACF6001A793F /* NOCKeyboardManager.h */,
@@ -613,7 +608,6 @@
 				E0C29E541E33AC43001A793F /* NOCGrowingTextView.m in Sources */,
 				E02351581E3749FE00AE57D2 /* TGTitleView.m in Sources */,
 				E065740C1E3845D500D2FBB2 /* NOCUser.m in Sources */,
-				E06574081E38455300D2FBB2 /* NOCChatManager.m in Sources */,
 				E09B248B1E0E322E00E9345B /* NOCAppDelegate.m in Sources */,
 				E0C29E571E33ACF6001A793F /* NOCKeyboardManager.m in Sources */,
 				E06574541E39E99D00D2FBB2 /* TGDateMessageCellLayout.m in Sources */,
