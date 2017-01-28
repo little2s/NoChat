@@ -35,6 +35,10 @@
 
 @end
 
+@interface NOCGame : NSObject
+
+@end
+
 // Scence
 @interface NOCDeath : NSObject <NOCSence>
 

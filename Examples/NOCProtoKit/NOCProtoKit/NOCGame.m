@@ -9,6 +9,8 @@
 #import "NOCGame.h"
 #import "NOCClient.h"
 
+#define kUserId @"89757"
+
 @interface NOCMap ()
 @property (nonatomic, strong) NSString *startSence;
 @end
@@ -51,8 +53,6 @@
 }
 
 @end
-
-#define kUserId @"89757"
 
 @interface NOCEngine () <NOCClientDelegate>
 
@@ -136,6 +136,18 @@
 {
     self.currentSence = [self.sceneMap nextScene:sceneName];
     [self.currentSence enter:nil];
+}
+
+@end
+
+@implementation NOCGame
+
++ (void)load
+{
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        [[NOCEngine shared] play];
+    });
 }
 
 @end
