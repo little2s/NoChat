@@ -199,6 +199,9 @@
     }
     [self.collectionView.collectionViewLayout invalidateLayout];
     [self reloadChatItemsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.layouts.count)] completion:nil];
+    
+    // fix navigation items display
+    [self setupNavigationItems];
 }
 
 @end
