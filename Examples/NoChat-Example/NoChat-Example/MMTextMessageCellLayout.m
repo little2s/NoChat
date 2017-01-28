@@ -165,7 +165,7 @@
     static UIColor *_linkColor = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        _linkColor = [UIColor colorWithRed:0/255.0 green:75/255.0 blue:173/255.0 alpha:1];
+        _linkColor = [UIColor colorWithRed:31/255.0 green:121/255.0 blue:253/255.0 alpha:1];
     });
     return _linkColor;
 }
@@ -175,7 +175,7 @@
     static UIColor *_linkBackgroundColor = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        _linkBackgroundColor = [UIColor colorWithRed:191/255.0 green:223/255.0 blue:254/255.0 alpha:1];
+        _linkBackgroundColor = [UIColor colorWithRed:212/255.0 green:209/255.0 blue:209/255.0 alpha:1];
     });
     return _linkBackgroundColor;
 }
