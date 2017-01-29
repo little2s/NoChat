@@ -39,12 +39,17 @@
     return self;
 }
 
-- (void)viewDidLoad
+- (void)loadView
 {
-    [super viewDidLoad];
+    [super loadView];
     self.view.backgroundColor = [UIColor whiteColor];
     [self setupSubviews];
     [self setupLayoutConstraints];
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
     [self registerChatItemCells];
 }
 
