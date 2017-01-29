@@ -10,8 +10,6 @@
 
 @interface NOCChatCollectionView ()
 
-@property (nonatomic, assign, getter=isTapState) BOOL tapState;
-
 @end
 
 @implementation NOCChatCollectionView
@@ -23,37 +21,18 @@
         self.backgroundColor = [UIColor clearColor];
         self.showsVerticalScrollIndicator = YES;
         self.showsHorizontalScrollIndicator = NO;
-        self.allowsSelection = NO;
         self.scrollsToTop = NO;
         self.alwaysBounceVertical = YES;
+        self.exclusiveTouch = YES;
+        self.delaysContentTouches = NO;
     }
     return self;
-}
-
-- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
-{
-    [super touchesBegan:touches withEvent:event];
-    if (((UITouch *)touches.anyObject).tapCount == 1) {
-        self.tapState = YES;
-    }
-}
-
-- (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
-{
-    [super touchesMoved:touches withEvent:event];
-    self.tapState = NO;
-}
-
-- (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
-{
-    [super touchesCancelled:touches withEvent:event];
-    self.tapState = NO;
 }
 
 - (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
 {
     [super touchesEnded:touches withEvent:event];
-    if (self.tapAction && self.isTapState) {
+    if (self.tapAction) {
         self.tapAction();
     }
 }
