@@ -129,21 +129,21 @@
     [self.inputBar addSubview:textView];
     self.textView = textView;
     
-    UIButton *micButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    UIButton *micButton = [UIButton buttonWithType:UIButtonTypeCustom];
     micButton.translatesAutoresizingMaskIntoConstraints = NO;
     [micButton setImage:[UIImage imageNamed:@"MMVoice"] forState:UIControlStateNormal];
     [micButton setImage:[UIImage imageNamed:@"MMVoiceHL"] forState:UIControlStateHighlighted];
     [self.inputBar addSubview:micButton];
     self.micButton = micButton;
     
-    UIButton *faceButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    UIButton *faceButton = [UIButton buttonWithType:UIButtonTypeCustom];
     faceButton.translatesAutoresizingMaskIntoConstraints = NO;
     [faceButton setImage:[UIImage imageNamed:@"MMEmotion"] forState:UIControlStateNormal];
     [faceButton setImage:[UIImage imageNamed:@"MMEmotionHL"] forState:UIControlStateHighlighted];
     [self.inputBar addSubview:faceButton];
     self.faceButton = faceButton;
     
-    UIButton *attachButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    UIButton *attachButton = [UIButton buttonWithType:UIButtonTypeCustom];
     attachButton.translatesAutoresizingMaskIntoConstraints = NO;
     [attachButton setImage:[UIImage imageNamed:@"MMAttach"] forState:UIControlStateNormal];
     [attachButton setImage:[UIImage imageNamed:@"MMAttachHL"] forState:UIControlStateHighlighted];
