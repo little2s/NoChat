@@ -15,7 +15,6 @@
 
 @optional
 - (void)chatInputView:(TGChatInputView *)chatInputView didSendText:(NSString *)text;
-- (void)chatInputView:(TGChatInputView *)chatInputView didTapAttachButton:(UIButton *)attachButton;
 
 @end
 

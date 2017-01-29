@@ -138,7 +138,6 @@
     UIButton *attachButton = [UIButton buttonWithType:UIButtonTypeSystem];
     attachButton.translatesAutoresizingMaskIntoConstraints = NO;
     [attachButton setImage:[UIImage imageNamed:@"TGAttachButton"] forState:UIControlStateNormal];
-    [attachButton addTarget:self action:@selector(didTapAttachButton:) forControlEvents:UIControlEventTouchUpInside];
     [self.inputBar addSubview:attachButton];
     self.attachButton = attachButton;
 }
@@ -224,14 +223,6 @@
             }
             [self clearInputText];
         }
-    }
-}
-
-- (void)didTapAttachButton:(UIButton *)button
-{
-    [self endInputting:YES];
-    if ([self.delegate respondsToSelector:@selector(chatInputView:didTapAttachButton:)]) {
-        [((id<TGChatInputViewDelegate>)self.delegate) chatInputView:self didTapAttachButton:button];
     }
 }
 
