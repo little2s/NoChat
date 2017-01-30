@@ -46,6 +46,11 @@
     
 }
 
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection
+{
+    [self resetContentSizeAndOffset];
+}
+
 #pragma mark - Public
 
 - (void)setTextInsets:(UIEdgeInsets)textInsets
@@ -73,6 +78,7 @@
 - (void)resetContentSizeAndOffset
 {
     [self layoutIfNeeded];
+    (void)[self sizeThatFits:CGSizeMake(self.contentSize.width, CGFLOAT_MAX)];
     CGFloat textViewHeight = MAX(MIN(self.contentSize.height, self.maximumHeight), self.minimumHeight);
     if ([self.growingDelegate respondsToSelector:@selector(growingTextView:didUpdateHeight:)]) {
         [self.growingDelegate growingTextView:self didUpdateHeight:textViewHeight];
