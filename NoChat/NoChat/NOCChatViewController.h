@@ -7,23 +7,31 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "NOCChatInputView.h"
+#import "NOCChatCollectionViewLayout.h"
 #import "NOCChatItemCell.h"
+#import "NOCChatInputPanel.h"
 
+@class NOCChatContainerView;
 @class NOCChatCollectionView;
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface NOCChatViewController : UIViewController <UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, NOCChatInputViewDelegate, NOCChatItemCellDelegate>
+@interface NOCChatViewController : UIViewController <UICollectionViewDataSource, UICollectionViewDelegate, NOCChatCollectionViewLayoutDelegate, NOCChatInputPanelDelegate, NOCChatItemCellDelegate>
 
-@property (nullable, nonatomic, weak) UIImageView *backgroundView;
-@property (nullable, nonatomic, weak) UIScrollView *proxyScrollView;
-@property (nullable, nonatomic, weak) UIView *chatCollectionContainerView;
-@property (nullable, nonatomic, weak) NOCChatCollectionView *collectionView;
-@property (nullable, nonatomic, weak) UIView *chatInputContainerView;
-@property (nullable, nonatomic, weak) NOCChatInputView *chatInputView;
+@property (nullable, nonatomic, strong) NOCChatContainerView *containerView;
+@property (nullable, nonatomic, strong) UIImageView *backgroundView;
 
-@property (nullable, nonatomic, strong) NSLayoutConstraint *chatInputContainerViewHeightConstraint;
+@property (nullable, nonatomic, strong) NOCChatCollectionView *collectionView;
+@property (nullable, nonatomic, strong) NOCChatCollectionViewLayout *collectionLayout;
+@property (nullable, nonatomic, strong) UIScrollView *collectionViewScrollToTopProxy;
+
+@property (nullable, nonatomic, strong) NOCChatInputPanel *inputPanel;
+
+@property (nonatomic, assign) CGFloat halfTransitionKeyboardHeight;
+@property (nonatomic, assign) CGFloat keyboardHeight;
+@property (nonatomic, assign) BOOL isRotating;
+
+@property (nonatomic, assign) BOOL isInControllerTransition;
 
 @property (nonatomic, strong) NSMutableArray<id<NOCChatItemCellLayout>> *layouts;
 @property (nonatomic, strong) dispatch_queue_t serialQueue; // queue for changes
@@ -37,7 +45,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign, readonly) CGFloat cellWidth;
 
 + (nullable Class)cellLayoutClassForItemType:(NSString *)type;
-+ (nullable Class)chatInputViewClass;
++ (nullable Class)inputPanelClass;
 - (void)registerChatItemCells;
 
 - (void)didTapStatusBar;

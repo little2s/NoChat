@@ -5,5 +5,6 @@ target 'NoChat-Example' do
     pod 'NoChat', :path => '../../'
     pod 'NOCProtoKit', :path => '../'
     pod 'YYText'
+    pod 'HPGrowingTextView'
 
 end

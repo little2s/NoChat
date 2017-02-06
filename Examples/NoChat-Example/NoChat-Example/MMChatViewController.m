@@ -14,7 +14,8 @@
 #import "MMDateMessageCellLayout.h"
 #import "MMSystemMessageCell.h"
 #import "MMSystemMessageCellLayout.h"
-#import "MMChatInputView.h"
+
+#import "MMChatInputTextPanel.h"
 
 #import "NOCUser.h"
 #import "NOCChat.h"
@@ -45,9 +46,9 @@
     }
 }
 
-+ (Class)chatInputViewClass
++ (Class)inputPanelClass
 {
-    return [MMChatInputView class];
+    return [MMChatInputTextPanel class];
 }
 
 - (void)registerChatItemCells
@@ -63,6 +64,7 @@
     if (self) {
         self.chat = chat;
         self.messageManager = [NOCMessageManager manager];
+        [self.messageManager addDelegate:self];
         self.inverted = NO;
         self.chatInputContainerViewDefaultHeight = 50;
     }
@@ -71,7 +73,6 @@
 
 - (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [self.messageManager removeDelegate:self];
 }
 
@@ -84,9 +85,6 @@
     self.navigationItem.rightBarButtonItem = rightItem;
     self.title = self.chat.title;
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleContentSizeCategoryDidChanged:) name:UIContentSizeCategoryDidChangeNotification object:nil];
-    
-    [self.messageManager addDelegate:self];
     [self loadMessages];
 }
 
@@ -109,20 +107,20 @@
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {    
     if (scrollView == self.collectionView && scrollView.isTracking) {
-        [self.chatInputView endInputting:YES];
+        [self.inputPanel endInputting:YES];
     }
 }
 
-#pragma mark - MMChatInputViewDelegate
+#pragma mark - MMChatInputTextPanelDelegate
 
-- (void)didChatInputViewStartInputting:(MMChatInputView *)chatInputView
+- (void)didInputTextPanelStartInputting:(MMChatInputTextPanel *)inputTextPanel
 {
-    if (self.layouts.count) {
+    if (![self isScrolledAtBottom]) {
         [self scrollToBottom:YES];
     }
 }
 
-- (void)chatInputView:(MMChatInputView *)chatInputView didSendText:(NSString *)text
+- (void)inputTextPanel:(MMChatInputTextPanel *)inputTextPanel requestSendText:(NSString *)text
 {
     NOCMessage *message = [[NOCMessage alloc] init];
     message.text = text;
@@ -133,7 +131,7 @@
 
 - (void)cell:(MMTextMessageCell *)cell didTapLink:(NSDictionary *)linkInfo
 {
-    [self.chatInputView endInputting:YES];
+    [self.inputPanel endInputting:YES];
     
     NSString *command = linkInfo[@"command"];
     if (!command) {
@@ -153,13 +151,13 @@
         return;
     }
     
-    self.chatInputView.delegate = nil;
+    self.isInControllerTransition = YES;
     
     __weak typeof(self) weakSelf = self;
     id<UIViewControllerTransitionCoordinator> transitionCoordinator = navigationController.topViewController.transitionCoordinator;
     [transitionCoordinator notifyWhenInteractionEndsUsingBlock:^(id<UIViewControllerTransitionCoordinatorContext> context) {
         if ([context isCancelled] && weakSelf) {
-            weakSelf.chatInputView.delegate = weakSelf;
+            weakSelf.isInControllerTransition = NO;
         }
     }];
 }
@@ -168,6 +166,10 @@
 
 - (void)didReceiveMessages:(NSArray *)messages chatId:(NSString *)chatId
 {
+    if (!self.isViewLoaded) {
+        return;
+    }
+    
     if ([chatId isEqualToString:self.chat.chatId]) {
         [self appendChatItems:messages completion:^(BOOL finished) {
             if (self.layouts.count) {
@@ -211,15 +213,6 @@
             [self.messageManager sendMessage:message toChat:self.chat];
         });
     });
-}
-
-- (void)handleContentSizeCategoryDidChanged:(NSNotification *)notification
-{
-    if (self.layouts.count == 0) {
-        return;
-    }
-    [self.collectionView.collectionViewLayout invalidateLayout];
-    [self reloadChatItemsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.layouts.count)] completion:nil];
 }
 
 @end

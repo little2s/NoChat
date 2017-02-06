@@ -14,7 +14,8 @@
 #import "TGDateMessageCellLayout.h"
 #import "TGSystemMessageCell.h"
 #import "TGSystemMessageCellLayout.h"
-#import "TGChatInputView.h"
+
+#import "TGChatInputTextPanel.h"
 
 #import "TGTitleView.h"
 #import "TGAvatarButton.h"
@@ -51,9 +52,9 @@
     }
 }
 
-+ (Class)chatInputViewClass
++ (Class)inputPanelClass
 {
-    return [TGChatInputView class];
+    return [TGChatInputTextPanel class];
 }
 
 - (void)registerChatItemCells
@@ -69,13 +70,16 @@
     if (self) {
         self.chat = chat;
         self.messageManager = [NOCMessageManager manager];
+        [self.messageManager addDelegate:self];
+        [self registerContentSizeCategoryDidChangeNotification];
+        [self setupNavigationItems];
     }
     return self;
 }
 
 - (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [self unregisterContentSizeCategoryDidChangeNotification];
     [self.messageManager removeDelegate:self];
 }
 
@@ -84,17 +88,12 @@
     [super viewDidLoad];
     self.backgroundView.image = [UIImage imageNamed:@"TGWallpaper"];
     self.navigationController.delegate = self;
-    [self setupNavigationItems];
-
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleContentSizeCategoryDidChanged:) name:UIContentSizeCategoryDidChangeNotification object:nil];
-    
-    [self.messageManager addDelegate:self];
     [self loadMessages];
 }
 
-#pragma mark - TGChatInputViewDelegate
+#pragma mark - TGChatInputTextPanelDelegate
 
-- (void)chatInputView:(TGChatInputView *)chatInputView didSendText:(NSString *)text
+- (void)inputTextPanel:(TGChatInputTextPanel *)inputTextPanel requestSendText:(NSString *)text
 {
     NOCMessage *message = [[NOCMessage alloc] init];
     message.text = text;
@@ -105,7 +104,7 @@
 
 - (void)cell:(TGTextMessageCell *)cell didTapLink:(NSDictionary *)linkInfo
 {
-    [self.chatInputView endInputting:YES];
+    [self.inputPanel endInputting:YES];
     
     NSString *command = linkInfo[@"command"];
     if (!command) {
@@ -117,6 +116,19 @@
     [self sendMessage:message];
 }
 
+#pragma mark - NOCMessageManagerDelegate
+
+- (void)didReceiveMessages:(NSArray *)messages chatId:(NSString *)chatId
+{
+    if (!self.isViewLoaded) {
+        return;
+    }
+    
+    if ([chatId isEqualToString:self.chat.chatId]) {
+        [self appendChatItems:messages completion:nil];
+    }
+}
+
 #pragma mark - UINavigationControllerDelegate
 
 - (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated
@@ -125,27 +137,33 @@
         return;
     }
     
-    self.chatInputView.delegate = nil;
+    self.isInControllerTransition = YES;
     
     __weak typeof(self) weakSelf = self;
     id<UIViewControllerTransitionCoordinator> transitionCoordinator = navigationController.topViewController.transitionCoordinator;
     [transitionCoordinator notifyWhenInteractionEndsUsingBlock:^(id<UIViewControllerTransitionCoordinatorContext> context) {
         if ([context isCancelled] && weakSelf) {
-            weakSelf.chatInputView.delegate = weakSelf;
+            weakSelf.isInControllerTransition = NO;
         }
     }];
 }
 
-#pragma mark - NOCMessageManagerDelegate
-
-- (void)didReceiveMessages:(NSArray *)messages chatId:(NSString *)chatId
-{
-    if ([chatId isEqualToString:self.chat.chatId]) {
-        [self appendChatItems:messages completion:nil];
-    }
-}
-
 #pragma mark - Private
+
+- (void)setupNavigationItems
+{
+    self.titleView = [[TGTitleView alloc] init];
+    self.titleView.title = self.chat.title;
+    self.titleView.detail = self.chat.detail;
+    self.navigationItem.titleView = self.titleView;
+    
+    UIBarButtonItem *spacerItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
+    spacerItem.width = -12;
+    
+    self.avatarButton = [[TGAvatarButton alloc] init];
+    UIBarButtonItem *rightItem = [[UIBarButtonItem alloc] initWithCustomView:self.avatarButton];
+    self.navigationItem.rightBarButtonItems = @[spacerItem, rightItem];
+}
 
 - (void)loadMessages
 {
@@ -177,26 +195,26 @@
     }];
 }
 
-- (void)setupNavigationItems
+- (void)registerContentSizeCategoryDidChangeNotification
 {
-    self.titleView = [[TGTitleView alloc] init];
-    self.titleView.title = self.chat.title;
-    self.titleView.detail = self.chat.detail;
-    self.navigationItem.titleView = self.titleView;
-    
-    UIBarButtonItem *spacerItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
-    spacerItem.width = -12;
-    
-    self.avatarButton = [[TGAvatarButton alloc] init];
-    UIBarButtonItem *rightItem = [[UIBarButtonItem alloc] initWithCustomView:self.avatarButton];
-    self.navigationItem.rightBarButtonItems = @[spacerItem, rightItem];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleContentSizeCategoryDidChanged:) name:UIContentSizeCategoryDidChangeNotification object:nil];
+}
+
+- (void)unregisterContentSizeCategoryDidChangeNotification
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIContentSizeCategoryDidChangeNotification object:nil];
 }
 
 - (void)handleContentSizeCategoryDidChanged:(NSNotification *)notification
 {
+    if (!self.isViewLoaded) {
+        return;
+    }
+    
     if (self.layouts.count == 0) {
         return;
     }
+    
     [self.collectionView.collectionViewLayout invalidateLayout];
     [self reloadChatItemsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.layouts.count)] completion:nil];
     

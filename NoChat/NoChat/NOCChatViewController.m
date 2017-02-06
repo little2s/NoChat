@@ -7,11 +7,12 @@
 //
 
 #import "NOCChatViewController.h"
+#import "NOCChatContainerView.h"
+#import "NOCChatInputPanel.h"
 #import "NOCChatCollectionView.h"
 #import "NOCChatCollectionViewLayout.h"
 #import "NOCChatItemCell.h"
 #import "NOCChatItemCellLayout.h"
-#import "NOCChatInputView.h"
 #import "NOCChatItem.h"
 
 @interface NOCChatViewController ()
@@ -34,17 +35,25 @@
         dispatch_queue_attr_t attr = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_DEFAULT, 0);
         self.serialQueue = dispatch_queue_create("com.little2s.nochat.chatvc.changes", attr);
         self.hidesBottomBarWhenPushed = YES;
-        self.automaticallyAdjustsScrollViewInsets = NO; // use `chatCollectionContainerView` and `topLayoutGuide` instead
+        self.automaticallyAdjustsScrollViewInsets = NO;
+        [self registerKeyboardNotifications];
     }
     return self;
+}
+
+- (void)dealloc
+{
+    [self unregisterKeyboardNotifications];
 }
 
 - (void)loadView
 {
     [super loadView];
-    self.view.backgroundColor = [UIColor whiteColor];
-    [self setupSubviews];
-    [self setupLayoutConstraints];
+    [self setupContainerView];
+    [self setupBackgroundView];
+    [self setupCollectionViewScrollToTopProxy];
+    [self setupCollectionView];
+    [self setupInputPanel];
 }
 
 - (void)viewDidLoad
@@ -53,24 +62,25 @@
     [self registerChatItemCells];
 }
 
+- (void)viewWillLayoutSubviews
+{
+    [super viewWillLayoutSubviews];
+    [self adjustColletionViewInsets];
+}
+
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
 {
-    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
-    
-    if (self.layouts.count == 0) {
-        return;
+    CGSize previousSize = self.view.frame.size;
+    if ((size.width - previousSize.height < FLT_EPSILON) && (size.height - previousSize.width < FLT_EPSILON )) {
+        self.isRotating = YES;
     }
     
-    [self.collectionView.collectionViewLayout invalidateLayout];
-    dispatch_async(self.serialQueue, ^{
-        [self.layouts enumerateObjectsUsingBlock:^(id<NOCChatItemCellLayout> layout, NSUInteger idx, BOOL *stop) {
-            layout.width = size.width;
-            [layout calculateLayout];
-        }];
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            [self.collectionView reloadData];
-        });
-    });
+    __weak typeof(self) weakSelf = self;
+    [coordinator animateAlongsideTransition:nil completion:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
+        if (weakSelf && weakSelf.isRotating) {
+            weakSelf.isRotating = NO;
+        }
+    }];
 }
 
 #pragma mark - Public
@@ -81,7 +91,7 @@
     return nil;
 }
 
-+ (Class)chatInputViewClass
++ (Class)inputPanelClass
 {
     NSAssert(NO, @"ERROR: required method not implemented: %s", __PRETTY_FUNCTION__);
     return nil;
@@ -121,67 +131,25 @@
     return cell;
 }
 
-#pragma mark - UICollectionViewDelegate
+#pragma mark - NOCChatCollectionViewLayoutDelegate
 
-- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
+- (NSArray *)cellLayouts
 {
-    CGFloat width = self.cellWidth;
-    CGFloat height = ((id<NOCChatItemCellLayout>)self.layouts[indexPath.row]).height;
-    return CGSizeMake(width, height);
+    return self.layouts;
 }
 
-#pragma mark - NOCChatInputViewDelegate
+#pragma mark - NOCChatInputPanelDelgate
 
-- (void)chatInputView:(NOCChatInputView *)chatInputView didUpdateHeight:(CGFloat)newHeight oldHeight:(CGFloat)oldHeight
+- (void)inputPanel:(NOCChatInputPanel *)inputPanel willChangeHeight:(CGFloat)height duration:(NSTimeInterval)duration animationCurve:(int)animationCurve
 {
-    CGFloat dH = newHeight - oldHeight;
-    if (fabs(dH) < 1) {
-        return;
-    }
-    
-    [self stopScrollIfNeeded];
-    
-    CGFloat minChatInputContainerViewHeight = [self chatInputContainerViewDefaultHeight];
-    self.chatInputContainerViewHeightConstraint.constant = MAX(minChatInputContainerViewHeight, newHeight);
-    
-    CGPoint newContentOffset;
-    UIEdgeInsets newContentInset;
-    if (!self.inverted) {
-        UIEdgeInsets oldContentInset = self.collectionView.contentInset;
-        newContentInset = UIEdgeInsetsMake(self.chatCollectionViewContentInset.top, self.chatCollectionViewContentInset.left, self.chatCollectionViewContentInset.bottom + newHeight, self.chatCollectionViewContentInset.right);
-        UIEdgeInsets contentInset = dH > 0 ? oldContentInset : newContentInset;
-        newContentOffset = [self contentOffsetWithContentInset:contentInset dH:dH];
-    } else {
-        UIEdgeInsets oldContentInset = self.collectionView.contentInset;
-        newContentInset = UIEdgeInsetsMake(self.chatCollectionViewContentInset.top + newHeight, self.chatCollectionViewContentInset.left, self.chatCollectionViewContentInset.bottom, self.chatCollectionViewContentInset.right);
-        UIEdgeInsets contentInset = dH > 0 ? newContentInset : oldContentInset;
-        newContentOffset = [self contentOffsetWithContentInset:contentInset dH:-dH];
-    }
-    
-    self.collectionView.contentOffset = newContentOffset;
-    self.collectionView.contentInset = newContentInset;
-    
-    [self.view layoutIfNeeded];
-}
-
-- (CGPoint)contentOffsetWithContentInset:(UIEdgeInsets)contentInset dH:(CGFloat)dH
-{
-    CGFloat topPadding = contentInset.top;
-    CGFloat bottomPadding = contentInset.bottom;
-    CGFloat dY = self.collectionView.contentOffset.y + dH;
-    CGFloat minY = 0 - topPadding;
-    CGFloat maxY = minY + self.collectionView.contentSize.height + topPadding + bottomPadding;
-    CGPoint oldContentOffset = self.collectionView.contentOffset;
-    CGFloat newContentOffsetX = oldContentOffset.x;
-    CGFloat newContentOffsetY = MAX(minY, MIN(maxY, dY));
-    return CGPointMake(newContentOffsetX, newContentOffsetY);
+    [self adjustCollectionViewForSize:self.containerView.bounds.size keyboardHeight:self.keyboardHeight inputContainerHeight:height scrollToBottom:NO duration:duration animationCurve:0];
 }
 
 #pragma mark - UIScrollViewDelegate
 
 - (BOOL)scrollViewShouldScrollToTop:(UIScrollView *)scrollView
 {
-    NSAssert(scrollView == self.proxyScrollView, @"Other scroll views should not set `scrollsToTop` true");
+    NSAssert(scrollView == self.collectionViewScrollToTopProxy, @"Other scroll views should not set `scrollsToTop` true");
     [self didTapStatusBar];
     return NO;
 }
@@ -203,126 +171,397 @@
 
 #pragma mark - Private
 
-- (void)setupSubviews
+- (void)setupContainerView
 {
-    [self setupBackgroundView];
-    [self setupProxyScrollView];
-    [self setupChatCollectionContainerView];
-    [self setupChatCollectionView];
-    [self setupChatInputContainerView];
-    [self setupChatInputView];
+    _containerView = [[NOCChatContainerView alloc] initWithFrame:self.view.bounds];
+    _containerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    _containerView.backgroundColor = [UIColor whiteColor];
+    _containerView.clipsToBounds = YES;
+    __weak typeof(self) weakSelf = self;
+    _containerView.layoutForSize = ^(CGSize size) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (strongSelf.keyboardHeight < FLT_EPSILON) {
+            [strongSelf performSizeChangesWithDuration:(strongSelf.isRotating ? 0.3 : 0.0) size:size];
+        }
+    };
+    [self.view addSubview:_containerView];
 }
 
 - (void)setupBackgroundView
 {
-    UIImageView *backgroundView = [[UIImageView alloc] init];
-    backgroundView.translatesAutoresizingMaskIntoConstraints = NO;
-    backgroundView.contentMode = UIViewContentModeScaleAspectFill;
-    backgroundView.clipsToBounds = YES;
-    [self.view addSubview:backgroundView];
-    self.backgroundView = backgroundView;
+    _backgroundView = [[UIImageView alloc] initWithFrame:_containerView.bounds];
+    _backgroundView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    _backgroundView.contentMode = UIViewContentModeScaleAspectFill;
+    _backgroundView.clipsToBounds = YES;
+    [_containerView addSubview:_backgroundView];
 }
 
-- (void)setupProxyScrollView
+- (void)setupCollectionViewScrollToTopProxy
 {
-    UIScrollView *proxyScrollView = [[UIScrollView alloc] init];
-    proxyScrollView.translatesAutoresizingMaskIntoConstraints = NO;
-    proxyScrollView.contentSize = CGSizeMake(600, 1000);
-    proxyScrollView.contentOffset = CGPointMake(0, 1);
-    proxyScrollView.scrollsToTop = YES;
-    proxyScrollView.scrollEnabled = YES;
-    proxyScrollView.showsVerticalScrollIndicator = NO;
-    proxyScrollView.showsHorizontalScrollIndicator = NO;
-    proxyScrollView.backgroundColor = [UIColor clearColor];
-    proxyScrollView.delegate = self;
-    [self.view addSubview:proxyScrollView];
-    self.proxyScrollView = proxyScrollView;
+    _collectionViewScrollToTopProxy = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, _containerView.bounds.size.width, 8)];
+    _collectionViewScrollToTopProxy.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    _collectionViewScrollToTopProxy.contentSize = CGSizeMake(1, 16);
+    _collectionViewScrollToTopProxy.contentOffset = CGPointMake(0, 8);
+    _collectionViewScrollToTopProxy.scrollsToTop = YES;
+    _collectionViewScrollToTopProxy.scrollEnabled = YES;
+    _collectionViewScrollToTopProxy.showsVerticalScrollIndicator = NO;
+    _collectionViewScrollToTopProxy.showsHorizontalScrollIndicator = NO;
+    _collectionViewScrollToTopProxy.backgroundColor = [UIColor clearColor];
+    _collectionViewScrollToTopProxy.delegate = self;
+    [_containerView addSubview:_collectionViewScrollToTopProxy];
 }
 
-- (void)setupChatCollectionContainerView
+- (void)setupCollectionView
 {
-    UIView *chatCollectionContainerView = [[UIView alloc] init];
-    chatCollectionContainerView.translatesAutoresizingMaskIntoConstraints = NO;
-    chatCollectionContainerView.backgroundColor = [UIColor clearColor];
-    [self.view addSubview:chatCollectionContainerView];
-    self.chatCollectionContainerView = chatCollectionContainerView;
-}
-
-- (void)setupChatCollectionView
-{
-    __weak typeof(self) weakSelf = self;
+    CGSize collectionViewSize = _containerView.bounds.size;
     
-    NOCChatCollectionViewLayout *collectionViewLayout = [[NOCChatCollectionViewLayout alloc] init];
-    NOCChatCollectionView *collectionView = [[NOCChatCollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:collectionViewLayout];
-    collectionView.translatesAutoresizingMaskIntoConstraints = NO;
-    UIEdgeInsets contentInset = self.isInverted ? UIEdgeInsetsMake(self.chatCollectionViewContentInset.top + self.chatInputContainerViewDefaultHeight, self.chatCollectionViewContentInset.left, self.chatCollectionViewContentInset.bottom, self.chatCollectionViewContentInset.right) : UIEdgeInsetsMake(self.chatCollectionViewContentInset.top, self.chatCollectionViewContentInset.left, self.chatCollectionViewContentInset.bottom + self.chatInputContainerViewDefaultHeight, self.chatCollectionViewContentInset.right);
-    collectionView.contentInset = contentInset;
-    collectionView.scrollIndicatorInsets = self.chatCollectionViewScrollIndicatorInsets;
-    collectionView.dataSource = self;
-    collectionView.delegate = self;
+    _collectionLayout = [[NOCChatCollectionViewLayout alloc] init];
+    
+    _collectionView = [[NOCChatCollectionView alloc] initWithFrame:CGRectMake(0, 0, collectionViewSize.width, collectionViewSize.height) collectionViewLayout:_collectionLayout];
+    _collectionView.dataSource = self;
+    _collectionView.delegate = self;
+    
+    UIEdgeInsets originalInset = self.chatCollectionViewContentInset;
+    UIEdgeInsets inset = originalInset;
     if (self.isInverted) {
-        collectionView.transform = CGAffineTransformMake(1, 0, 0, -1, 0, 0);
+        inset.top += self.chatInputContainerViewDefaultHeight;
+    } else {
+        inset.bottom += self.chatInputContainerViewDefaultHeight;
     }
-    collectionView.tapAction = ^(){
-        [weakSelf.chatInputView endInputting:YES];
+    _collectionView.contentInset = inset;
+    _collectionView.scrollIndicatorInsets = self.chatCollectionViewScrollIndicatorInsets;
+
+    if (self.isInverted) {
+        _collectionView.transform = CGAffineTransformMake(1, 0, 0, -1, 0, 0);
+    }
+    
+    __weak typeof(self) weakSelf = self;
+    _collectionView.tapAction = ^() {
+        if (weakSelf) {
+            [weakSelf.inputPanel endInputting:YES];
+        }
     };
-    [self.chatCollectionContainerView addSubview:collectionView];
-    self.collectionView = collectionView;
+    [_containerView addSubview:_collectionView];
 }
 
-- (void)setupChatInputContainerView
+- (void)setupInputPanel
 {
-    UIView *chatInputContainerView = [[UIView alloc] init];
-    chatInputContainerView.translatesAutoresizingMaskIntoConstraints = NO;
-    chatInputContainerView.backgroundColor = [UIColor clearColor];
-    [self.view addSubview:chatInputContainerView];
-    self.chatInputContainerView = chatInputContainerView;
+    Class inputPanelClass = [[self class] inputPanelClass];
+    _inputPanel = [[inputPanelClass alloc] initWithFrame:CGRectMake(0, self.containerView.bounds.size.height - self.chatInputContainerViewDefaultHeight, self.containerView.bounds.size.width, self.chatInputContainerViewDefaultHeight)];
+    _inputPanel.delegate = self;
+    [_containerView addSubview:_inputPanel];
 }
 
-- (void)setupChatInputView
+- (void)registerKeyboardNotifications
 {
-    Class chatInputViewClass = [[self class] chatInputViewClass];
-    NOCChatInputView *chatInputView = [[chatInputViewClass alloc] init];
-    chatInputView.translatesAutoresizingMaskIntoConstraints = NO;
-    chatInputView.delegate = self;
-    [self.chatInputContainerView addSubview:chatInputView];
-    self.chatInputView = chatInputView;
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillChangeFrame:) name:UIKeyboardWillChangeFrameNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidChangeFrame:) name:UIKeyboardDidChangeFrameNotification object:nil];
 }
 
-- (void)setupLayoutConstraints
+- (void)unregisterKeyboardNotifications
 {
-    [self.backgroundView setContentHuggingPriority:240 forAxis:UILayoutConstraintAxisHorizontal];
-    [self.backgroundView setContentHuggingPriority:240 forAxis:UILayoutConstraintAxisVertical];
-    [self.backgroundView setContentCompressionResistancePriority:240 forAxis:UILayoutConstraintAxisHorizontal];
-    [self.backgroundView setContentCompressionResistancePriority:240 forAxis:UILayoutConstraintAxisVertical];
-    
-    [self pinSubview:self.backgroundView toSuperview:self.view];
-    
-    [self pinSubview:self.proxyScrollView toSuperview:self.view];
-    
-    [NSLayoutConstraint constraintWithItem:self.topLayoutGuide attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.chatCollectionContainerView attribute:NSLayoutAttributeTop multiplier:1 constant:0].active = YES;
-    [NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self.chatCollectionContainerView attribute:NSLayoutAttributeLeading multiplier:1 constant:0].active = YES;
-    [NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.chatCollectionContainerView attribute:NSLayoutAttributeBottom multiplier:1 constant:0].active = YES;
-    [NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:self.chatCollectionContainerView attribute:NSLayoutAttributeTrailing multiplier:1 constant:0].active = YES;
-    
-    [self pinSubview:self.collectionView toSuperview:self.chatCollectionContainerView];
-    
-    [NSLayoutConstraint constraintWithItem:self.chatInputContainerView attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeLeading multiplier:1 constant:0].active = YES;
-    [NSLayoutConstraint constraintWithItem:self.chatInputContainerView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeBottom multiplier:1 constant:0].active = YES;
-    [NSLayoutConstraint constraintWithItem:self.chatInputContainerView attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeTrailing multiplier:1 constant:0].active = YES;
-    self.chatInputContainerViewHeightConstraint = [NSLayoutConstraint constraintWithItem:self.chatInputContainerView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1 constant:self.chatInputContainerViewDefaultHeight];
-    self.chatInputContainerViewHeightConstraint.active = YES;
-    
-    [self pinSubview:self.chatInputView toSuperview:self.chatInputContainerView];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillChangeFrameNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardDidChangeFrameNotification object:nil];
 }
 
-- (void)pinSubview:(UIView *)subview toSuperview:(UIView *)superview
+- (void)keyboardWillChangeFrame:(NSNotification *)notification
 {
-    NSLayoutConstraint *topLC = [NSLayoutConstraint constraintWithItem:subview attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:superview attribute:NSLayoutAttributeTop multiplier:1 constant:0];
-    NSLayoutConstraint *leadingLC = [NSLayoutConstraint constraintWithItem:subview attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:superview attribute:NSLayoutAttributeLeading multiplier:1 constant:0];
-    NSLayoutConstraint *bottomLC = [NSLayoutConstraint constraintWithItem:subview attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:superview attribute:NSLayoutAttributeBottom multiplier:1 constant:0];
-    NSLayoutConstraint *trailingLC = [NSLayoutConstraint constraintWithItem:subview attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:superview attribute:NSLayoutAttributeTrailing multiplier:1 constant:0];
-    [NSLayoutConstraint activateConstraints:@[topLC, leadingLC, bottomLC, trailingLC]];
+    if (!self.collectionView) {
+        return;
+    }
+    
+    if (self.isInControllerTransition) {
+        return;
+    }
+    
+    CGSize collectionViewSize = self.containerView.frame.size;
+    
+    NSTimeInterval duration = notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] == nil ? 0.3 : [notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue];
+    int curve = [notification.userInfo[UIKeyboardAnimationCurveUserInfoKey] intValue];
+    
+    CGRect screenKeyboardFrame = [notification.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
+    CGRect keyboardFrame = [self.containerView convertRect:screenKeyboardFrame fromView:nil];
+    
+    CGFloat keyboardHeight = (keyboardFrame.size.height <= FLT_EPSILON || keyboardFrame.size.width <= FLT_EPSILON) ? 0.0f : (collectionViewSize.height - keyboardFrame.origin.y);
+    
+    self.halfTransitionKeyboardHeight = keyboardHeight;
+    
+    keyboardHeight = MAX(keyboardHeight, 0.0f);
+    
+    if (keyboardFrame.origin.y + keyboardFrame.size.height < collectionViewSize.height - FLT_EPSILON) {
+        keyboardHeight = 0.0f;
+    }
+    
+    if (ABS(self.keyboardHeight - keyboardHeight) < FLT_EPSILON && ABS(collectionViewSize.width - self.collectionView.frame.size.width) < FLT_EPSILON) {
+        return;
+    }
+    
+    if (ABS(self.keyboardHeight - keyboardHeight) > FLT_EPSILON) {
+        self.keyboardHeight = keyboardHeight;
+        
+        if (ABS(collectionViewSize.width - self.collectionView.frame.size.width) > FLT_EPSILON) {
+            if ([NSThread isMainThread]) {
+                [self performSizeChangesWithDuration:0.3 size:self.containerView.bounds.size];
+            } else {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self performSizeChangesWithDuration:0.3 size:self.containerView.bounds.size];
+                });
+            }
+        } else {
+            [self.inputPanel adjustForSize:self.containerView.bounds.size keyboardHeight:keyboardHeight  duration:duration animationCurve:curve];
+            [self adjustCollectionViewForSize:self.containerView.bounds.size keyboardHeight:keyboardHeight inputContainerHeight:self.inputPanel.frame.size.height scrollToBottom:NO duration:duration animationCurve:curve];
+        }
+    }
+}
+
+- (void)keyboardDidChangeFrame:(NSNotification *)notification
+{
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad && notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] == nil) {
+        
+    }
+}
+
+- (void)adjustColletionViewInsets
+{
+    CGFloat topPadding = self.chatCollectionViewContentInset.top + self.topLayoutGuide.length;
+    UIEdgeInsets originalInset = self.collectionView.contentInset;
+    UIEdgeInsets inset = originalInset;
+    if (self.isInverted) {
+        inset.bottom = topPadding;
+    } else {
+        inset.top = topPadding;
+    }
+    self.collectionView.contentInset = inset;
+}
+
+- (void)adjustCollectionViewForSize:(CGSize)size keyboardHeight:(CGFloat)keyboardHeight inputContainerHeight:(CGFloat)inputContainerHeight scrollToBottom:(BOOL)scrollToBottom duration:(NSTimeInterval)duration animationCurve:(int)animationCurve
+{
+    [self stopScrollIfNeeded];
+    
+    CGFloat contentHeight = self.collectionView.contentSize.height;
+    
+    UIEdgeInsets originalInset = self.collectionView.contentInset;
+    UIEdgeInsets inset = originalInset;
+    if (self.isInverted) {
+        inset.top = keyboardHeight + inputContainerHeight + self.chatCollectionViewContentInset.bottom;
+    } else {
+        inset.bottom = keyboardHeight + inputContainerHeight + self.chatCollectionViewContentInset.bottom;
+    }
+    
+    CGPoint originalContentOffset = self.collectionView.contentOffset;
+    CGPoint contentOffset = originalContentOffset;
+    
+    if (scrollToBottom) {
+        if (self.isInverted) {
+            contentOffset = CGPointMake(0, -inset.top);
+        } else {
+            contentOffset = CGPointMake(0, contentHeight - self.collectionView.bounds.size.height + inset.bottom);
+        }
+    } else {
+        if (self.isInverted) {
+            contentOffset.y += originalInset.top - inset.top;
+        } else {
+            contentOffset.y += inset.bottom - originalInset.bottom;
+        }
+        contentOffset.y = MIN(contentOffset.y, contentHeight - self.collectionView.bounds.size.height + inset.bottom);
+        contentOffset.y = MAX(contentOffset.y, -inset.top);
+    }
+    
+    if (duration > DBL_EPSILON) {
+        [UIView animateWithDuration:duration delay:0 options:(animationCurve << 16) | UIViewAnimationOptionBeginFromCurrentState animations:^{
+            self.collectionView.contentInset = inset;
+            if (!CGPointEqualToPoint(contentOffset, originalContentOffset)) {
+                self.collectionView.contentOffset = contentOffset;
+            }
+        } completion:nil];
+    } else {
+        self.collectionView.contentInset = inset;
+        if (!CGPointEqualToPoint(contentOffset, originalContentOffset)) {
+            self.collectionView.contentOffset = contentOffset;
+        }
+    }
+}
+
+- (void)performSizeChangesWithDuration:(NSTimeInterval)duration size:(CGSize)size
+{
+    [self stopScrollIfNeeded];
+    
+    BOOL animated = duration > DBL_EPSILON;
+    CGSize collectionViewSize = size;
+    CGFloat keyboardHeight = self.keyboardHeight;
+    
+    [self.inputPanel changeToSize:size keyboardHeight:keyboardHeight duration:duration];
+    
+    CGFloat maxOriginY = self.isInverted ? self.collectionView.contentOffset.y + self.collectionView.contentInset.top : self.collectionView.contentOffset.y + self.collectionView.bounds.size.height - self.collectionView.contentInset.bottom;
+    CGPoint previousContentOffset = self.collectionView.contentOffset;
+    CGRect previousCollectionFrame = self.collectionView.frame;
+    
+    NSInteger anchorItemIndex = -1;
+    CGFloat anchorItemOriginY = 0;
+    CGFloat anchorItemRelativeOffset = 0;
+    CGFloat anchorItemHeight = 0;
+    
+    NSMutableArray *previousItemFrames = [[NSMutableArray alloc] init];
+    CGRect previousVisibleBounds = CGRectMake(previousContentOffset.x, previousContentOffset.y, self.collectionView.frame.size.width, self.collectionView.frame.size.height);
+    
+    NSMutableSet *previousVisibleItemIndices = [[NSMutableSet alloc] init];
+    
+    NSArray *previousLayoutAttributes = [self.collectionLayout layoutAttributesForLayouts:self.layouts containerWidth:previousCollectionFrame.size.width maxHeight:CGFLOAT_MAX contentHeight:NULL];
+    
+    NSInteger chatItemsCount = self.layouts.count;
+    for (NSInteger i = 0; i < chatItemsCount; i++) {
+        UICollectionViewLayoutAttributes *attributes = previousLayoutAttributes[i];
+        CGRect itemFrame = attributes.frame;
+        
+        if (itemFrame.origin.y < maxOriginY) {
+            anchorItemHeight = itemFrame.size.height;
+            anchorItemIndex = i;
+            anchorItemOriginY = itemFrame.origin.y;
+        }
+        
+        if (!CGRectIsEmpty(CGRectIntersection(itemFrame, previousVisibleBounds))) {
+            [previousVisibleItemIndices addObject:@(i)];
+        }
+        
+        [previousItemFrames addObject:[NSValue valueWithCGRect:itemFrame]];
+    }
+    
+    if (anchorItemIndex != -1) {
+        if (anchorItemHeight > 1.0f) {
+            anchorItemRelativeOffset = (anchorItemOriginY - maxOriginY) / anchorItemHeight;
+        }
+    }
+    
+    self.collectionView.frame = CGRectMake(0, 0, collectionViewSize.width, collectionViewSize.height);
+    
+    [self.collectionLayout invalidateLayout];
+    
+    UIEdgeInsets originalInset = self.collectionView.contentInset;
+    UIEdgeInsets inset = originalInset;
+    if (self.isInverted) {
+        inset.top = keyboardHeight + self.inputPanel.frame.size.height + self.chatCollectionViewContentInset.bottom;
+    } else {
+        inset.bottom = keyboardHeight + self.inputPanel.frame.size.height + self.chatCollectionViewContentInset.bottom;
+    }
+    self.collectionView.contentInset = inset;
+    
+    CGFloat newContentHeight = 0;
+    NSArray *newLayoutAttributes = [self.collectionLayout layoutAttributesForLayouts:self.layouts containerWidth:collectionViewSize.width maxHeight:CGFLOAT_MAX contentHeight:&newContentHeight];
+    
+    CGPoint newContentOffset = CGPointZero;
+    newContentOffset.y = -self.collectionView.contentInset.top;
+    if (anchorItemIndex >= 0 && anchorItemIndex < newLayoutAttributes.count) {
+        UICollectionViewLayoutAttributes *attributes = newLayoutAttributes[anchorItemIndex];
+        if (self.isInverted) {
+            newContentOffset.y += attributes.frame.origin.y - floor(anchorItemRelativeOffset * attributes.frame.size.height);
+        } else {
+            newContentOffset.y += self.collectionView.contentInset.top + attributes.frame.origin.y - floor(anchorItemRelativeOffset * attributes.frame.size.height) - (self.collectionView.bounds.size.height - self.collectionView.contentInset.bottom);
+        }
+    }
+    newContentOffset.y = MIN(newContentOffset.y, newContentHeight + self.collectionView.contentInset.bottom - self.collectionView.frame.size.height);
+    newContentOffset.y = MAX(newContentOffset.y, -self.collectionView.contentInset.top);
+    
+    NSMutableArray *transitiveItemIndicesWithFrames = [[NSMutableArray alloc] init];
+    
+    CGRect newVisibleBounds = CGRectMake(newContentOffset.x, newContentOffset.y, self.collectionView.frame.size.width, self.collectionView.frame.size.height);
+    for (NSInteger i = 0; i < chatItemsCount; i++) {
+        UICollectionViewLayoutAttributes *attributes = newLayoutAttributes[i];
+        CGRect itemFrame = attributes.frame;
+        
+        if (CGRectIsEmpty(CGRectIntersection(itemFrame, newVisibleBounds)) && [previousVisibleItemIndices containsObject:@(i)]) {
+            [transitiveItemIndicesWithFrames addObject:@[@(i), [NSValue valueWithCGRect:itemFrame]]];
+        }
+    }
+    
+    NSMutableDictionary *transitiveCells = [[NSMutableDictionary alloc] init];
+    
+    if (animated && !self.collectionView.decelerating && !self.collectionView.dragging && !self.collectionView.tracking) {
+        for (NSArray *nDesc in transitiveItemIndicesWithFrames) {
+            NSNumber *nIndex = nDesc[0];
+            
+            NOCChatItemCell *currentCell = (NOCChatItemCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:[nIndex intValue] inSection:0]];
+            if (currentCell != nil) {
+                NOCChatItemCell *transitiveCell = [[NOCChatItemCell alloc] initWithFrame:[nDesc[1] CGRectValue]];
+                transitiveCell.layout = self.layouts[[nIndex intValue]];
+                
+                transitiveCells[nIndex] = transitiveCell;
+            }
+        }
+    }
+    
+    self.collectionView.contentOffset = newContentOffset;
+    
+    [self updateCellLayouts];
+    [self.collectionView layoutSubviews];
+    
+    if (animated) {
+        self.collectionView.clipsToBounds = NO;
+        
+        CGFloat contentOffsetDifference = newContentOffset.y - previousContentOffset.y + (self.collectionView.frame.size.height - previousCollectionFrame.size.height);
+        CGFloat widthDifference = self.collectionView.frame.size.width - previousCollectionFrame.size.width;
+        
+        NSMutableArray *itemFramesToRestore = [[NSMutableArray alloc] init];
+        
+        for (NSInteger i = 0; i < chatItemsCount; i++) {
+            NOCChatItemCell *cell = [self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForRow:i inSection:0]];
+            NOCChatItemCell *transitiveCell = transitiveCells[@(i)];
+            
+            if (transitiveCell != nil) {
+                if (cell == nil) {
+                    cell = transitiveCell;
+                    [_collectionView addSubview:transitiveCell];
+                } else {
+                    [transitiveCells removeObjectForKey:@(i)];
+                }
+            }
+            
+            if (cell != nil) {
+                [itemFramesToRestore addObject:@[@(i), [NSValue valueWithCGRect:cell.frame]]];
+                CGRect previousFrame = [previousItemFrames[i] CGRectValue];
+                cell.frame = CGRectOffset(previousFrame, widthDifference, contentOffsetDifference);
+                
+                [self adjustLayoutForCell:cell];
+            }
+        }
+        
+        [UIView animateWithDuration:duration animations:^{
+            for (NSArray *frameDesc in itemFramesToRestore) {
+                NOCChatItemCell *cell = [self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForRow:[frameDesc[0] intValue] inSection:0]];
+                if (cell == nil) {
+                    cell = transitiveCells[frameDesc[0]];
+                }
+                cell.frame = [frameDesc[1] CGRectValue];
+                
+                [self adjustLayoutForCell:cell];
+            }
+        } completion:^(BOOL finished) {
+            if (finished) {
+                self.collectionView.clipsToBounds = YES;
+            }
+            
+            [transitiveCells enumerateKeysAndObjectsUsingBlock:^(NSNumber *nIndex, NOCChatItemCell *cell, BOOL *stop) {
+                [cell removeFromSuperview];
+            }];
+        }];
+    }
+}
+
+- (void)updateCellLayouts
+{
+    for (NSInteger i = 0; i < self.layouts.count; i++) {
+        NOCChatItemCell *cell = (NOCChatItemCell *)[_collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:i inSection:0]];
+        if (cell) {
+            cell.layout = self.layouts[i];
+        }
+    }
+}
+
+- (void)adjustLayoutForCell:(NOCChatItemCell *)cell
+{
+    id<NOCChatItemCellLayout> layout = cell.layout;
+    layout.width = cell.frame.size.width;
+    [layout calculateLayout];
+    cell.layout = layout;
 }
 
 @end
@@ -376,7 +615,7 @@
 - (void)insertChatItems:(NSArray<id<NOCChatItem>> *)chatItems atIndexes:(NSIndexSet *)indexes completion:(nullable void (^)(BOOL))completion
 {
     dispatch_async(self.serialQueue, ^{
-        if (!chatItems.count == indexes.count) {
+        if (chatItems.count != indexes.count) {
             return;
         }
         
@@ -560,7 +799,7 @@ typedef NS_ENUM(NSUInteger, NOCChatCellVerticalEdge) {
     
     // Note that we don't rely on collectionView's contentSize. This is because it won't be valid after performBatchUpdates or reloadData
     // After reload data, collectionViewLayout.collectionViewContentSize won't be even valid, so you may want to refresh the layout manually
-    CGFloat offsetY = MAX(-collectionView.contentInset.top, contentHeight-boundsHeight+collectionView.contentInset.bottom);
+    CGFloat offsetY = MAX(-collectionView.contentInset.top, contentHeight - boundsHeight + collectionView.contentInset.bottom);
     CGPoint contentOffset = CGPointMake(collectionView.contentOffset.x, offsetY);
     
     [collectionView setContentOffset:contentOffset animated:animated];
@@ -574,9 +813,9 @@ typedef NS_ENUM(NSUInteger, NOCChatCellVerticalEdge) {
         CGRect cellRect = layoutAttributes.frame;
         CGRect intersection = CGRectIntersection(visibleRect, cellRect);
         if (edge == NOCChatCellVerticalEdgeTop) {
-            return fabs(CGRectGetMinY(intersection) - CGRectGetMinY(cellRect)) < 0.001;
+            return ABS(CGRectGetMinY(intersection) - CGRectGetMinY(cellRect)) < FLT_EPSILON;
         } else {
-            return fabs(CGRectGetMaxY(intersection) - CGRectGetMaxY(cellRect)) < 0.001;
+            return ABS(CGRectGetMaxY(intersection) - CGRectGetMaxY(cellRect)) < FLT_EPSILON;
         }
     } else {
         return NO;
@@ -589,16 +828,13 @@ typedef NS_ENUM(NSUInteger, NOCChatCellVerticalEdge) {
     UIEdgeInsets contentInset = collectionView.contentInset;
     CGRect bounds = collectionView.bounds;
     CGSize contentSize = collectionView.collectionViewLayout.collectionViewContentSize;
-    CGFloat y = collectionView.contentOffset.y + contentInset.top;
-    CGFloat width = bounds.size.width;
-    CGFloat height = MIN(contentSize.height, bounds.size.height - contentInset.top - contentInset.bottom);
-    return CGRectMake(0, y, width, height);
+    return CGRectMake(0, collectionView.contentOffset.y + contentInset.top, bounds.size.width, MIN(contentSize.height, bounds.size.height - contentInset.top - contentInset.bottom));
 }
 
 - (void)stopScrollIfNeeded
 {
     NOCChatCollectionView *collectionView = self.collectionView;
-    if (collectionView.isDragging || collectionView.isDecelerating) {
+    if (collectionView.isTracking || collectionView.isDragging || collectionView.isDecelerating) {
         [collectionView setContentOffset:collectionView.contentOffset animated:NO];
     }
 }
