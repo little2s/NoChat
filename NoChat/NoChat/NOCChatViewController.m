@@ -503,7 +503,7 @@
         NSMutableArray *itemFramesToRestore = [[NSMutableArray alloc] init];
         
         for (NSInteger i = 0; i < chatItemsCount; i++) {
-            NOCChatItemCell *cell = [self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForRow:i inSection:0]];
+            NOCChatItemCell *cell = (NOCChatItemCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForRow:i inSection:0]];
             NOCChatItemCell *transitiveCell = transitiveCells[@(i)];
             
             if (transitiveCell != nil) {
@@ -526,7 +526,7 @@
         
         [UIView animateWithDuration:duration animations:^{
             for (NSArray *frameDesc in itemFramesToRestore) {
-                NOCChatItemCell *cell = [self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForRow:[frameDesc[0] intValue] inSection:0]];
+                NOCChatItemCell *cell = (NOCChatItemCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForRow:[frameDesc[0] intValue] inSection:0]];
                 if (cell == nil) {
                     cell = transitiveCells[frameDesc[0]];
                 }

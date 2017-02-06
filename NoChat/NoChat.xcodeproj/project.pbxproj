@@ -17,8 +17,6 @@
 		E019EA9A1E1F3622004706DD /* NOCChatItemCell.h in Headers */ = {isa = PBXBuildFile; fileRef = E019EA911E1F3622004706DD /* NOCChatItemCell.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E019EA9B1E1F3622004706DD /* NOCChatItemCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E019EA921E1F3622004706DD /* NOCChatItemCell.m */; };
 		E019EA9C1E1F3622004706DD /* NOCChatItemCellLayout.h in Headers */ = {isa = PBXBuildFile; fileRef = E019EA931E1F3622004706DD /* NOCChatItemCellLayout.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		E019EA9D1E1F3622004706DD /* NOCChatInputView.h in Headers */ = {isa = PBXBuildFile; fileRef = E019EA941E1F3622004706DD /* NOCChatInputView.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		E019EA9E1E1F3622004706DD /* NOCChatInputView.m in Sources */ = {isa = PBXBuildFile; fileRef = E019EA951E1F3622004706DD /* NOCChatInputView.m */; };
 		E019EAA01E1F362C004706DD /* NOCChatItem.h in Headers */ = {isa = PBXBuildFile; fileRef = E019EA9F1E1F362C004706DD /* NOCChatItem.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E08C42951E41E684000EBA84 /* NOCChatContainerView.h in Headers */ = {isa = PBXBuildFile; fileRef = E08C42931E41E684000EBA84 /* NOCChatContainerView.h */; };
 		E08C42961E41E684000EBA84 /* NOCChatContainerView.m in Sources */ = {isa = PBXBuildFile; fileRef = E08C42941E41E684000EBA84 /* NOCChatContainerView.m */; };
@@ -39,8 +37,6 @@
 		E019EA911E1F3622004706DD /* NOCChatItemCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NOCChatItemCell.h; sourceTree = "<group>"; };
 		E019EA921E1F3622004706DD /* NOCChatItemCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NOCChatItemCell.m; sourceTree = "<group>"; };
 		E019EA931E1F3622004706DD /* NOCChatItemCellLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NOCChatItemCellLayout.h; sourceTree = "<group>"; };
-		E019EA941E1F3622004706DD /* NOCChatInputView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NOCChatInputView.h; sourceTree = "<group>"; };
-		E019EA951E1F3622004706DD /* NOCChatInputView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NOCChatInputView.m; sourceTree = "<group>"; };
 		E019EA9F1E1F362C004706DD /* NOCChatItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NOCChatItem.h; sourceTree = "<group>"; };
 		E08C42931E41E684000EBA84 /* NOCChatContainerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NOCChatContainerView.h; sourceTree = "<group>"; };
 		E08C42941E41E684000EBA84 /* NOCChatContainerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NOCChatContainerView.m; sourceTree = "<group>"; };
@@ -78,7 +74,6 @@
 		E019EA7C1E1F359C004706DD /* NoChat */ = {
 			isa = PBXGroup;
 			children = (
-				E0DCB2E51E46A15F00150E2C /* legacy */,
 				E019EA881E1F35EE004706DD /* Models */,
 				E019EA871E1F35EA004706DD /* Views */,
 				E019EA861E1F35E1004706DD /* ViewController */,
@@ -131,15 +126,6 @@
 			name = Models;
 			sourceTree = "<group>";
 		};
-		E0DCB2E51E46A15F00150E2C /* legacy */ = {
-			isa = PBXGroup;
-			children = (
-				E019EA941E1F3622004706DD /* NOCChatInputView.h */,
-				E019EA951E1F3622004706DD /* NOCChatInputView.m */,
-			);
-			name = legacy;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -153,7 +139,6 @@
 				E08C42991E41E6A9000EBA84 /* NOCChatInputPanel.h in Headers */,
 				E019EA8B1E1F360D004706DD /* NOCChatViewController.h in Headers */,
 				E019EA961E1F3622004706DD /* NOCChatCollectionView.h in Headers */,
-				E019EA9D1E1F3622004706DD /* NOCChatInputView.h in Headers */,
 				E019EA9C1E1F3622004706DD /* NOCChatItemCellLayout.h in Headers */,
 				E019EA7F1E1F359C004706DD /* NoChat.h in Headers */,
 				E08C42951E41E684000EBA84 /* NOCChatContainerView.h in Headers */,
@@ -234,7 +219,6 @@
 				E08C429A1E41E6A9000EBA84 /* NOCChatInputPanel.m in Sources */,
 				E019EA971E1F3622004706DD /* NOCChatCollectionView.m in Sources */,
 				E019EA9B1E1F3622004706DD /* NOCChatItemCell.m in Sources */,
-				E019EA9E1E1F3622004706DD /* NOCChatInputView.m in Sources */,
 				E08C42961E41E684000EBA84 /* NOCChatContainerView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
