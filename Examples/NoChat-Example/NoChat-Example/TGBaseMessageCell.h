@@ -27,7 +27,6 @@
 
 @interface TGBaseMessageCell : NOCChatItemCell
 
-@property (nonatomic, strong) UIView *messageView;
 @property (nonatomic, strong) UIView *bubbleView;
 
 @property (nonatomic, assign, getter=isHighlight) BOOL hightlight;

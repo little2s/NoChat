@@ -27,7 +27,6 @@
 
 @interface MMBaseMessageCell : NOCChatItemCell
 
-@property (nonatomic, strong) UIView *messageView;
 @property (nonatomic, strong) UIView *bubbleView;
 @property (nonatomic, strong) UIImageView *avatarImageView;
 

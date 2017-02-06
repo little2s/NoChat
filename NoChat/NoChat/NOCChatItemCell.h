@@ -38,6 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nullable, nonatomic, weak) id<NOCChatItemCellDelegate> delegate;
 @property (nullable, nonatomic, strong) id<NOCChatItemCellLayout> layout;
+@property (nullable, nonatomic, strong) UIView *itemView;
 
 + (NSString *)reuseIdentifier;
 

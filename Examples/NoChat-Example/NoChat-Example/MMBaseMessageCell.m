@@ -37,14 +37,11 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
-        _messageView = [[UIView alloc] init];
-        [self.contentView addSubview:_messageView];
-        
         _avatarImageView = [[UIImageView alloc] init];
-        [_messageView addSubview:_avatarImageView];
+        [self.itemView addSubview:_avatarImageView];
         
         _bubbleView = [[UIView alloc] init];
-        [_messageView addSubview:_bubbleView];
+        [self.itemView addSubview:_bubbleView];
     }
     return self;
 }
@@ -52,7 +49,6 @@
 - (void)setLayout:(id<NOCChatItemCellLayout>)layout
 {
     [super setLayout:layout];
-    self.messageView.frame = CGRectMake(0, 0, layout.width, layout.height);
     
     MMBaseMessageCellLayout *cellLayout = (MMBaseMessageCellLayout *)layout;
     self.bubbleView.frame = cellLayout.bubbleViewFrame;

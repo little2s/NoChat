@@ -37,15 +37,12 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
-        _messageView = [[UIView alloc] init];
-        [self.contentView addSubview:_messageView];
-        
         _backgroundImageView = [[UIImageView alloc] init];
-        [_messageView addSubview:_backgroundImageView];
+        [self.itemView addSubview:_backgroundImageView];
         
         _textLabel = [[UILabel alloc] init];
         _textLabel.numberOfLines = 0;
-        [_messageView addSubview:_textLabel];
+        [self.itemView addSubview:_textLabel];
     }
     return self;
 }
@@ -55,7 +52,6 @@
     [super setLayout:layout];
     
     MMSystemMessageCellLayout *cellLayout = (MMSystemMessageCellLayout *)layout;
-    self.messageView.frame = CGRectMake(0, 0, cellLayout.width, cellLayout.height);
     self.backgroundImageView.frame = cellLayout.backgroundImageViewFrame;
     self.backgroundImageView.image = cellLayout.backgroundImage;
     self.textLabel.frame = cellLayout.textLabelFrame;

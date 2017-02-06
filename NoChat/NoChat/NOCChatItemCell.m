@@ -32,6 +32,23 @@
     return @"NOCChatItemCell";
 }
 
+- (instancetype)initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
+    if (self) {
+        _itemView = [[UIView alloc] initWithFrame:self.bounds];
+        [self.contentView addSubview:_itemView];
+    }
+    return self;
+}
+
+- (void)setLayout:(id<NOCChatItemCellLayout>)layout
+{
+    _layout = layout;
+    
+    self.itemView.frame = CGRectMake(0, 0, layout.width, layout.height);
+}
+
 - (UIView *)snapshotViewAfterScreenUpdates:(BOOL)afterUpdates
 {
     UIGraphicsBeginImageContext(self.bounds.size);

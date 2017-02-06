@@ -135,14 +135,18 @@
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     id<NOCChatItemCellLayout> layout = self.layouts[indexPath.item];
+    
     NOCChatItemCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:layout.reuseIdentifier forIndexPath:indexPath];
     cell.delegate = self;
     
     [UIView performWithoutAnimation:^{
         cell.layout = layout;
-        cell.contentView.transform = collectionView.transform;
+        
+        if (!CGAffineTransformEqualToTransform(cell.itemView.transform, collectionView.transform)) {
+            cell.itemView.transform = collectionView.transform;
+        }
     }];
-    
+
     return cell;
 }
 
@@ -382,7 +386,7 @@
         contentOffset.y = MAX(contentOffset.y, -inset.top);
     }
     
-    if (duration > DBL_EPSILON) {
+    if (duration > DBL_EPSILON) {        
         [UIView animateWithDuration:duration delay:0 options:(animationCurve << 16) | UIViewAnimationOptionBeginFromCurrentState animations:^{
             self.collectionView.contentInset = inset;
             if (!CGPointEqualToPoint(contentOffset, originalContentOffset)) {

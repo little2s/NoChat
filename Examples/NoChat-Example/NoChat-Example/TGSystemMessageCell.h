@@ -26,7 +26,6 @@
 
 @interface TGSystemMessageCell : NOCChatItemCell
 
-@property (nonatomic, strong) UIView *messageView;
 @property (nonatomic, strong) UIImageView *backgroundImageView;
 @property (nonatomic, strong) UILabel *textLabel;
 
