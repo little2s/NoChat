@@ -49,6 +49,7 @@
 @property (nonatomic, strong) TGAvatarButton *avatarButton;
 
 @property (nonatomic, strong) NOCMessageManager *messageManager;
+@property (nonatomic, strong) dispatch_queue_t layoutQueue;
 
 @end
 
@@ -90,6 +91,8 @@
         [self.messageManager addDelegate:self];
         [self registerContentSizeCategoryDidChangeNotification];
         [self setupNavigationItems];
+        dispatch_queue_attr_t attr = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_DEFAULT, 0);
+        _layoutQueue = dispatch_queue_create("com.little2s.nochat-example.tg.layout", attr);
     }
     return self;
 }
@@ -142,7 +145,7 @@
     }
     
     if ([chatId isEqualToString:self.chat.chatId]) {
-        [self appendChatItems:messages completion:nil];
+        [self addMessages:messages scrollToBottom:YES animated:YES];
     }
 }
 
@@ -184,14 +187,13 @@
 
 - (void)loadMessages
 {
+    [self.layouts removeAllObjects];
+    
     __weak typeof(self) weakSelf = self;
     [self.messageManager fetchMessagesWithChatId:self.chat.chatId handler:^(NSArray *messages) {
-        __strong typeof(weakSelf) strongSelf = weakSelf;
-        [strongSelf loadChatItems:messages completion:^(BOOL finished) {
-            if (!strongSelf.collectionView.isTracking && strongSelf.layouts.count) {
-                [strongSelf scrollToBottom:YES];
-            }
-        }];
+        if (weakSelf) {
+            [weakSelf addMessages:messages scrollToBottom:YES animated:NO];
+        }
     }];
 }
 
@@ -202,15 +204,34 @@
     message.date = [NSDate date];
     message.deliveryStatus = NOCMessageDeliveryStatusRead;
     
-    __weak typeof(self) weakSelf = self;
-    [self appendChatItems:@[message] completion:^(BOOL finished) {
-        __strong typeof(weakSelf) strongSelf = weakSelf;
-        if (strongSelf.layouts.count) {
-            [strongSelf scrollToBottom:YES];
-        }
-        [strongSelf.messageManager sendMessage:message toChat:strongSelf.chat];
-    }];
+    [self addMessages:@[message] scrollToBottom:YES animated:YES];
+    
+    [self.messageManager sendMessage:message toChat:self.chat];
 }
+
+- (void)addMessages:(NSArray *)messages scrollToBottom:(BOOL)scrollToBottom animated:(BOOL)animated
+{
+    dispatch_async(self.layoutQueue, ^{
+        NSIndexSet *indexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, messages.count)];
+        
+        NSMutableArray *layouts = [[NSMutableArray alloc] init];
+        
+        [messages enumerateObjectsUsingBlock:^(NOCMessage *message, NSUInteger idx, BOOL *stop) {
+            Class layoutClass = [[self class] cellLayoutClassForItemType:message.type];
+            id<NOCChatItemCellLayout> layout = [[layoutClass alloc] initWithChatItem:message cellWidth:self.cellWidth];
+            [layouts insertObject:layout atIndex:0];
+        }];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self insertLayouts:layouts atIndexes:indexes animated:animated];
+            if (scrollToBottom) {
+                [self scrollToBottomAnimated:animated];
+            }
+        });
+    });
+}
+
+#pragma mark - Dynamic font support
 
 - (void)registerContentSizeCategoryDidChangeNotification
 {
@@ -232,8 +253,57 @@
         return;
     }
     
-    [self.collectionView.collectionViewLayout invalidateLayout];
-    [self reloadChatItemsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.layouts.count)] completion:nil];
+    CGSize collectionViewSize = self.containerView.bounds.size;
+    
+    CGFloat maxOriginY = self.collectionView.contentOffset.y + self.collectionView.contentInset.top;
+    CGRect previousCollectionFrame = self.collectionView.frame;
+    
+    NSInteger anchorItemIndex = -1;
+    CGFloat anchorItemOriginY = 0;
+    CGFloat anchorItemRelativeOffset = 0;
+    CGFloat anchorItemHeight = 0;
+    
+    NSArray *previousLayoutAttributes = [self.collectionLayout layoutAttributesForLayouts:self.layouts containerWidth:previousCollectionFrame.size.width maxHeight:CGFLOAT_MAX contentHeight:NULL];
+    
+    NSInteger chatItemsCount = self.layouts.count;
+    for (NSInteger i = 0; i < chatItemsCount; i++) {
+        UICollectionViewLayoutAttributes *attributes = previousLayoutAttributes[i];
+        CGRect itemFrame = attributes.frame;
+        
+        if (itemFrame.origin.y < maxOriginY) {
+            anchorItemHeight = itemFrame.size.height;
+            anchorItemIndex = i;
+            anchorItemOriginY = itemFrame.origin.y;
+        }
+    }
+    
+    if (anchorItemIndex != -1) {
+        if (anchorItemHeight > 1.0f) {
+            anchorItemRelativeOffset = (anchorItemOriginY - maxOriginY) / anchorItemHeight;
+        }
+    }
+    
+    for (id<NOCChatItemCellLayout> layout in self.layouts) {
+        [layout calculateLayout];
+    }
+    
+    [self.collectionLayout invalidateLayout];
+    
+    CGFloat newContentHeight = 0;
+    NSArray *newLayoutAttributes = [self.collectionLayout layoutAttributesForLayouts:self.layouts containerWidth:collectionViewSize.width maxHeight:CGFLOAT_MAX contentHeight:&newContentHeight];
+    
+    CGPoint newContentOffset = CGPointZero;
+    newContentOffset.y = -self.collectionView.contentInset.top;
+    if (anchorItemIndex >= 0 && anchorItemIndex < newLayoutAttributes.count) {
+        UICollectionViewLayoutAttributes *attributes = newLayoutAttributes[anchorItemIndex];
+        newContentOffset.y += attributes.frame.origin.y - floor(anchorItemRelativeOffset * attributes.frame.size.height);
+    }
+    newContentOffset.y = MIN(newContentOffset.y, newContentHeight + self.collectionView.contentInset.bottom - self.collectionView.frame.size.height);
+    newContentOffset.y = MAX(newContentOffset.y, -self.collectionView.contentInset.top);
+    
+    [self.collectionView reloadData];
+    
+    self.collectionView.contentOffset = newContentOffset;
     
     // fix navigation items display
     [self setupNavigationItems];

@@ -51,7 +51,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL isInControllerTransition;
 
 @property (nonatomic, strong) NSMutableArray<id<NOCChatItemCellLayout>> *layouts;
-@property (nonatomic, strong) dispatch_queue_t serialQueue; // queue for changes
 
 @property (nonatomic, assign, getter=isInverted) BOOL inverted;
 @property (nonatomic, assign) UIEdgeInsets chatCollectionViewContentInset;
@@ -71,14 +70,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NOCChatViewController (NOCChanges)
 
-- (void)loadChatItems:(NSArray<id<NOCChatItem>> *)chatItems completion:(nullable void (^)(BOOL finished))completion;
-- (void)appendChatItems:(NSArray<id<NOCChatItem>> *)chatItems completion:(nullable void (^)(BOOL finished))completion;
-
-- (NSUInteger)indexOfChatItem:(id<NOCChatItem>)chatItem;
-
-- (void)insertChatItems:(NSArray<id<NOCChatItem>> *)chatItems atIndexes:(NSIndexSet *)indexes completion:(nullable void (^)(BOOL finished))completion;
-- (void)deleteChatItemsAtIndexes:(NSIndexSet *)indexes completion:(nullable void (^)(BOOL finished))completion;
-- (void)reloadChatItemsAtIndexes:(NSIndexSet *)indexes completion:(nullable void (^)(BOOL finished))completion;
+- (void)insertLayouts:(NSArray<id<NOCChatItemCellLayout>> *)layouts atIndexes:(NSIndexSet *)indexes animated:(BOOL)animated;
+- (void)deleteLayoutsAtIndexes:(NSIndexSet *)indexes animated:(BOOL)animated;
+- (void)updateLayoutAtIndex:(NSUInteger)index toLayout:(id<NOCChatItemCellLayout>)layout;
 
 @end
 
@@ -86,11 +80,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL)isCloseToTop;
 - (BOOL)isScrolledAtTop;
-- (void)scrollToTop:(BOOL)animated;
+- (void)scrollToTopAnimated:(BOOL)animated;
 
 - (BOOL)isCloseToBottom;
 - (BOOL)isScrolledAtBottom;
-- (void)scrollToBottom:(BOOL)animated;
+- (void)scrollToBottomAnimated:(BOOL)animated;
 
 - (void)stopScrollIfNeeded;
 

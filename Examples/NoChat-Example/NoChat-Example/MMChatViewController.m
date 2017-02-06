@@ -42,6 +42,7 @@
 @interface MMChatViewController () <UINavigationControllerDelegate, NOCMessageManagerDelegate>
 
 @property (nonatomic, strong) NOCMessageManager *messageManager;
+@property (nonatomic, strong) dispatch_queue_t layoutQueue;
 
 @end
 
@@ -83,6 +84,8 @@
         [self.messageManager addDelegate:self];
         self.inverted = NO;
         self.chatInputContainerViewDefaultHeight = 50;
+        dispatch_queue_attr_t attr = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_DEFAULT, 0);
+        _layoutQueue = dispatch_queue_create("com.little2s.nochat-example.mm.layout", attr);
     }
     return self;
 }
@@ -132,7 +135,7 @@
 - (void)didInputTextPanelStartInputting:(MMChatInputTextPanel *)inputTextPanel
 {
     if (![self isScrolledAtBottom]) {
-        [self scrollToBottom:YES];
+        [self scrollToBottomAnimated:YES];
     }
 }
 
@@ -187,11 +190,7 @@
     }
     
     if ([chatId isEqualToString:self.chat.chatId]) {
-        [self appendChatItems:messages completion:^(BOOL finished) {
-            if (self.layouts.count) {
-                [self scrollToBottom:YES];
-            }
-        }];
+        [self addMessages:messages scrollToBottom:YES animated:YES];
     }
 }
 
@@ -199,14 +198,13 @@
 
 - (void)loadMessages
 {
+    [self.layouts removeAllObjects];
+    
     __weak typeof(self) weakSelf = self;
     [self.messageManager fetchMessagesWithChatId:self.chat.chatId handler:^(NSArray *messages) {
-        __strong typeof(weakSelf) strongSelf = weakSelf;
-        [strongSelf loadChatItems:messages completion:^(BOOL finished) {
-            if (!strongSelf.collectionView.isTracking && strongSelf.layouts.count) {
-                [strongSelf scrollToBottom:NO];
-            }
-        }];
+        if (weakSelf) {
+            [weakSelf addMessages:messages scrollToBottom:YES animated:NO];
+        }
     }];
 }
 
@@ -217,16 +215,29 @@
     message.deliveryStatus = NOCMessageDeliveryStatusRead;
     message.outgoing = YES;
     
-    dispatch_async(self.serialQueue, ^{
-        Class layoutClass = [[self class] cellLayoutClassForItemType:message.type];
-        id<NOCChatItemCellLayout> layout = [[layoutClass alloc] initWithChatItem:message cellWidth:self.cellWidth];
-        [self.layouts addObject:layout];
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            [self.collectionView insertItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:self.layouts.count-1 inSection:0]]];
-            if (self.layouts.count) {
-                [self scrollToBottom:YES];
+    [self addMessages:@[message] scrollToBottom:YES animated:YES];
+    
+    [self.messageManager sendMessage:message toChat:self.chat];
+}
+
+- (void)addMessages:(NSArray *)messages scrollToBottom:(BOOL)scrollToBottom animated:(BOOL)animated
+{
+    dispatch_async(self.layoutQueue, ^{
+        NSIndexSet *indexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(self.layouts.count, messages.count)];
+        
+        NSMutableArray *layouts = [[NSMutableArray alloc] init];
+        
+        [messages enumerateObjectsUsingBlock:^(NOCMessage *message, NSUInteger idx, BOOL *stop) {
+            Class layoutClass = [[self class] cellLayoutClassForItemType:message.type];
+            id<NOCChatItemCellLayout> layout = [[layoutClass alloc] initWithChatItem:message cellWidth:self.cellWidth];
+            [layouts addObject:layout];
+        }];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self insertLayouts:layouts atIndexes:indexes animated:animated];
+            if (scrollToBottom) {
+                [self scrollToBottomAnimated:animated];
             }
-            [self.messageManager sendMessage:message toChat:self.chat];
         });
     });
 }
