@@ -33,6 +33,7 @@
     if (self) {
         _msgId = [NSUUID new].UUIDString;
         _type = @"Text";
+        _date = [NSDate date];
     }
     return self;
 }
