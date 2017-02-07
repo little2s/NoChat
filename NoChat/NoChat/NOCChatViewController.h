@@ -42,6 +42,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, strong) NOCChatCollectionViewLayout *collectionLayout;
 @property (nullable, nonatomic, strong) UIScrollView *collectionViewScrollToTopProxy;
 
+// Supporting you have only one input panel. If you had custom input panels,
+// this property would be a pointer which point to current panel.
 @property (nullable, nonatomic, strong) NOCChatInputPanel *inputPanel;
 
 @property (nonatomic, assign) CGFloat halfTransitionKeyboardHeight;
@@ -50,9 +52,24 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, assign) BOOL isInControllerTransition;
 
+//
+// Pay more attention to inverted mode with layouts,
+// as you see on collectionView:
+//
+// +------------+                +------------+
+// |    ...     |                |  layout 0  |
+// |  layout 2  |                |  layout 1  |
+// |  layout 1  |       VS.      |  layout 2  |
+// |  layout 0  |                |    ...     |
+// +------------+                +------------+
+//
+// inverted is YES               inverted is NO
+//
 @property (nonatomic, strong) NSMutableArray<id<NOCChatItemCellLayout>> *layouts;
 
+// Default is YES.
 @property (nonatomic, assign, getter=isInverted) BOOL inverted;
+
 @property (nonatomic, assign) UIEdgeInsets chatCollectionViewContentInset;
 @property (nonatomic, assign) UIEdgeInsets chatCollectionViewScrollIndicatorInsets;
 @property (nonatomic, assign) CGFloat chatInputContainerViewDefaultHeight;
@@ -68,6 +85,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+//
+// Pay more attention to use these methods with inverted mode.
+// These methods won't check or even map the relationship
+// between layouts and their indexes for you.
+//
 @interface NOCChatViewController (NOCChanges)
 
 - (void)insertLayouts:(NSArray<id<NOCChatItemCellLayout>> *)layouts atIndexes:(NSIndexSet *)indexes animated:(BOOL)animated;
@@ -76,6 +98,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+//
+// These scrolling methods already deal with inverted mode for you.
+// For example `isScrolledAtBottom`, the `bottom` is the bottom you see on screen,
+// maybe not real bottom of collectionView.
+//
 @interface NOCChatViewController (NOCScrolling)
 
 - (BOOL)isCloseToTop;
