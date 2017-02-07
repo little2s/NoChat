@@ -204,6 +204,7 @@
 - (void)clearInputField
 {
     self.inputField.internalTextView.text = nil;
+    [self.inputField refreshHeight];
 }
 
 #pragma mark - HPGrowingTextViewDelegate
