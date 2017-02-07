@@ -27,20 +27,41 @@
 #import "NOCChatItemCellLayout.h"
 
 @implementation NOCChatCollectionViewLayout {
+    BOOL _isInverted;
+    
     NSMutableArray *_layoutAttributes;
     CGSize _contentSize;
+    
+    NSMutableArray *_insertIndexPaths;
+    NSMutableArray *_deleteIndexPaths;
 }
 
 #pragma mark - Overrides
+
+- (instancetype)initWithInverted:(BOOL)inverted
+{
+    self = [super init];
+    if (self) {
+        _isInverted = inverted;
+        [self commonInit];
+    }
+    return self;
+}
 
 - (instancetype)init
 {
     self = [super init];
     if (self) {
-        _layoutAttributes = [[NSMutableArray alloc] init];
-        _contentSize = CGSizeZero;
+        _isInverted = YES;
+        [self commonInit];
     }
     return self;
+}
+
+- (void)commonInit
+{
+    _layoutAttributes = [[NSMutableArray alloc] init];
+    _contentSize = CGSizeZero;
 }
 
 - (void)prepareLayout
@@ -85,6 +106,80 @@
 - (BOOL)shouldInvalidateLayoutForBoundsChange:(CGRect)newBounds
 {
     return NO;
+}
+
+#pragma mark - Animation
+
+- (void)prepareForCollectionViewUpdates:(NSArray *)updateItems
+{
+    [super prepareForCollectionViewUpdates:updateItems];
+    
+    if (!_isInverted) {
+        return;
+    }
+    
+    _deleteIndexPaths = [NSMutableArray array];
+    _insertIndexPaths = [NSMutableArray array];
+    
+    for (UICollectionViewUpdateItem *update in updateItems) {
+        if (update.updateAction == UICollectionUpdateActionDelete) {
+            [_deleteIndexPaths addObject:update.indexPathBeforeUpdate];
+        } else if (update.updateAction == UICollectionUpdateActionInsert) {
+            [_insertIndexPaths addObject:update.indexPathAfterUpdate];
+        }
+    }
+}
+
+- (void)finalizeCollectionViewUpdates
+{
+    [super finalizeCollectionViewUpdates];
+    
+    if (!_isInverted) {
+        return;
+    }
+    
+    _deleteIndexPaths = nil;
+    _insertIndexPaths = nil;
+}
+
+- (UICollectionViewLayoutAttributes *)initialLayoutAttributesForAppearingItemAtIndexPath:(NSIndexPath *)itemIndexPath
+{
+    UICollectionViewLayoutAttributes *attributes = [super initialLayoutAttributesForAppearingItemAtIndexPath:itemIndexPath];
+    
+    if (!_isInverted) {
+        return attributes;
+    }
+    
+    if ([_insertIndexPaths containsObject:itemIndexPath]) {
+        if (!attributes) {
+            attributes = [self layoutAttributesForItemAtIndexPath:itemIndexPath];
+        }
+        
+        attributes = [attributes copy];
+        
+        attributes.transform3D = CATransform3DMakeTranslation(0, -floor(attributes.frame.size.height * 1.125), 0);
+        
+        attributes.alpha = 0;
+    }
+    
+    return attributes;
+}
+
+- (UICollectionViewLayoutAttributes *)finalLayoutAttributesForDisappearingItemAtIndexPath:(NSIndexPath *)itemIndexPath
+{
+    UICollectionViewLayoutAttributes *attributes = [super finalLayoutAttributesForDisappearingItemAtIndexPath:itemIndexPath];
+    
+    if (!_isInverted) {
+        return attributes;
+    }
+    
+    if ([_deleteIndexPaths containsObject:itemIndexPath]) {
+        attributes = [attributes copy];
+        
+        attributes.alpha = 0;
+    }
+    
+    return attributes;
 }
 
 #pragma mark - Public

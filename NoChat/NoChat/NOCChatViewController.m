@@ -234,7 +234,7 @@
 {
     CGSize collectionViewSize = _containerView.bounds.size;
     
-    _collectionLayout = [[NOCChatCollectionViewLayout alloc] init];
+    _collectionLayout = [[NOCChatCollectionViewLayout alloc] initWithInverted:self.isInverted];
     
     _collectionView = [[NOCChatCollectionView alloc] initWithFrame:CGRectMake(0, 0, collectionViewSize.width, collectionViewSize.height) collectionViewLayout:_collectionLayout];
     _collectionView.dataSource = self;
