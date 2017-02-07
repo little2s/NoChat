@@ -333,7 +333,23 @@
 - (void)keyboardDidChangeFrame:(NSNotification *)notification
 {
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad && notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] == nil) {
+        CGSize collectionViewSize = self.containerView.frame.size;
         
+        NSTimeInterval duration = 0.3;
+        int curve = [notification.userInfo[UIKeyboardAnimationCurveUserInfoKey] intValue];
+        CGRect screenKeyboardFrame = [notification.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
+        CGRect keyboardFrame = [self.containerView convertRect:screenKeyboardFrame fromView:nil];
+        
+        CGFloat keyboardHeight = (keyboardFrame.size.height <= FLT_EPSILON || keyboardFrame.size.width <= FLT_EPSILON) ? 0 : (collectionViewSize.height - keyboardFrame.origin.y);
+        
+        if (keyboardFrame.origin.y + keyboardFrame.size.height < collectionViewSize.height - FLT_EPSILON) {
+            keyboardHeight = 0;
+        }
+        
+        self.keyboardHeight = keyboardHeight;
+        
+        [self.inputPanel adjustForSize:self.containerView.bounds.size keyboardHeight:keyboardHeight duration:duration animationCurve:curve];
+        [self adjustCollectionViewForSize:self.containerView.bounds.size keyboardHeight:keyboardHeight inputContainerHeight:self.inputPanel.frame.size.height scrollToBottom:NO duration:duration animationCurve:curve];
     }
 }
 
