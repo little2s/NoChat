@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E018A5301E49B3BE0034B376 /* sent.caf in Resources */ = {isa = PBXBuildFile; fileRef = E018A52F1E49B3BE0034B376 /* sent.caf */; };
+		E018A5331E49B3FD0034B376 /* NOCSoundManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E018A5321E49B3FD0034B376 /* NOCSoundManager.m */; };
+		E018A5351E49B7800034B376 /* notification.caf in Resources */ = {isa = PBXBuildFile; fileRef = E018A5341E49B7800034B376 /* notification.caf */; };
 		E02351541E37462500AE57D2 /* TGAvatarButton.m in Sources */ = {isa = PBXBuildFile; fileRef = E02351531E37462500AE57D2 /* TGAvatarButton.m */; };
 		E02351581E3749FE00AE57D2 /* TGTitleView.m in Sources */ = {isa = PBXBuildFile; fileRef = E02351571E3749FE00AE57D2 /* TGTitleView.m */; };
 		E06574021E3840F300D2FBB2 /* NOCChat.m in Sources */ = {isa = PBXBuildFile; fileRef = E06574011E3840F300D2FBB2 /* NOCChat.m */; };
@@ -62,6 +65,10 @@
 /* Begin PBXFileReference section */
 		5F4683890547AED21B7FE846 /* Pods-NoChat-Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NoChat-Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-NoChat-Example/Pods-NoChat-Example.debug.xcconfig"; sourceTree = "<group>"; };
 		87D54D4AE83B6A71EC459EBB /* Pods-NoChat-Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NoChat-Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-NoChat-Example/Pods-NoChat-Example.release.xcconfig"; sourceTree = "<group>"; };
+		E018A52F1E49B3BE0034B376 /* sent.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sent.caf; sourceTree = "<group>"; };
+		E018A5311E49B3FD0034B376 /* NOCSoundManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NOCSoundManager.h; sourceTree = "<group>"; };
+		E018A5321E49B3FD0034B376 /* NOCSoundManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NOCSoundManager.m; sourceTree = "<group>"; };
+		E018A5341E49B7800034B376 /* notification.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = notification.caf; sourceTree = "<group>"; };
 		E02351521E37462500AE57D2 /* TGAvatarButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TGAvatarButton.h; sourceTree = "<group>"; };
 		E02351531E37462500AE57D2 /* TGAvatarButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TGAvatarButton.m; sourceTree = "<group>"; };
 		E02351561E3749FE00AE57D2 /* TGTitleView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TGTitleView.h; sourceTree = "<group>"; };
@@ -274,6 +281,8 @@
 				E09B24951E0E322E00E9345B /* Assets.xcassets */,
 				E09B249A1E0E322E00E9345B /* Info.plist */,
 				E09B24871E0E322E00E9345B /* main.m */,
+				E018A52F1E49B3BE0034B376 /* sent.caf */,
+				E018A5341E49B7800034B376 /* notification.caf */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -326,6 +335,8 @@
 			children = (
 				E06574031E38454300D2FBB2 /* NOCMessageManager.h */,
 				E06574041E38454300D2FBB2 /* NOCMessageManager.m */,
+				E018A5311E49B3FD0034B376 /* NOCSoundManager.h */,
+				E018A5321E49B3FD0034B376 /* NOCSoundManager.m */,
 			);
 			name = Utilities;
 			sourceTree = "<group>";
@@ -523,6 +534,8 @@
 			files = (
 				E09B24991E0E322E00E9345B /* LaunchScreen.storyboard in Resources */,
 				E09B24961E0E322E00E9345B /* Assets.xcassets in Resources */,
+				E018A5351E49B7800034B376 /* notification.caf in Resources */,
+				E018A5301E49B3BE0034B376 /* sent.caf in Resources */,
 				E09B24941E0E322E00E9345B /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -600,6 +613,7 @@
 				E09B248B1E0E322E00E9345B /* NOCAppDelegate.m in Sources */,
 				E06574541E39E99D00D2FBB2 /* TGDateMessageCellLayout.m in Sources */,
 				E065744B1E39E96800D2FBB2 /* TGDateMessageCell.m in Sources */,
+				E018A5331E49B3FD0034B376 /* NOCSoundManager.m in Sources */,
 				E02351541E37462500AE57D2 /* TGAvatarButton.m in Sources */,
 				E0C29E6C1E33BEBB001A793F /* TGBaseMessageCell.m in Sources */,
 				E06574511E39E98700D2FBB2 /* MMSystemMessageCell.m in Sources */,

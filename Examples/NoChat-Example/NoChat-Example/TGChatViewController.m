@@ -42,6 +42,7 @@
 #import "NOCMessage.h"
 
 #import "NOCMessageManager.h"
+#import "NOCSoundManager.h"
 
 @interface TGChatViewController () <UINavigationControllerDelegate, NOCMessageManagerDelegate>
 
@@ -146,6 +147,8 @@
     
     if ([chatId isEqualToString:self.chat.chatId]) {
         [self addMessages:messages scrollToBottom:YES animated:YES];
+        
+        [[NOCSoundManager manager] playSound:@"notification.caf" vibrate:NO];
     }
 }
 
@@ -207,6 +210,8 @@
     [self addMessages:@[message] scrollToBottom:YES animated:YES];
     
     [self.messageManager sendMessage:message toChat:self.chat];
+    
+    [[NOCSoundManager manager] playSound:@"sent.caf" vibrate:NO];
 }
 
 - (void)addMessages:(NSArray *)messages scrollToBottom:(BOOL)scrollToBottom animated:(BOOL)animated
