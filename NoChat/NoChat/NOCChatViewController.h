@@ -70,8 +70,6 @@ NS_ASSUME_NONNULL_BEGIN
 // Default is YES.
 @property (nonatomic, assign, getter=isInverted) BOOL inverted;
 
-@property (nonatomic, assign) UIEdgeInsets chatCollectionViewContentInset;
-@property (nonatomic, assign) UIEdgeInsets chatCollectionViewScrollIndicatorInsets;
 @property (nonatomic, assign) CGFloat chatInputContainerViewDefaultHeight;
 @property (nonatomic, assign) CGFloat scrollFractionalThreshold; // in [0, 1]
 

@@ -62,6 +62,7 @@
 {
     _layoutAttributes = [[NSMutableArray alloc] init];
     _contentSize = CGSizeZero;
+    _inset = UIEdgeInsetsMake(8, 0, 8, 0);
 }
 
 - (void)prepareLayout
@@ -191,14 +192,9 @@
 
 - (NSArray *)layoutAttributesForLayouts:(NSArray *)layouts containerWidth:(CGFloat)containerWidth maxHeight:(CGFloat)maxHeight contentHeight:(CGFloat *)contentHeight
 {
-    return [NOCChatCollectionViewLayout layoutAttributesForLayouts:layouts containerWidth:containerWidth maxHeight:maxHeight contentHeight:contentHeight];
-}
-
-+ (NSArray *)layoutAttributesForLayouts:(NSArray *)layouts containerWidth:(CGFloat)containerWidth maxHeight:(CGFloat)maxHeight contentHeight:(CGFloat *)contentHeight
-{
     NSMutableArray *layoutAttributes = [[NSMutableArray alloc] init];
     
-    __block CGFloat verticalOffset = 0;
+    __block CGFloat verticalOffset = _inset.top;
     
     [layouts enumerateObjectsUsingBlock:^(id<NOCChatItemCellLayout> layout, NSUInteger i, BOOL *stop) {
         UICollectionViewLayoutAttributes *attributes = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:[NSIndexPath indexPathForItem:i inSection:0]];
@@ -213,6 +209,8 @@
         
         verticalOffset += layout.height;
     }];
+    
+    verticalOffset += _inset.bottom;
     
     if (contentHeight != NULL) {
         *contentHeight = MIN(verticalOffset, maxHeight);

@@ -54,4 +54,14 @@
     }
 }
 
+- (void)setContentInset:(UIEdgeInsets)contentInset
+{
+    [super setContentInset:contentInset];
+    
+    UIEdgeInsets inset = self.scrollIndicatorInsets;
+    inset.top = contentInset.top;
+    inset.bottom = contentInset.bottom;
+    self.scrollIndicatorInsets = inset;
+}
+
 @end

@@ -45,8 +45,6 @@
     self = [super init];
     if (self) {
         self.inverted = YES;
-        self.chatCollectionViewContentInset = UIEdgeInsetsMake(8, 0, 8, 0);
-        self.chatCollectionViewScrollIndicatorInsets = UIEdgeInsetsZero;
         self.chatInputContainerViewDefaultHeight = 45;
         self.scrollFractionalThreshold = 0.05;
         self.automaticallyAdjustsScrollViewInsets = NO;
@@ -240,7 +238,7 @@
     _collectionView.dataSource = self;
     _collectionView.delegate = self;
     
-    UIEdgeInsets originalInset = self.chatCollectionViewContentInset;
+    UIEdgeInsets originalInset = UIEdgeInsetsZero;
     UIEdgeInsets inset = originalInset;
     if (self.isInverted) {
         inset.top += self.chatInputContainerViewDefaultHeight;
@@ -248,7 +246,6 @@
         inset.bottom += self.chatInputContainerViewDefaultHeight;
     }
     _collectionView.contentInset = inset;
-    _collectionView.scrollIndicatorInsets = self.chatCollectionViewScrollIndicatorInsets;
 
     if (self.isInverted) {
         _collectionView.transform = CGAffineTransformMake(1, 0, 0, -1, 0, 0);
@@ -342,7 +339,7 @@
 
 - (void)adjustColletionViewInsets
 {
-    CGFloat topPadding = self.chatCollectionViewContentInset.top + self.topLayoutGuide.length;
+    CGFloat topPadding = self.topLayoutGuide.length;
     UIEdgeInsets originalInset = self.collectionView.contentInset;
     UIEdgeInsets inset = originalInset;
     if (self.isInverted) {
@@ -362,9 +359,9 @@
     UIEdgeInsets originalInset = self.collectionView.contentInset;
     UIEdgeInsets inset = originalInset;
     if (self.isInverted) {
-        inset.top = keyboardHeight + inputContainerHeight + self.chatCollectionViewContentInset.bottom;
+        inset.top = keyboardHeight + inputContainerHeight;
     } else {
-        inset.bottom = keyboardHeight + inputContainerHeight + self.chatCollectionViewContentInset.bottom;
+        inset.bottom = keyboardHeight + inputContainerHeight;
     }
     
     CGPoint originalContentOffset = self.collectionView.contentOffset;
@@ -458,9 +455,9 @@
     UIEdgeInsets originalInset = self.collectionView.contentInset;
     UIEdgeInsets inset = originalInset;
     if (self.isInverted) {
-        inset.top = keyboardHeight + self.inputPanel.frame.size.height + self.chatCollectionViewContentInset.bottom;
+        inset.top = keyboardHeight + self.inputPanel.frame.size.height;
     } else {
-        inset.bottom = keyboardHeight + self.inputPanel.frame.size.height + self.chatCollectionViewContentInset.bottom;
+        inset.bottom = keyboardHeight + self.inputPanel.frame.size.height;
     }
     self.collectionView.contentInset = inset;
     

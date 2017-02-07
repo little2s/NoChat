@@ -39,9 +39,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NOCChatCollectionViewLayout : UICollectionViewLayout
 
+@property (nonatomic, assign) UIEdgeInsets inset;
+
 - (instancetype)initWithInverted:(BOOL)inverted;
 
-+ (NSArray<UICollectionViewLayoutAttributes *> *)layoutAttributesForLayouts:(NSArray<id<NOCChatItemCellLayout>> *)layouts containerWidth:(CGFloat)containerWidth maxHeight:(CGFloat)maxHeight contentHeight:(nullable CGFloat *)contentHeight;
 - (NSArray<UICollectionViewLayoutAttributes *> *)layoutAttributesForLayouts:(NSArray<id<NOCChatItemCellLayout>> *)layouts containerWidth:(CGFloat)containerWidth maxHeight:(CGFloat)maxHeight contentHeight:(nullable CGFloat *)contentHeight;
 
 - (BOOL)hasLayoutAttributes;
