@@ -39,7 +39,7 @@
         _reuseIdentifier = @"TGSystemMessageCell";
         _chatItem = chatItem;
         _width = width;
-        _textLabelInsets = UIEdgeInsetsMake(2, 5, 2, 5);
+        _textLabelInsets = UIEdgeInsetsMake(2, 7, 2, 5);
         [self setupBackgroundImage];
         [self setupAttributedText];
         [self calculateLayout];
