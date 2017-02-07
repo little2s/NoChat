@@ -132,8 +132,9 @@
 
 - (void)print:(NSArray *)msgs completed:(void (^)())completed
 {
+    __block float delay = 0.65;
     [msgs enumerateObjectsUsingBlock:^(NSString *text, NSUInteger idx, BOOL *stop) {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)((idx+1) * NSEC_PER_SEC)), self.queue, ^{
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), self.queue, ^{
             NSDictionary *message = @{
                 @"from": kUserId,
                 @"to": self.targetId,
@@ -146,7 +147,18 @@
                 completed();
             }
         });
+        delay += [self delayOfText:text];
     }];
+}
+
+- (float)delayOfText:(NSString *)text
+{
+    if (text.length < 30) {
+        return 0.65;
+    } else if (text.length < 70) {
+        return 1.25;
+    } else
+        return 2;
 }
 
 - (void)nextScene:(NSString *)sceneName
