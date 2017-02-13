@@ -47,7 +47,26 @@ class ChatsViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let chat = ChatsViewController.botChat
+        var chatVC: UIViewController?
+        if indexPath.row == 0 {
+            chatVC = TGChatViewController(chat: chat)
+        }
+        if let vc = chatVC {
+            navigationController?.pushViewController(vc, animated: true)
+        }
         
         tableView.deselectRow(at: indexPath, animated: true)
     }
+    
+    static let botChat: Chat = {
+        let chat = Chat()
+        chat.type = "bot"
+        chat.targetId = "89757"
+        chat.chatId = chat.type + "_" + chat.targetId
+        chat.title = "Gothons From Planet Percal #25"
+        chat.detail = "bot"
+        return chat
+    }()
+    
 }

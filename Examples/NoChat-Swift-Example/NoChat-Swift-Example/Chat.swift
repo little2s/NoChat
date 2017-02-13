@@ -24,3 +24,15 @@
 //
 
 import Foundation
+
+class Chat {
+    
+    var chatId: String = ""
+    var type: String = ""
+    
+    var targetId: String = ""
+
+    var title: String = ""
+    var detail: String = ""
+    
+}

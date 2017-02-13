@@ -24,3 +24,15 @@
 //
 
 import Foundation
+
+class User {
+    
+    var userId: String = ""
+    
+    static let currentUser: User = {
+        let user = User()
+        user.userId = "23333"
+        return user
+    }()
+    
+}

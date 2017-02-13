@@ -1,5 +1,5 @@
 //
-//  UIFont+NoChat.swift
+//  TGChatViewController.swift
 //  NoChat-Swift-Example
 //
 //  Copyright (c) 2016-present, little2s.
@@ -25,16 +25,17 @@
 
 import UIKit
 
-extension UIFont {
+class TGChatViewController: UIViewController {
     
-    static func noc_mediumSystemFont(ofSize fontSize: CGFloat) -> UIFont {
-        var font: UIFont
-        if #available(iOS 8.2, *) {
-            font = UIFont.systemFont(ofSize: fontSize, weight: UIFontWeightMedium)
-        } else {
-            font = UIFont(name: "HelveticaNeue-Medium", size: fontSize)!
-        }
-        return font
+    let chat: Chat
+    
+    init(chat: Chat) {
+        self.chat = chat
+        super.init(nibName: nil, bundle: nil)
     }
-
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
 }

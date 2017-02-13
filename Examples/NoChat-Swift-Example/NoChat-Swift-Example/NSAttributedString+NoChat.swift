@@ -23,4 +23,13 @@
 //  SOFTWARE.
 //
 
-import Foundation
+import UIKit
+
+extension NSAttributedString {
+    
+    func noc_sizeThatFits(size: CGSize) -> CGSize {
+        let rect = boundingRect(with: size, options: [.usesLineFragmentOrigin, .usesFontLeading ], context: nil)
+        return rect.integral.size
+    }
+    
+}

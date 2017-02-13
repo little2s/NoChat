@@ -35,6 +35,7 @@
 		E018A5971E4A1AC80034B376 /* TGBaseMessageCellLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = E018A5961E4A1AC80034B376 /* TGBaseMessageCellLayout.swift */; };
 		E018A5991E4A1AD50034B376 /* TGTextMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E018A5981E4A1AD50034B376 /* TGTextMessageCell.swift */; };
 		E018A59B1E4A1AEB0034B376 /* TGTextMessageCellLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = E018A59A1E4A1AEB0034B376 /* TGTextMessageCellLayout.swift */; };
+		E021C4361E51C9DA003A2EA1 /* TGChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E021C4351E51C9DA003A2EA1 /* TGChatViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -69,6 +70,7 @@
 		E018A5961E4A1AC80034B376 /* TGBaseMessageCellLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TGBaseMessageCellLayout.swift; sourceTree = "<group>"; };
 		E018A5981E4A1AD50034B376 /* TGTextMessageCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TGTextMessageCell.swift; sourceTree = "<group>"; };
 		E018A59A1E4A1AEB0034B376 /* TGTextMessageCellLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TGTextMessageCellLayout.swift; sourceTree = "<group>"; };
+		E021C4351E51C9DA003A2EA1 /* TGChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TGChatViewController.swift; sourceTree = "<group>"; };
 		F2086D5A65816BB8659D62B9 /* Pods_NoChat_Swift_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NoChat_Swift_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -214,6 +216,7 @@
 				E018A57B1E4A19A60034B376 /* Cell */,
 				E018A57A1E4A199F0034B376 /* Input Panel */,
 				E018A5791E4A19960034B376 /* Progress View */,
+				E021C4351E51C9DA003A2EA1 /* TGChatViewController.swift */,
 			);
 			name = Telegram;
 			sourceTree = "<group>";
@@ -426,6 +429,7 @@
 			files = (
 				E018A57F1E4A19E70034B376 /* TGTitleView.swift in Sources */,
 				E018A56F1E4A19370034B376 /* NSAttributedString+NoChat.swift in Sources */,
+				E021C4361E51C9DA003A2EA1 /* TGChatViewController.swift in Sources */,
 				E018A54B1E4A0F680034B376 /* AppDelegate.swift in Sources */,
 				E018A58B1E4A1A470034B376 /* TGDeliveryStatusView.swift in Sources */,
 				E018A58F1E4A1A890034B376 /* TGDateMessageCellLayout.swift in Sources */,
