@@ -1,107 +1,146 @@
 <img src="https://raw.githubusercontent.com/little2s/NoChat/master/Assets/icon.png" width="100" height="100" />
 
+[![Languages](https://img.shields.io/badge/languages-ObjC%20%7C%20Swift-orange.svg)](https://github.com/little2s/NoChat)
+
 # NoChat
-NoChat is a Swift lightweight chat framework base on [Chatto](https://github.com/badoo/Chatto).    
-Along with NoChat, there are three companion frameworks: NoChatTG, NoChatMM, NoChatSLK.    
-These companion frameworks are just different user interface, you can custom your own with NoChat :].        
+NoChat is a lightweight chat UI framework which has no particular faces. 
+The projects in [Examples](https://github.com/little2s/NoChat/Examples) directory 
+show you how to use this framework to implement a text game with user interface like 
+Telegram or WeChat very easily. You can custom your own with NoChat :].       
 
 <img src="https://raw.githubusercontent.com/little2s/NoChat/master/Screenshots/screenshot-0.png" width="250" height="444" />
 &nbsp;&nbsp;
 <img src="https://raw.githubusercontent.com/little2s/NoChat/master/Screenshots/screenshot-1.png" width="250" height="444" />
-&nbsp;&nbsp;
-<img src="https://raw.githubusercontent.com/little2s/NoChat/master/Screenshots/screenshot-2.png" width="250" height="444" />
 
 ## Features
-- Calculation of collection view changes and layout in background
-- Supports pagination in both directions and autoloading
-- Message count contention for fast pagination and rotation with thousands of messsages
-- Supports custom message bubble and toolbar
-- Invert mode
+- Inverted mode
+- Adaptive user interface
+- Custom chat items and input panel
+- Simple MVC pattern
+- Supports both Objective-C and Swift
 
 ## Requirements
 - iOS 8.0+
-- Xcode 7.3 or above
+- Xcode 8.2.1 or above
 
 ## Install
+NoChat supports multiple methods for install.
+
 ### CocoaPods
-
 Include the following in your `Podfile`:    
-
 ``` ruby
-pod 'NoChat'
+target 'TargetName' do
+    pod 'NoChat', '~> 0.3'
+end
 ```
-    
-#### Manually
-Download and drop ```/NoChat/Source```folder in your project.  
+
+### Carthage
+Include the following in your `Cartfile`: 
+```
+github "little2s/NoChat" ~> 0.3
+```
+
+### Manually
+Download and drop `/NoChat/NoChat` folder in your project.  
+
+## Architecture
+
+### Model
+- `<NOCChatItem>`
+
+### Views
+- `NOCChatContainerView`
+- `NOCChatInputPanel`
+- `NOCChatCollectionView`
+- `NOCChatCollectionViewLayout`
+- `NOCChatItemCell`
+- `<NOCChatItemCellLayout>`
+
+### ViewController
+- `NOCChatViewController`
 
 ## Usage
 
-Import the framework you want to use
+### Objective-C
 
+Import the framework.
+``` objective-c
+#import <NoChat/NoChat.h>
+```
+
+You can create a subclass of `NOCChatViewController`, and provide the data.
+``` objective-c
+@interface TGChatViewController : NOCChatViewController
+    // ...
+@end
+
+@implementation TGChatViewController
+
+    // Overrides these three methods below to provide basic classes.
+    + (Class)cellLayoutClassForItemType:(NSString *)type
+    {
+        // ...
+    }
+
+    + (Class)inputPanelClass
+    {
+        // ...
+    }
+
+    - (void)registerChatItemCells
+    {
+        // ...
+    }
+        
+}
+```
+
+Implement your business in this subclass. You may update `layouts` property through
+these there methods provide by super class:
+- `insertLayouts:atIndexes:animated:`
+- `deleteLayoutsAtIndexes:animated:`
+- `updateLayoutAtIndex:toLayout:`
+
+And I also suggest you custom the view controller of chat with the protocols provide by NoChat.
+I mean you can write your own `ChatViewController` without `NOCChatViewController`.
+Source code is mind, not just code, I think.
+
+### Swift
+
+Import the framework.
 ``` swift
 import NoChat
 ```
-
-You can create a subclass of `ChatViewController`, and provide the data.
-
+You can create a subclass of `NOCChatViewController`, and provide the data.
 ``` swift
+class TGChatViewController: NOCChatViewController {
 
-class TGChatViewController: ChatViewController {
-
-    // ...
-    
-    override func viewDidLoad() {
-        inverted = true
-        super.viewDidLoad()
-    }
-
-    
-    // Setup chat items
-    override func createPresenterBuilders() -> [ChatItemType: [ChatItemPresenterBuilderProtocol]] {
-        return [
-            DateItem.itemType : [
-                DateItemPresenterBuider()
-            ],
-            MessageType.Text.rawValue : [
-                MessagePresenterBuilder<TextBubbleView, TGTextMessageViewModelBuilder>(
-                    viewModelBuilder: TGTextMessageViewModelBuilder(),
-                    layoutCache: messageLayoutCache
-                )
-            ]
-        ]
-    }
-    
-    // Setup chat input views
-    override func createChatInputViewController() -> UIViewController {
-        let inputController = NoChatTG.ChatInputViewController()
-
+    // Overrides these three methods below to provide basic classes.
+    override class func cellLayoutClass(forItemType type: String) -> Swift.AnyClass? {
         // ...
-        
-        return inputController
     }
-
-    // ...
+    
+    override class func inputPanelClass() -> Swift.AnyClass? {
+        // ...
+    }
+    
+    override func registerChatItemCells() {
+        // ...
+    }
     
 }
-
 ```
-
-And I also suggest you custom the view controller of chat with the protocols provide by NoChat.
-I mean you can write your own `ChatViewController` without `NoChat.ChatViewController`.
-Source code is mind, not just code, I think.
-
-## Architechture
-The architechture of the chat UI looks like this:
-![Mind](https://raw.githubusercontent.com/little2s/NoChat/master/Assets/mind.png)
+Implement your business in this subclass. The same way as description in Objective-C section above.
 
 ## More
-See the Demo project inside.
+See the [Examples](https://github.com/little2s/NoChat/Examples) projects inside.
 
-## About the name
-Why call it `NoChat`?
-Because the boss let us write many apps with chat UI,
-sorry I really don't want to write chat UI anymore 😢
-
+## About
+- This framework is inspired by [Chatto](https://github.com/badoo/Chatto) and [Telegram](https://github.com/peter-iakovlev/Telegram). Thanks.
+- All reources in example projects are extracted from real app [Telegram](https://itunes.apple.com/us/app/telegram-messenger/id686449807?mt=8) and [WeChat](https://itunes.apple.com/us/app/wechat/id414478124?mt=8). Do not use these resources in your project for business directly.  
+- The example use [YYLabel](https://github.com/ibireme/YYText/blob/master/YYText/YYLabel.h) instead of `UILabel` and [HPGrowingTextView](https://github.com/HansPinckaers/GrowingTextView) for writing text input panel. Thanks to these great contributers. And these dependencies are not essential for `NoChat` framework. `NoChat` just a view layer framework. Mainly provide a container just like `UITableViewController`.
+- Text game is migration from [Here](https://learnpythonthehardway.org/book/ex43.html).
+- If you prefer the pure swift version before 0.3, here is a great fork with swift 3 support: https://github.com/mbalex99/NoChat, thanks for their great work.
 
 ## License
 Source code is distributed under MIT license.

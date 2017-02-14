@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0730"
+   LastUpgradeVersion = "0820"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E0E6677E1CE0879200146301"
+               BlueprintIdentifier = "E019EA791E1F359C004706DD"
                BuildableName = "NoChat.framework"
                BlueprintName = "NoChat"
                ReferencedContainer = "container:NoChat.xcodeproj">
@@ -45,7 +45,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E0E6677E1CE0879200146301"
+            BlueprintIdentifier = "E019EA791E1F359C004706DD"
             BuildableName = "NoChat.framework"
             BlueprintName = "NoChat"
             ReferencedContainer = "container:NoChat.xcodeproj">
@@ -63,7 +63,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E0E6677E1CE0879200146301"
+            BlueprintIdentifier = "E019EA791E1F359C004706DD"
             BuildableName = "NoChat.framework"
             BlueprintName = "NoChat"
             ReferencedContainer = "container:NoChat.xcodeproj">
