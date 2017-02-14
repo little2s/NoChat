@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/little2s/NoChat/master/Assets/icon.png" width="100" height="100" />
+<img src="https://github.com/little2s/NoChat/raw/master/Examples/NoChat-Example/NoChat-Example/Assets.xcassets/AppIcon.appiconset/Icon-60%402x.png" width="100" height="100" />
 
 [![Languages](https://img.shields.io/badge/languages-ObjC%20%7C%20Swift-orange.svg)](https://github.com/little2s/NoChat)
 
@@ -99,7 +99,7 @@ Implement your business in this subclass. You may update `layouts` property thro
 these there methods provide by super class:
 - `insertLayouts:atIndexes:animated:`
 - `deleteLayoutsAtIndexes:animated:`
-- `updateLayoutAtIndex:toLayout:`
+- `updateLayoutAtIndex:toLayout:animated:`
 
 And I also suggest you custom the view controller of chat with the protocols provide by NoChat.
 I mean you can write your own `ChatViewController` without `NOCChatViewController`.
@@ -138,7 +138,7 @@ See the [Examples](https://github.com/little2s/NoChat/Examples) projects inside.
 ## About
 - This framework is inspired by [Chatto](https://github.com/badoo/Chatto) and [Telegram](https://github.com/peter-iakovlev/Telegram). Thanks.
 - All reources in example projects are extracted from real app [Telegram](https://itunes.apple.com/us/app/telegram-messenger/id686449807?mt=8) and [WeChat](https://itunes.apple.com/us/app/wechat/id414478124?mt=8). Do not use these resources in your project for business directly.  
-- The example use [YYLabel](https://github.com/ibireme/YYText/blob/master/YYText/YYLabel.h) instead of `UILabel` and [HPGrowingTextView](https://github.com/HansPinckaers/GrowingTextView) for writing text input panel. Thanks to these great contributers. And these dependencies are not essential for `NoChat` framework. `NoChat` just a view layer framework. Mainly provide a container just like `UITableViewController`.
+- The example use [YYLabel](https://github.com/ibireme/YYText/blob/master/YYText/YYLabel.h) instead of `UILabel` and [HPGrowingTextView](https://github.com/HansPinckaers/GrowingTextView) for writing text input panel. Thanks to these great contributers. And these dependencies are not essential for `NoChat` framework. `NoChat` is just a view layer framework which mainly provide a container just like `UITableViewController`.
 - Text game is migration from [Here](https://learnpythonthehardway.org/book/ex43.html).
 - If you prefer the pure swift version before 0.3, here is a great fork with swift 3 support: https://github.com/mbalex99/NoChat, thanks for their great work.
 

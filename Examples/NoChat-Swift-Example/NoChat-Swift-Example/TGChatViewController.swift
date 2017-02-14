@@ -222,8 +222,10 @@ class TGChatViewController: NOCChatViewController, UINavigationControllerDelegat
         
         collectionLayout!.invalidateLayout()
         
+        let cellLayouts = layouts.map { $0 as! NOCChatItemCellLayout }
+        
         var newContentHeight = CGFloat(0)
-        let newLayoutAttributes = collectionLayout!.layoutAttributes(for: layouts, containerWidth: collectionViewSize.width, maxHeight: CGFloat.greatestFiniteMagnitude, contentHeight: &newContentHeight)
+        let newLayoutAttributes = collectionLayout!.layoutAttributes(for: cellLayouts, containerWidth: collectionViewSize.width, maxHeight: CGFloat.greatestFiniteMagnitude, contentHeight: &newContentHeight)
         
         var newContentOffset = CGPoint.zero
         newContentOffset.y = -collectionView!.contentInset.top
@@ -251,8 +253,10 @@ class TGChatViewController: NOCChatViewController, UINavigationControllerDelegat
         var itemOriginY = CGFloat(0)
         var itemOffset = CGFloat(0)
         var itemHeight = CGFloat(0)
+        
+        let cellLayouts = layouts.map { $0 as! NOCChatItemCellLayout }
 
-        let previousLayoutAttributes = collectionLayout!.layoutAttributes(for: layouts, containerWidth: previousCollectionFrame.width, maxHeight: CGFloat.greatestFiniteMagnitude, contentHeight: nil)
+        let previousLayoutAttributes = collectionLayout!.layoutAttributes(for: cellLayouts, containerWidth: previousCollectionFrame.width, maxHeight: CGFloat.greatestFiniteMagnitude, contentHeight: nil)
         
         for i in 0..<layouts.count {
             let attributes = previousLayoutAttributes[i]

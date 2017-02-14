@@ -692,7 +692,7 @@
 
 - (void)updateLayoutAtIndex:(NSUInteger)index toLayout:(id<NOCChatItemCellLayout>)layout animated:(BOOL)animated
 {
-    if (index < 0 || index >= self.layouts.count) {
+    if (index >= self.layouts.count) {
         return;
     }
     

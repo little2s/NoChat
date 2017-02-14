@@ -94,7 +94,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)insertLayouts:(NSArray<id<NOCChatItemCellLayout>> *)layouts atIndexes:(NSIndexSet *)indexes animated:(BOOL)animated;
 - (void)deleteLayoutsAtIndexes:(NSIndexSet *)indexes animated:(BOOL)animated;
-- (void)updateLayoutAtIndex:(NSUInteger)index toLayout:(id<NOCChatItemCellLayout>)layout;
+- (void)updateLayoutAtIndex:(NSUInteger)index toLayout:(id<NOCChatItemCellLayout>)layout animated:(BOOL)animated;
 
 @end
 

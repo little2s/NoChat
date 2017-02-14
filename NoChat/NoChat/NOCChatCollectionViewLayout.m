@@ -190,7 +190,7 @@
     return _contentSize.height > FLT_EPSILON;
 }
 
-- (NSArray *)layoutAttributesForLayouts:(NSMutableArray *)layouts containerWidth:(CGFloat)containerWidth maxHeight:(CGFloat)maxHeight contentHeight:(CGFloat *)contentHeight
+- (NSArray *)layoutAttributesForLayouts:(NSArray *)layouts containerWidth:(CGFloat)containerWidth maxHeight:(CGFloat)maxHeight contentHeight:(CGFloat *)contentHeight
 {
     NSMutableArray *layoutAttributes = [[NSMutableArray alloc] init];
     
