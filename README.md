@@ -140,6 +140,7 @@ See the [Examples](https://github.com/little2s/NoChat/Examples) projects inside.
 - All reources in example projects are extracted from real app [Telegram](https://itunes.apple.com/us/app/telegram-messenger/id686449807?mt=8) and [WeChat](https://itunes.apple.com/us/app/wechat/id414478124?mt=8). Do not use these resources in your project for business directly.  
 - The example use [YYLabel](https://github.com/ibireme/YYText/blob/master/YYText/YYLabel.h) instead of `UILabel` and [HPGrowingTextView](https://github.com/HansPinckaers/GrowingTextView) for writing text input panel. Thanks to these great contributers. And these dependencies are not essential for `NoChat` framework. `NoChat` just a view layer framework. Mainly provide a container just like `UITableViewController`.
 - Text game is migration from [Here](https://learnpythonthehardway.org/book/ex43.html).
+- If you prefer the pure swift version before 0.3, here is a great fork with swift 3 support: https://github.com/mbalex99/NoChat, thanks for their great work.
 
 ## License
 Source code is distributed under MIT license.
