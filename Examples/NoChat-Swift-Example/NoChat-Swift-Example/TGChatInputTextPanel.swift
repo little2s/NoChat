@@ -27,7 +27,7 @@ import NoChat
 import HPGrowingTextView
 
 protocol TGChatInputTextPanelDelegate: NOCChatInputPanelDelegate {
-    func inputTextPanel(_ inputTextPanel: TGChatInputTextPanel, requestSendText: String)
+    func inputTextPanel(_ inputTextPanel: TGChatInputTextPanel, requestSendText text: String)
 }
 
 private let TGRetinaPixel = CGFloat(0.5)
@@ -91,6 +91,7 @@ class TGChatInputTextPanel: NOCChatInputPanel, HPGrowingTextViewDelegate {
         sendButton.setTitle(NSLocalizedString("Send", comment: ""), for: .normal)
         sendButton.setTitleColor(UIColor(colorLiteralRed: 0/255.0, green: 126/255.0, blue: 229/255.0, alpha: 1), for: .normal)
         sendButton.setTitleColor(UIColor(colorLiteralRed: 142/255.0, green: 142/255.0, blue: 147/255.0, alpha: 1), for: .disabled)
+        sendButton.titleLabel?.font = UIFont.noc_mediumSystemFont(ofSize: 17)
         sendButton.isEnabled = false
         sendButton.isHidden = true
         

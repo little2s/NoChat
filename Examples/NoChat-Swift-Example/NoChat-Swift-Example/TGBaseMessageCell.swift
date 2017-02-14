@@ -22,4 +22,36 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 //
-import Foundation
+import NoChat
+
+class TGBaseMessageCell: NOCChatItemCell {
+    
+    var bubbleView = UIView()
+    
+    var isHighlight = false
+    
+    override class func reuseIdentifier() -> String {
+        return "TGBaseMessageCell"
+    }
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        
+        itemView?.addSubview(bubbleView)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override var layout: NOCChatItemCellLayout? {
+        didSet {
+            guard let cellLayout = layout as? TGBaseMessageCellLayout else {
+                fatalError("invalid layout type")
+            }
+            
+            bubbleView.frame = cellLayout.bubbleViewFrame
+        }
+    }
+    
+}

@@ -40,16 +40,29 @@
 
 #pragma mark - Override
 
+- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self) {
+        [self commonInit];
+    }
+    return self;
+}
+
+- (instancetype)initWithCoder:(NSCoder *)aDecoder
+{
+    self = [super initWithCoder:aDecoder];
+    if (self) {
+        [self commonInit];
+    }
+    return self;
+}
+
 - (instancetype)init
 {
     self = [super init];
     if (self) {
-        self.inverted = YES;
-        self.chatInputContainerViewDefaultHeight = 45;
-        self.scrollFractionalThreshold = 0.05;
-        self.automaticallyAdjustsScrollViewInsets = NO;
-        self.hidesBottomBarWhenPushed = YES;
-        [self registerKeyboardNotifications];
+        [self commonInit];
     }
     return self;
 }
@@ -187,6 +200,16 @@
 }
 
 #pragma mark - Private
+
+- (void)commonInit
+{
+    _inverted = YES;
+    _chatInputContainerViewDefaultHeight = 45;
+    _scrollFractionalThreshold = 0.05;
+    self.automaticallyAdjustsScrollViewInsets = NO;
+    self.hidesBottomBarWhenPushed = YES;
+    [self registerKeyboardNotifications];
+}
 
 - (void)setupContainerView
 {

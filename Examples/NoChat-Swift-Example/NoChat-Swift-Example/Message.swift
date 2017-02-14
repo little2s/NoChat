@@ -37,7 +37,7 @@ enum MessageDeliveryStatus {
 class Message: NSObject, NOCChatItem {
     
     var msgId: String = UUID().uuidString
-    var msgType: String = ""
+    var msgType: String = "Text"
     
     var senderId: String = ""
     var date: Date = Date()

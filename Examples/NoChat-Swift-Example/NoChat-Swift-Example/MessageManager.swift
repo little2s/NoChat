@@ -52,28 +52,25 @@ class MessageManager: NSObject, NOCClientDelegate {
     }
     
     func fetchMessages(withChatId chatId: String, handler: ([Message]) -> Void) {
-        guard var msgs = messages[chatId] else {
-            handler([])
-            return;
-        }
-        
-        if msgs.count == 0 {
-            handler([])
+        if let msgs = messages[chatId] {
+            handler(msgs)
         } else {
+            var arr = [Message]()
+            
             let msg = Message()
             msg.msgType = "Date"
-            msgs.append(msg)
+            arr.append(msg)
             
             if chatId == "bot_89757" {
                 let msg = Message()
                 msg.msgType = "System"
                 msg.text = "Welcome to Gothons From Planet Percal #25! Please input `/start` to play!"
-                msgs.append(msg)
+                arr.append(msg)
             }
             
-            saveMessages(msgs, chatId: chatId)
+            saveMessages(arr, chatId: chatId)
             
-            handler(msgs)
+            handler(arr)
         }
     }
     
