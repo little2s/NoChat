@@ -4,7 +4,7 @@
 
 # NoChat
 NoChat is a lightweight chat UI framework which has no particular faces. 
-The projects in [Examples](https://github.com/little2s/NoChat/Examples) directory 
+The projects in [Examples](https://github.com/little2s/NoChat/tree/master/Examples) directory 
 show you how to use this framework to implement a text game with user interface like 
 Telegram or WeChat very easily. You can custom your own with NoChat :].       
 
@@ -133,7 +133,7 @@ class TGChatViewController: NOCChatViewController {
 Implement your business in this subclass. The same way as description in Objective-C section above.
 
 ## More
-See the [Examples](https://github.com/little2s/NoChat/Examples) projects inside.
+See the [Examples](https://github.com/little2s/NoChat/tree/master/Examples) projects inside.
 
 ## About
 - This framework is inspired by [Chatto](https://github.com/badoo/Chatto) and [Telegram](https://github.com/peter-iakovlev/Telegram). Thanks.
