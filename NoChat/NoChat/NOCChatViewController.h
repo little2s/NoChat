@@ -81,6 +81,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)didTapStatusBar;
 
+- (nullable id<NOCChatItemCellLayout>)createLayoutWithItem:(id<NOCChatItem>)item;
+
 @end
 
 //

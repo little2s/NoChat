@@ -222,8 +222,7 @@
         NSMutableArray *layouts = [[NSMutableArray alloc] init];
         
         [messages enumerateObjectsUsingBlock:^(NOCMessage *message, NSUInteger idx, BOOL *stop) {
-            Class layoutClass = [[self class] cellLayoutClassForItemType:message.type];
-            id<NOCChatItemCellLayout> layout = [[layoutClass alloc] initWithChatItem:message cellWidth:self.cellWidth];
+            id<NOCChatItemCellLayout> layout = [self createLayoutWithItem:message];
             [layouts insertObject:layout atIndex:0];
         }];
         

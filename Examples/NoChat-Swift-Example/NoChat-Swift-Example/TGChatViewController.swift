@@ -178,7 +178,7 @@ class TGChatViewController: NOCChatViewController, UINavigationControllerDelegat
             var layouts = [NOCChatItemCellLayout]()
             
             for message in messages {
-                let layout = self.layoutsForMessage(message)
+                let layout = self.createLayout(with: message)!
                 layouts.insert(layout, at: 0)
             }
             
@@ -188,20 +188,6 @@ class TGChatViewController: NOCChatViewController, UINavigationControllerDelegat
                     self.scrollToBottom(animated: animated)
                 }
             }
-        }
-    }
-    
-    private func layoutsForMessage(_ message: Message) -> NOCChatItemCellLayout {
-        let width = self.cellWidth
-        let type = message.msgType
-        if type == "Text" {
-            return TGTextMessageCellLayout(chatItem: message, cellWidth: width)
-        } else if type == "Date" {
-            return TGDateMessageCellLayout(chatItem: message, cellWidth: width)
-        } else if type == "System" {
-            return TGSystemMessageCellLayout(chatItem: message, cellWidth: width)
-        } else {
-            fatalError("invalid nessage type")
         }
     }
     

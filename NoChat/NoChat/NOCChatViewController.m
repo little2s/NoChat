@@ -136,6 +136,16 @@
     }
 }
 
+- (nullable id<NOCChatItemCellLayout>)createLayoutWithItem:(id<NOCChatItem>)item
+{
+    Class layoutClass = [[self class] cellLayoutClassForItemType:item.type];
+    if (layoutClass == nil) {
+        return nil;
+    }
+    
+    return [[layoutClass alloc] initWithChatItem:item cellWidth:self.cellWidth];
+}
+
 #pragma mark - UICollectionViewDataSource
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
