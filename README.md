@@ -8,9 +8,9 @@ The projects in [Examples](https://github.com/little2s/NoChat/Examples) director
 show you how to use this framework to implement a text game with user interface like 
 Telegram or WeChat very easily. You can custom your own with NoChat :].       
 
-<img src="https://raw.githubusercontent.com/little2s/NoChat/master/Screenshots/screenshot-0.png" width="250" height="444" />
+<img src="https://raw.githubusercontent.com/little2s/NoChat/master/Screenshots/screenshot-0x00.png" width="250" height="444" />
 &nbsp;&nbsp;
-<img src="https://raw.githubusercontent.com/little2s/NoChat/master/Screenshots/screenshot-1.png" width="250" height="444" />
+<img src="https://raw.githubusercontent.com/little2s/NoChat/master/Screenshots/screenshot-0x01.png" width="250" height="444" />
 
 ## Features
 - Inverted mode
