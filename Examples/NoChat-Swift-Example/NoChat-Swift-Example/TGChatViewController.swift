@@ -172,20 +172,21 @@ class TGChatViewController: NOCChatViewController, UINavigationControllerDelegat
     }
     
     private func addMessages(_ messages: [Message], scrollToBottom: Bool, animated: Bool) {
-        layoutQueue.async {
+        layoutQueue.async { [weak self] in
+            guard let strongSelf = self else { return }
             let indexes = IndexSet(integersIn: 0..<messages.count)
             
             var layouts = [NOCChatItemCellLayout]()
             
             for message in messages {
-                let layout = self.createLayout(with: message)!
+                let layout = strongSelf.createLayout(with: message)!
                 layouts.insert(layout, at: 0)
             }
             
             DispatchQueue.main.async {
-                self.insertLayouts(layouts, at: indexes, animated: animated)
+                strongSelf.insertLayouts(layouts, at: indexes, animated: animated)
                 if scrollToBottom {
-                    self.scrollToBottom(animated: animated)
+                    strongSelf.scrollToBottom(animated: animated)
                 }
             }
         }

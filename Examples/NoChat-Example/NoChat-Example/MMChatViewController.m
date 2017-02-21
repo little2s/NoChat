@@ -222,20 +222,23 @@
 
 - (void)addMessages:(NSArray *)messages scrollToBottom:(BOOL)scrollToBottom animated:(BOOL)animated
 {
+    __weak typeof(self) weakSelf = self;
     dispatch_async(self.layoutQueue, ^{
+        __strong typeof(weakSelf) strongSelf = self;
+        
         NSIndexSet *indexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(self.layouts.count, messages.count)];
         
         NSMutableArray *layouts = [[NSMutableArray alloc] init];
         
         [messages enumerateObjectsUsingBlock:^(NOCMessage *message, NSUInteger idx, BOOL *stop) {
-            id<NOCChatItemCellLayout> layout = [self createLayoutWithItem:message];
+            id<NOCChatItemCellLayout> layout = [strongSelf createLayoutWithItem:message];
             [layouts addObject:layout];
         }];
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self insertLayouts:layouts atIndexes:indexes animated:animated];
+            [strongSelf insertLayouts:layouts atIndexes:indexes animated:animated];
             if (scrollToBottom) {
-                [self scrollToBottomAnimated:animated];
+                [strongSelf scrollToBottomAnimated:animated];
             }
         });
     });
