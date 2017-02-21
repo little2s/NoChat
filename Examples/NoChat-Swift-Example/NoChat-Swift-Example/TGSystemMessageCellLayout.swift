@@ -102,57 +102,22 @@ class TGSystemMessageCellLayout: NSObject, NOCChatItemCellLayout {
 }
 
 fileprivate func TGGenerateSystemMessageBackground() -> UIImage? {
-    UIGraphicsBeginImageContextWithOptions(CGSize(width: 21, height: 21), false, 0)
+    UIGraphicsBeginImageContextWithOptions(CGSize(width: 20, height: 20), false, 0)
     
     guard let context = UIGraphicsGetCurrentContext() else {
         return nil
     }
-    
-    let bounds = CGRect(x: 0.5, y: 0, width: 20, height: 20)
-    
-    let radius = 0.5 * bounds.height
-    
-    let visiblePath = CGMutablePath()
-    let innerRect = bounds.insetBy(dx: radius, dy: radius)
-    visiblePath.move(to: CGPoint(x: innerRect.origin.x, y: bounds.origin.y))
-    visiblePath.addLine(to: CGPoint(x: innerRect.origin.x + innerRect.size.width, y: bounds.origin.y))
-    visiblePath.addArc(tangent1End: CGPoint(x: bounds.origin.x + bounds.size.width, y: bounds.origin.y), tangent2End: CGPoint(x: bounds.origin.x + bounds.size.width, y: innerRect.origin.y), radius: radius)
-    visiblePath.addLine(to: CGPoint(x: bounds.origin.x + bounds.size.width, y: innerRect.origin.y + innerRect.size.height))
-    visiblePath.addArc(tangent1End: CGPoint(x: bounds.origin.x + bounds.size.width, y: bounds.origin.y + bounds.size.height), tangent2End: CGPoint(x: innerRect.origin.x + innerRect.size.width, y: bounds.origin.y + bounds.size.height), radius: radius)
-    visiblePath.addLine(to: CGPoint(x: innerRect.origin.x, y: bounds.origin.y + bounds.size.height))
-    visiblePath.addArc(tangent1End: CGPoint(x: bounds.origin.x, y: bounds.origin.y + bounds.size.height), tangent2End: CGPoint(x: bounds.origin.x, y: innerRect.origin.y + innerRect.size.height), radius: radius)
-    visiblePath.addLine(to: CGPoint(x: bounds.origin.x, y: innerRect.origin.y))
-    visiblePath.addArc(tangent1End: CGPoint(x: bounds.origin.x, y: bounds.origin.y), tangent2End: CGPoint(x: innerRect.origin.x, y: bounds.origin.y), radius: radius)
-    visiblePath.closeSubpath()
-    
-    context.saveGState()
+
+    let path = UIBezierPath(roundedRect: CGRect(x: 0, y: 0, width: 20, height: 20), cornerRadius: 10)
     
     let color = TGSystemMessageCellLayout.Style.textBackgroundColor
-    
     color.setFill()
-    context.addPath(visiblePath)
+    
+    context.addPath(path.cgPath)
     context.fillPath()
     
-    context.restoreGState()
-    
-    let path = CGMutablePath()
-    path.addRect(bounds.insetBy(dx: -2, dy: -2))
-    
-    path.addPath(visiblePath)
-    path.closeSubpath()
-    
-    context.addPath(visiblePath)
-    context.clip()
-    
-    context.saveGState()
-    
-    color.setFill()
-    context.addPath(path)
-    context.fillPath(using: .evenOdd)
-    
-    context.restoreGState()
-    
     let image = UIGraphicsGetImageFromCurrentImageContext()
+    
     UIGraphicsEndImageContext()
     
     return image

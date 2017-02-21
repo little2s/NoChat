@@ -120,65 +120,27 @@
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         UIImage *rawImage = [self generateSystemMessageBackground];
-        _systemMessageBackground = [rawImage stretchableImageWithLeftCapWidth:(int)(rawImage.size.width/2) topCapHeight:(int)(rawImage.size.height/2)];
+        _systemMessageBackground = [rawImage stretchableImageWithLeftCapWidth:(NSInteger)(rawImage.size.width/2) topCapHeight:(NSInteger)(rawImage.size.height/2)];
     });
     return _systemMessageBackground;
 }
 
 + (UIImage *)generateSystemMessageBackground
 {
-    UIGraphicsBeginImageContextWithOptions(CGSizeMake(21, 21), false, 0.0f);
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(20, 20), NO, 0);
     
     CGContextRef context = UIGraphicsGetCurrentContext();
     
-    CGRect bounds = CGRectMake(0.5f, 0, 20, 20);
+    UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, 20, 20) cornerRadius:10];
     
-    CGFloat radius = 0.5f * CGRectGetHeight(bounds);
-    
-    CGMutablePathRef visiblePath = CGPathCreateMutable();
-    CGRect innerRect = CGRectInset(bounds, radius, radius);
-    CGPathMoveToPoint(visiblePath, NULL, innerRect.origin.x, bounds.origin.y);
-    CGPathAddLineToPoint(visiblePath, NULL, innerRect.origin.x + innerRect.size.width, bounds.origin.y);
-    CGPathAddArcToPoint(visiblePath, NULL, bounds.origin.x + bounds.size.width, bounds.origin.y, bounds.origin.x + bounds.size.width, innerRect.origin.y, radius);
-    CGPathAddLineToPoint(visiblePath, NULL, bounds.origin.x + bounds.size.width, innerRect.origin.y + innerRect.size.height);
-    CGPathAddArcToPoint(visiblePath, NULL,  bounds.origin.x + bounds.size.width, bounds.origin.y + bounds.size.height, innerRect.origin.x + innerRect.size.width, bounds.origin.y + bounds.size.height, radius);
-    CGPathAddLineToPoint(visiblePath, NULL, innerRect.origin.x, bounds.origin.y + bounds.size.height);
-    CGPathAddArcToPoint(visiblePath, NULL,  bounds.origin.x, bounds.origin.y + bounds.size.height, bounds.origin.x, innerRect.origin.y + innerRect.size.height, radius);
-    CGPathAddLineToPoint(visiblePath, NULL, bounds.origin.x, innerRect.origin.y);
-    CGPathAddArcToPoint(visiblePath, NULL,  bounds.origin.x, bounds.origin.y, innerRect.origin.x, bounds.origin.y, radius);
-    CGPathCloseSubpath(visiblePath);
-    
-    CGContextSaveGState(context);
-    
-    UIColor *color = [UIColor colorWithWhite:0.2 alpha:0.25];
-    
+    UIColor *color = [self textBackgroundColor];
     [color setFill];
-    CGContextAddPath(context, visiblePath);
+    
+    CGContextAddPath(context, path.CGPath);
     CGContextFillPath(context);
     
-    CGContextRestoreGState(context);
-    
-    CGMutablePathRef path = CGPathCreateMutable();
-    CGPathAddRect(path, NULL, CGRectInset(bounds, -2, -2));
-    
-    CGPathAddPath(path, NULL, visiblePath);
-    CGPathCloseSubpath(path);
-    
-    CGContextAddPath(context, visiblePath);
-    CGContextClip(context);
-    
-    CGContextSaveGState(context);
-    
-    [color setFill];
-    CGContextAddPath(context, path);
-    CGContextEOFillPath(context);
-    
-    CGContextRestoreGState(context);
-    
-    CGPathRelease(path);
-    CGPathRelease(visiblePath);
-    
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    
     UIGraphicsEndImageContext();
     
     return image;
