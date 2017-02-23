@@ -345,6 +345,10 @@
         return;
     }
     
+    if (self.isRotating && keyboardHeight < FLT_EPSILON) {
+        return;
+    }
+    
     if (ABS(self.keyboardHeight - keyboardHeight) > FLT_EPSILON) {
         self.keyboardHeight = keyboardHeight;
         
