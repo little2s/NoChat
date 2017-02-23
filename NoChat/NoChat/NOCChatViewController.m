@@ -832,8 +832,6 @@ typedef NS_ENUM(NSUInteger, NOCChatCellVerticalEdge) {
         return;
     }
     
-    // Note that we don't rely on collectionView's contentSize. This is because it won't be valid after performBatchUpdates or reloadData
-    // After reload data, collectionViewLayout.collectionViewContentSize won't be even valid, so you may want to refresh the layout manually
     CGFloat offsetY = MAX(-collectionView.contentInset.top, contentHeight - boundsHeight + collectionView.contentInset.bottom);
     CGPoint contentOffset = CGPointMake(collectionView.contentOffset.x, offsetY);
     
