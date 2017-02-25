@@ -52,7 +52,7 @@
     if (self) {
         _baseHeight = 50;
         _inputFieldInsets = UIEdgeInsetsMake(7.5, 40, 7.5, 80);
-        _inputFieldInternalEdgeInsets = UIEdgeInsetsMake(0, 4, 0, 0);
+        _inputFieldInternalEdgeInsets = UIEdgeInsetsMake(-3 - 0.5, 0, 0, 0);
         
         _backgroundView = [[UIToolbar alloc] init];
         [self addSubview:_backgroundView];
@@ -66,7 +66,7 @@
         _fieldBackground.layer.masksToBounds = YES;
         [self addSubview:_fieldBackground];
         
-        CGRect inputFieldClippingFrame = _fieldBackground.frame;
+        CGRect inputFieldClippingFrame = CGRectMake(_fieldBackground.frame.origin.x + 4, _fieldBackground.frame.origin.y + 4, _fieldBackground.frame.size.width - 8, _fieldBackground.frame.size.height - 8);
         _inputFieldClippingContainer = [[UIView alloc] initWithFrame:inputFieldClippingFrame];
         _inputFieldClippingContainer.clipsToBounds = YES;
         [self addSubview:_inputFieldClippingContainer];
@@ -126,7 +126,7 @@
     UIEdgeInsets inputFieldInsets = self.inputFieldInsets;
     self.fieldBackground.frame = CGRectMake(inputFieldInsets.left, inputFieldInsets.top, bounds.size.width - inputFieldInsets.left - inputFieldInsets.right, bounds.size.height - inputFieldInsets.top - inputFieldInsets.bottom);
     
-    CGRect inputFieldClippingFrame = self.fieldBackground.frame;
+    CGRect inputFieldClippingFrame = CGRectMake(_fieldBackground.frame.origin.x + 4, _fieldBackground.frame.origin.y + 4, _fieldBackground.frame.size.width - 8, _fieldBackground.frame.size.height - 8);
     self.inputFieldClippingContainer.frame = inputFieldClippingFrame;
     
     self.micButton.frame = CGRectMake(0, bounds.size.height - baseHeight, 40, baseHeight);
@@ -279,7 +279,7 @@
 - (CGFloat)heightForInputFieldHeight:(CGFloat)inputFieldHeight
 {
     UIEdgeInsets inputFieldInsets = [self inputFieldInsets];
-    CGFloat height = MAX([self baseHeight], inputFieldHeight - 8 + inputFieldInsets.top + inputFieldInsets.bottom);
+    CGFloat height = MAX([self baseHeight], inputFieldHeight - 8 + inputFieldInsets.top + inputFieldInsets.bottom + 8);
     return height;
 }
 
@@ -292,7 +292,7 @@
     UIEdgeInsets inputFieldInsets = [self inputFieldInsets];
     UIEdgeInsets inputFieldInternalEdgeInsets = [self inputFieldInternalEdgeInsets];
     
-    CGRect inputFieldClippingFrame = CGRectMake(inputFieldInsets.left, inputFieldInsets.top, self.parentSize.width - inputFieldInsets.left - inputFieldInsets.right, 0);
+    CGRect inputFieldClippingFrame = CGRectMake(inputFieldInsets.left + 4, inputFieldInsets.top + 4, self.parentSize.width - inputFieldInsets.left - inputFieldInsets.right - 8, 0);
     
     CGRect inputFieldFrame = CGRectMake(inputFieldInternalEdgeInsets.left, inputFieldInternalEdgeInsets.top, inputFieldClippingFrame.size.width - inputFieldInternalEdgeInsets.left, 0);
     
