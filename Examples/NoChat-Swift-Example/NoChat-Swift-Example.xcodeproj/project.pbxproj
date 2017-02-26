@@ -36,6 +36,16 @@
 		E018A5991E4A1AD50034B376 /* TGTextMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E018A5981E4A1AD50034B376 /* TGTextMessageCell.swift */; };
 		E018A59B1E4A1AEB0034B376 /* TGTextMessageCellLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = E018A59A1E4A1AEB0034B376 /* TGTextMessageCellLayout.swift */; };
 		E021C4361E51C9DA003A2EA1 /* TGChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E021C4351E51C9DA003A2EA1 /* TGChatViewController.swift */; };
+		E0C9577F1E6321FA002C254B /* MMChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0C9577E1E6321FA002C254B /* MMChatViewController.swift */; };
+		E0C957851E63225B002C254B /* MMDateMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0C957841E63225B002C254B /* MMDateMessageCell.swift */; };
+		E0C957871E632268002C254B /* MMDateMessageCellLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0C957861E632268002C254B /* MMDateMessageCellLayout.swift */; };
+		E0C957891E632278002C254B /* MMSystemMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0C957881E632278002C254B /* MMSystemMessageCell.swift */; };
+		E0C9578B1E632286002C254B /* MMSystemMessageCellLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0C9578A1E632286002C254B /* MMSystemMessageCellLayout.swift */; };
+		E0C9578D1E632290002C254B /* MMBaseMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0C9578C1E632290002C254B /* MMBaseMessageCell.swift */; };
+		E0C9578F1E6322A0002C254B /* MMBaseMessageCellLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0C9578E1E6322A0002C254B /* MMBaseMessageCellLayout.swift */; };
+		E0C957911E6322AF002C254B /* MMTextMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0C957901E6322AF002C254B /* MMTextMessageCell.swift */; };
+		E0C957931E6322BB002C254B /* MMTextMessageCellLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0C957921E6322BB002C254B /* MMTextMessageCellLayout.swift */; };
+		E0C957951E6322D3002C254B /* MMChatInputTextPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0C957941E6322D3002C254B /* MMChatInputTextPanel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -71,6 +81,16 @@
 		E018A5981E4A1AD50034B376 /* TGTextMessageCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TGTextMessageCell.swift; sourceTree = "<group>"; };
 		E018A59A1E4A1AEB0034B376 /* TGTextMessageCellLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TGTextMessageCellLayout.swift; sourceTree = "<group>"; };
 		E021C4351E51C9DA003A2EA1 /* TGChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TGChatViewController.swift; sourceTree = "<group>"; };
+		E0C9577E1E6321FA002C254B /* MMChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMChatViewController.swift; sourceTree = "<group>"; };
+		E0C957841E63225B002C254B /* MMDateMessageCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMDateMessageCell.swift; sourceTree = "<group>"; };
+		E0C957861E632268002C254B /* MMDateMessageCellLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMDateMessageCellLayout.swift; sourceTree = "<group>"; };
+		E0C957881E632278002C254B /* MMSystemMessageCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMSystemMessageCell.swift; sourceTree = "<group>"; };
+		E0C9578A1E632286002C254B /* MMSystemMessageCellLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMSystemMessageCellLayout.swift; sourceTree = "<group>"; };
+		E0C9578C1E632290002C254B /* MMBaseMessageCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMBaseMessageCell.swift; sourceTree = "<group>"; };
+		E0C9578E1E6322A0002C254B /* MMBaseMessageCellLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMBaseMessageCellLayout.swift; sourceTree = "<group>"; };
+		E0C957901E6322AF002C254B /* MMTextMessageCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMTextMessageCell.swift; sourceTree = "<group>"; };
+		E0C957921E6322BB002C254B /* MMTextMessageCellLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMTextMessageCellLayout.swift; sourceTree = "<group>"; };
+		E0C957941E6322D3002C254B /* MMChatInputTextPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMChatInputTextPanel.swift; sourceTree = "<group>"; };
 		F2086D5A65816BB8659D62B9 /* Pods_NoChat_Swift_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NoChat_Swift_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -178,6 +198,7 @@
 			children = (
 				E018A5761E4A197D0034B376 /* ChatsViewController.swift */,
 				E018A5781E4A19830034B376 /* Telegram */,
+				E0C9577B1E6321D6002C254B /* WeChat */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -297,6 +318,71 @@
 			children = (
 				E018A58C1E4A1A7B0034B376 /* TGDateMessageCell.swift */,
 				E018A58E1E4A1A880034B376 /* TGDateMessageCellLayout.swift */,
+			);
+			name = Date;
+			sourceTree = "<group>";
+		};
+		E0C9577B1E6321D6002C254B /* WeChat */ = {
+			isa = PBXGroup;
+			children = (
+				E0C9577C1E6321DC002C254B /* Cell */,
+				E0C9577D1E6321E2002C254B /* Input Panel */,
+				E0C9577E1E6321FA002C254B /* MMChatViewController.swift */,
+			);
+			name = WeChat;
+			sourceTree = "<group>";
+		};
+		E0C9577C1E6321DC002C254B /* Cell */ = {
+			isa = PBXGroup;
+			children = (
+				E0C957831E63221E002C254B /* Date */,
+				E0C957821E632219002C254B /* System */,
+				E0C957811E632214002C254B /* Base */,
+				E0C957801E63220E002C254B /* Text */,
+			);
+			name = Cell;
+			sourceTree = "<group>";
+		};
+		E0C9577D1E6321E2002C254B /* Input Panel */ = {
+			isa = PBXGroup;
+			children = (
+				E0C957941E6322D3002C254B /* MMChatInputTextPanel.swift */,
+			);
+			name = "Input Panel";
+			sourceTree = "<group>";
+		};
+		E0C957801E63220E002C254B /* Text */ = {
+			isa = PBXGroup;
+			children = (
+				E0C957901E6322AF002C254B /* MMTextMessageCell.swift */,
+				E0C957921E6322BB002C254B /* MMTextMessageCellLayout.swift */,
+			);
+			name = Text;
+			sourceTree = "<group>";
+		};
+		E0C957811E632214002C254B /* Base */ = {
+			isa = PBXGroup;
+			children = (
+				E0C9578C1E632290002C254B /* MMBaseMessageCell.swift */,
+				E0C9578E1E6322A0002C254B /* MMBaseMessageCellLayout.swift */,
+			);
+			name = Base;
+			sourceTree = "<group>";
+		};
+		E0C957821E632219002C254B /* System */ = {
+			isa = PBXGroup;
+			children = (
+				E0C957881E632278002C254B /* MMSystemMessageCell.swift */,
+				E0C9578A1E632286002C254B /* MMSystemMessageCellLayout.swift */,
+			);
+			name = System;
+			sourceTree = "<group>";
+		};
+		E0C957831E63221E002C254B /* Date */ = {
+			isa = PBXGroup;
+			children = (
+				E0C957841E63225B002C254B /* MMDateMessageCell.swift */,
+				E0C957861E632268002C254B /* MMDateMessageCellLayout.swift */,
 			);
 			name = Date;
 			sourceTree = "<group>";
@@ -433,23 +519,33 @@
 				E018A54B1E4A0F680034B376 /* AppDelegate.swift in Sources */,
 				E018A58B1E4A1A470034B376 /* TGDeliveryStatusView.swift in Sources */,
 				E018A58F1E4A1A890034B376 /* TGDateMessageCellLayout.swift in Sources */,
+				E0C957911E6322AF002C254B /* MMTextMessageCell.swift in Sources */,
 				E018A5731E4A195B0034B376 /* Chat.swift in Sources */,
 				E018A5891E4A1A380034B376 /* TGClockProgressView.swift in Sources */,
 				E018A5811E4A19F60034B376 /* TGAvatarButton.swift in Sources */,
+				E0C957851E63225B002C254B /* MMDateMessageCell.swift in Sources */,
+				E0C957951E6322D3002C254B /* MMChatInputTextPanel.swift in Sources */,
 				E018A5871E4A1A290034B376 /* TGChatInputTextPanel.swift in Sources */,
 				E018A5711E4A19480034B376 /* User.swift in Sources */,
+				E0C9578B1E632286002C254B /* MMSystemMessageCellLayout.swift in Sources */,
 				E018A5951E4A1AB60034B376 /* TGBaseMessageCell.swift in Sources */,
 				E018A5691E4A18F10034B376 /* MessageManager.swift in Sources */,
 				E018A5931E4A1AA80034B376 /* TGSystemMessageCellLayout.swift in Sources */,
 				E018A59B1E4A1AEB0034B376 /* TGTextMessageCellLayout.swift in Sources */,
 				E018A5911E4A1A9B0034B376 /* TGSystemMessageCell.swift in Sources */,
+				E0C9578D1E632290002C254B /* MMBaseMessageCell.swift in Sources */,
 				E018A5751E4A196B0034B376 /* Message.swift in Sources */,
 				E018A56B1E4A19040034B376 /* SoundManager.swift in Sources */,
 				E018A58D1E4A1A7B0034B376 /* TGDateMessageCell.swift in Sources */,
 				E018A5971E4A1AC80034B376 /* TGBaseMessageCellLayout.swift in Sources */,
 				E018A5771E4A197D0034B376 /* ChatsViewController.swift in Sources */,
 				E018A56D1E4A19260034B376 /* UIFont+NoChat.swift in Sources */,
+				E0C957931E6322BB002C254B /* MMTextMessageCellLayout.swift in Sources */,
+				E0C9577F1E6321FA002C254B /* MMChatViewController.swift in Sources */,
 				E018A5991E4A1AD50034B376 /* TGTextMessageCell.swift in Sources */,
+				E0C957891E632278002C254B /* MMSystemMessageCell.swift in Sources */,
+				E0C9578F1E6322A0002C254B /* MMBaseMessageCellLayout.swift in Sources */,
+				E0C957871E632268002C254B /* MMDateMessageCellLayout.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

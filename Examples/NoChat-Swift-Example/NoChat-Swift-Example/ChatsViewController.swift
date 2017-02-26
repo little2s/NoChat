@@ -34,14 +34,17 @@ class ChatsViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1
+        return 2
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ChatCell", for: indexPath)
         if indexPath.row == 0 {
             cell.textLabel?.text = "Telegram"
-            cell.imageView?.image = UIImage.init(named: "TGIcon")
+            cell.imageView?.image = UIImage(named: "TGIcon")
+        } else if indexPath.row == 1 {
+            cell.textLabel?.text = "WeChat"
+            cell.imageView?.image = UIImage(named: "MMIcon")
         }
         return cell
     }
@@ -51,6 +54,8 @@ class ChatsViewController: UITableViewController {
         var chatVC: UIViewController?
         if indexPath.row == 0 {
             chatVC = TGChatViewController(chat: chat)
+        } else if indexPath.row == 1 {
+            chatVC = MMChatViewController(chat: chat)
         }
         if let vc = chatVC {
             navigationController?.pushViewController(vc, animated: true)
