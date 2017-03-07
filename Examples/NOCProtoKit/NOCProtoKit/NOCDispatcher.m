@@ -26,7 +26,8 @@
 #import "NOCDispatcher.h"
 #import "NOCClient.h"
 
-@implementation NOCDispatcher {
+@implementation NOCDispatcher
+{
     NSMapTable *_table;
     dispatch_queue_t _queue;
 }

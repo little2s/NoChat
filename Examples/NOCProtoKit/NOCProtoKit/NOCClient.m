@@ -26,7 +26,8 @@
 #import "NOCClient.h"
 #import "NOCDispatcher.h"
 
-@implementation NOCClient {
+@implementation NOCClient
+{
     NSString *_userId;
 }
 

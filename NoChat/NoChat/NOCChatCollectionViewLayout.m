@@ -26,7 +26,8 @@
 #import "NOCChatCollectionViewLayout.h"
 #import "NOCChatItemCellLayout.h"
 
-@implementation NOCChatCollectionViewLayout {
+@implementation NOCChatCollectionViewLayout
+{
     BOOL _isInverted;
     
     NSMutableArray *_layoutAttributes;

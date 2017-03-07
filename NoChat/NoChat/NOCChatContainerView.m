@@ -25,7 +25,8 @@
 
 #import "NOCChatContainerView.h"
 
-@implementation NOCChatContainerView {
+@implementation NOCChatContainerView
+{
     CGSize _validSize;
 }
 
