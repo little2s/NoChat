@@ -24,7 +24,7 @@
 //
 
 #import "TGTitleView.h"
-#import "UIFont+NOChat.h"
+#import "UIFont+NoChat.h"
 
 @interface TGTitleView ()
 
