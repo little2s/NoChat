@@ -156,7 +156,7 @@
 
 - (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated
 {
-    if (self == navigationController.topViewController) {
+    if (![viewController isKindOfClass:NSClassFromString(@"NOCChatsViewController")]) {
         return;
     }
     

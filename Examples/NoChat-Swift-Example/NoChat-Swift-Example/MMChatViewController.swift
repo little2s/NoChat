@@ -142,7 +142,7 @@ class MMChatViewController: NOCChatViewController, UINavigationControllerDelegat
     // MARK: UINavigationControllerDelegate
     
     func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
-        if self === navigationController.topViewController {
+        guard viewController is ChatsViewController else {
             return
         }
         
