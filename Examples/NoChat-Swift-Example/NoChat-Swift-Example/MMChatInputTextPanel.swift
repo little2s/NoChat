@@ -162,7 +162,7 @@ class MMChatInputTextPanel: NOCChatInputPanel, HPGrowingTextViewDelegate {
         self.keyboardHeight = keyboardHeight
         
         var inputFieldSnapshotView: UIView?
-        if duration > DBL_EPSILON {
+        if duration > .ulpOfOne {
             inputFieldSnapshotView = inputField.internalTextView.snapshotView(afterScreenUpdates: false)
             if let v = inputFieldSnapshotView {
                 v.frame = inputField.frame.offsetBy(dx: inputFiledClippingContainer.frame.origin.x, dy: inputFiledClippingContainer.frame.origin.y)
@@ -177,7 +177,7 @@ class MMChatInputTextPanel: NOCChatInputPanel, HPGrowingTextViewDelegate {
         let inputContainerHeight = heightForInputFiledHeight(inputField.frame.size.height)
         let newInputContainerFrame = CGRect(x: 0, y: messageAreaSize.height - keyboardHeight - inputContainerHeight, width: messageAreaSize.width, height: inputContainerHeight)
         
-        if duration > DBL_EPSILON {
+        if duration > .ulpOfOne {
             if inputFieldSnapshotView != nil {
                 inputField.alpha = 0
             }
@@ -258,7 +258,7 @@ class MMChatInputTextPanel: NOCChatInputPanel, HPGrowingTextViewDelegate {
             self.layoutSubviews()
         }
         
-        if duration > DBL_EPSILON {
+        if duration > .ulpOfOne {
             UIView .animate(withDuration: duration, delay: 0, options: UIViewAnimationOptions(rawValue: UInt(animationCurve << 16)), animations: block, completion: nil)
         } else {
             block()
