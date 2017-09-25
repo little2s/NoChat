@@ -167,7 +167,7 @@
             cell.itemView.transform = collectionView.transform;
         }
     }];
-
+    
     return cell;
 }
 
@@ -279,7 +279,7 @@
         inset.bottom += self.chatInputContainerViewDefaultHeight;
     }
     _collectionView.contentInset = inset;
-
+    
     if (self.isInverted) {
         _collectionView.transform = CGAffineTransformMake(1, 0, 0, -1, 0, 0);
     }
@@ -422,21 +422,21 @@
     
     if (scrollToBottom) {
         if (self.isInverted) {
-            contentOffset = CGPointMake(0, -inset.top);
+            contentOffset = CGPointMake(0, -inset.top - 64.0f);
         } else {
             contentOffset = CGPointMake(0, contentHeight - self.collectionView.bounds.size.height + inset.bottom);
         }
     } else {
         if (self.isInverted) {
-            contentOffset.y += originalInset.top - inset.top;
+            contentOffset.y += originalInset.top - inset.top - 64.0f;
         } else {
             contentOffset.y += inset.bottom - originalInset.bottom;
         }
         contentOffset.y = MIN(contentOffset.y, contentHeight - self.collectionView.bounds.size.height + inset.bottom);
-        contentOffset.y = MAX(contentOffset.y, -inset.top);
+        contentOffset.y = MAX(contentOffset.y, -inset.top - 64.0f);
     }
     
-    if (duration > DBL_EPSILON) {        
+    if (duration > DBL_EPSILON) {
         [UIView animateWithDuration:duration delay:0 options:(animationCurve << 16) | UIViewAnimationOptionBeginFromCurrentState animations:^{
             self.collectionView.contentInset = inset;
             if (!CGPointEqualToPoint(contentOffset, originalContentOffset)) {
@@ -793,8 +793,8 @@ typedef NS_ENUM(NSUInteger, NOCChatCellVerticalEdge) {
     NOCChatCollectionView *collectionView = self.collectionView;
     
     CGFloat offsetY = -collectionView.contentInset.top;
-    CGPoint contentOffset = CGPointMake(collectionView.contentOffset.x, offsetY);
-
+    CGPoint contentOffset = CGPointMake(collectionView.contentOffset.x, offsetY - 64.0f);
+    
     [collectionView setContentOffset:contentOffset animated:animated];
 }
 
@@ -873,3 +873,4 @@ typedef NS_ENUM(NSUInteger, NOCChatCellVerticalEdge) {
 }
 
 @end
+

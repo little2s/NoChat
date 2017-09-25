@@ -195,7 +195,7 @@
 {
     NSMutableArray *layoutAttributes = [[NSMutableArray alloc] init];
     
-    __block CGFloat verticalOffset = _inset.top;
+    __block CGFloat verticalOffset = _inset.top - 64.0f;
     
     [layouts enumerateObjectsUsingBlock:^(id<NOCChatItemCellLayout> layout, NSUInteger i, BOOL *stop) {
         UICollectionViewLayoutAttributes *attributes = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:[NSIndexPath indexPathForItem:i inSection:0]];

@@ -59,9 +59,10 @@
     [super setContentInset:contentInset];
     
     UIEdgeInsets inset = self.scrollIndicatorInsets;
-    inset.top = contentInset.top;
+    inset.top = contentInset.top - 64.0f;
     inset.bottom = contentInset.bottom;
     self.scrollIndicatorInsets = inset;
 }
 
 @end
+

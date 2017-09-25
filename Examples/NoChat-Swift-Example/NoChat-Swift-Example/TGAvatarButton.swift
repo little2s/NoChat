@@ -47,10 +47,19 @@ class TGAvatarButton: UIButton {
     
     private func regularLayout() {
         frame = CGRect(x: 0, y: 0, width: 37, height: 37)
+        let widthConstraint = self.widthAnchor.constraint(equalToConstant: 37)
+        let heightConstraint = self.heightAnchor.constraint(equalToConstant: 37)
+        heightConstraint.isActive = true
+        widthConstraint.isActive = true
     }
     
     private func compactLayout() {
         frame = CGRect(x: 0, y: 0, width: 28, height: 28)
+        let widthConstraint = self.widthAnchor.constraint(equalToConstant: 28)
+        let heightConstraint = self.heightAnchor.constraint(equalToConstant: 28)
+        heightConstraint.isActive = true
+        widthConstraint.isActive = true
     }
     
 }
+
