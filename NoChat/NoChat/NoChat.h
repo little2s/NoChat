@@ -35,4 +35,4 @@ FOUNDATION_EXPORT const unsigned char NoChatVersionString[];
 #import <NoChat/NOCChatItemCell.h>
 #import <NoChat/NOCChatItemCellLayout.h>
 #import <NoChat/NOCChatInputPanel.h>
-#import <NoChat/NoCChatViewController.h>
+#import <NoChat/NOCChatViewController.h>
