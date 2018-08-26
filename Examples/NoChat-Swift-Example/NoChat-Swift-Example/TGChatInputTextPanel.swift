@@ -182,7 +182,14 @@ class TGChatInputTextPanel: NOCChatInputPanel, HPGrowingTextViewDelegate {
         }
         
         let inputContainerHeight = heightForInputFiledHeight(inputField.frame.size.height)
-        let newInputContainerFrame = CGRect(x: 0, y: messageAreaSize.height - keyboardHeight - inputContainerHeight, width: messageAreaSize.width, height: inputContainerHeight)
+        var newInputContainerFrame: CGRect = .zero
+        if (abs(keyboardHeight) < TG_EPSILON) {
+            if let vc = self.delegate as? NOCChatViewController {
+                newInputContainerFrame = CGRect(x: 0, y: messageAreaSize.height - vc.safeAreaInsets.bottom - keyboardHeight - inputContainerHeight, width: messageAreaSize.width, height: inputContainerHeight)
+            }
+        } else {
+            newInputContainerFrame = CGRect(x: 0, y: messageAreaSize.height - keyboardHeight - inputContainerHeight, width: messageAreaSize.width, height: inputContainerHeight)
+        }
         
         if duration > .ulpOfOne {
             if inputFieldSnapshotView != nil {
@@ -222,7 +229,14 @@ class TGChatInputTextPanel: NOCChatInputPanel, HPGrowingTextViewDelegate {
     
     func growingTextView(_ growingTextView: HPGrowingTextView!, willChangeHeight height: Float) {
         let inputContainerHeight = heightForInputFiledHeight(CGFloat(height))
-        let newInputContainerFrame = CGRect(x: 0, y: messageAreaSize.height - keyboardHeight - inputContainerHeight, width: messageAreaSize.width, height: inputContainerHeight)
+        var newInputContainerFrame: CGRect = .zero
+        if (abs(keyboardHeight) < TG_EPSILON) {
+            if let vc = self.delegate as? NOCChatViewController {
+                newInputContainerFrame = CGRect(x: 0, y: messageAreaSize.height - vc.safeAreaInsets.bottom - keyboardHeight - inputContainerHeight, width: messageAreaSize.width, height: inputContainerHeight)
+            }
+        } else {
+            newInputContainerFrame = CGRect(x: 0, y: messageAreaSize.height - keyboardHeight - inputContainerHeight, width: messageAreaSize.width, height: inputContainerHeight)
+        }
         
         UIView.animate(withDuration: 0.3) { 
             self.frame = newInputContainerFrame
@@ -258,7 +272,13 @@ class TGChatInputTextPanel: NOCChatInputPanel, HPGrowingTextViewDelegate {
             self.keyboardHeight = keyboardHeight
             
             let inputContainerHeight = self.heightForInputFiledHeight(inputFiledHeight)
-            self.frame = CGRect(x: 0, y: messageAreaSize.height - keyboardHeight - inputContainerHeight, width: self.messageAreaSize.width, height: inputContainerHeight)
+            if (abs(keyboardHeight) < TG_EPSILON) {
+                if let vc = self.delegate as? NOCChatViewController {
+                    self.frame = CGRect(x: 0, y: messageAreaSize.height - vc.safeAreaInsets.bottom - keyboardHeight - inputContainerHeight, width: self.messageAreaSize.width, height: inputContainerHeight)
+                }
+            } else {
+                self.frame = CGRect(x: 0, y: messageAreaSize.height - keyboardHeight - inputContainerHeight, width: self.messageAreaSize.width, height: inputContainerHeight)
+            }
             self.layoutSubviews()
         }
         

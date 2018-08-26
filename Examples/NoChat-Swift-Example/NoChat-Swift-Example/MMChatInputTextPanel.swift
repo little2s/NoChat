@@ -175,7 +175,14 @@ class MMChatInputTextPanel: NOCChatInputPanel, HPGrowingTextViewDelegate {
         }
         
         let inputContainerHeight = heightForInputFiledHeight(inputField.frame.size.height)
-        let newInputContainerFrame = CGRect(x: 0, y: messageAreaSize.height - keyboardHeight - inputContainerHeight, width: messageAreaSize.width, height: inputContainerHeight)
+        var newInputContainerFrame: CGRect = .zero
+        if (abs(keyboardHeight) < MM_EPSILON) {
+            if let vc = self.delegate as? NOCChatViewController {
+                newInputContainerFrame = CGRect(x: 0, y: messageAreaSize.height - vc.safeAreaInsets.bottom - keyboardHeight - inputContainerHeight, width: messageAreaSize.width, height: inputContainerHeight)
+            }
+        } else {
+             newInputContainerFrame = CGRect(x: 0, y: messageAreaSize.height - keyboardHeight - inputContainerHeight, width: messageAreaSize.width, height: inputContainerHeight)
+        }
         
         if duration > .ulpOfOne {
             if inputFieldSnapshotView != nil {
@@ -206,7 +213,14 @@ class MMChatInputTextPanel: NOCChatInputPanel, HPGrowingTextViewDelegate {
     
     func growingTextView(_ growingTextView: HPGrowingTextView!, willChangeHeight height: Float) {
         let inputContainerHeight = heightForInputFiledHeight(CGFloat(height))
-        let newInputContainerFrame = CGRect(x: 0, y: messageAreaSize.height - keyboardHeight - inputContainerHeight, width: messageAreaSize.width, height: inputContainerHeight)
+        var newInputContainerFrame: CGRect = .zero
+        if (abs(keyboardHeight) < MM_EPSILON) {
+            if let vc = self.delegate as? NOCChatViewController {
+                newInputContainerFrame = CGRect(x: 0, y: messageAreaSize.height - vc.safeAreaInsets.bottom - keyboardHeight - inputContainerHeight, width: messageAreaSize.width, height: inputContainerHeight)
+            }
+        } else {
+            newInputContainerFrame = CGRect(x: 0, y: messageAreaSize.height - keyboardHeight - inputContainerHeight, width: messageAreaSize.width, height: inputContainerHeight)
+        }
         
         UIView.animate(withDuration: 0.3) {
             self.frame = newInputContainerFrame
@@ -254,12 +268,18 @@ class MMChatInputTextPanel: NOCChatInputPanel, HPGrowingTextViewDelegate {
             self.keyboardHeight = keyboardHeight
             
             let inputContainerHeight = self.heightForInputFiledHeight(inputFiledHeight)
-            self.frame = CGRect(x: 0, y: messageAreaSize.height - keyboardHeight - inputContainerHeight, width: self.messageAreaSize.width, height: inputContainerHeight)
+            if (abs(keyboardHeight) < MM_EPSILON) {
+                if let vc = self.delegate as? NOCChatViewController {
+                    self.frame = CGRect(x: 0, y: messageAreaSize.height - vc.safeAreaInsets.bottom - keyboardHeight - inputContainerHeight, width: self.messageAreaSize.width, height: inputContainerHeight)
+                }
+            } else {
+                self.frame = CGRect(x: 0, y: messageAreaSize.height - keyboardHeight - inputContainerHeight, width: self.messageAreaSize.width, height: inputContainerHeight)
+            }
             self.layoutSubviews()
         }
         
         if duration > .ulpOfOne {
-            UIView .animate(withDuration: duration, delay: 0, options: UIView.AnimationOptions(rawValue: UInt(animationCurve << 16)), animations: block, completion: nil)
+            UIView.animate(withDuration: duration, delay: 0, options: UIView.AnimationOptions(rawValue: UInt(animationCurve << 16)), animations: block, completion: nil)
         } else {
             block()
         }

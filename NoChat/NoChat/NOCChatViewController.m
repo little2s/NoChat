@@ -34,7 +34,7 @@
 
 @interface NOCChatViewController ()
 
-@property (nonatomic, assign) UIEdgeInsets safeAreaInsets;
+@property (nonatomic, assign) BOOL isFirstLayout;
 
 @end
 
@@ -81,6 +81,7 @@
     [self setupBackgroundView];
     [self setupCollectionViewScrollToTopProxy];
     [self setupCollectionView];
+    [self setupBottomAreaView];
     [self setupInputPanel];
 }
 
@@ -93,7 +94,12 @@
 - (void)viewWillLayoutSubviews
 {
     [super viewWillLayoutSubviews];
-    [self adjustColletionViewInsets];
+    if (self.isFirstLayout) {
+        self.isFirstLayout = NO;
+        [self layoutInputPanel];
+        [self adjustColletionViewInsets];
+    }
+    [self layoutBottomAreaView];
 }
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
@@ -227,6 +233,7 @@
 
 - (void)commonInit
 {
+    _isFirstLayout = YES;
     _inverted = YES;
     _chatInputContainerViewDefaultHeight = 45;
     _scrollFractionalThreshold = 0.05;
@@ -313,9 +320,26 @@
 - (void)setupInputPanel
 {
     Class inputPanelClass = [[self class] inputPanelClass];
-    _inputPanel = [[inputPanelClass alloc] initWithFrame:CGRectMake(0, self.containerView.bounds.size.height - self.chatInputContainerViewDefaultHeight, self.containerView.bounds.size.width, self.chatInputContainerViewDefaultHeight)];
+    _inputPanel = [[inputPanelClass alloc] initWithFrame:CGRectMake(0, self.containerView.bounds.size.height - self.safeAreaInsets.bottom - self.chatInputContainerViewDefaultHeight, self.containerView.bounds.size.width, self.chatInputContainerViewDefaultHeight)];
     _inputPanel.delegate = self;
     [_containerView addSubview:_inputPanel];
+}
+
+- (void)setupBottomAreaView
+{
+    _bottomAreaView = [[UIView alloc] init];
+    _bottomAreaView.backgroundColor = [UIColor colorWithRed:250/255.0 green:250/255.0 blue:250/255.0 alpha:1.0];
+    [_containerView addSubview:_bottomAreaView];
+}
+
+- (void)layoutInputPanel
+{
+    _inputPanel.frame = CGRectMake(0, self.containerView.bounds.size.height - self.safeAreaInsets.bottom - self.chatInputContainerViewDefaultHeight, self.containerView.bounds.size.width, self.chatInputContainerViewDefaultHeight);
+}
+
+- (void)layoutBottomAreaView
+{
+    _bottomAreaView.frame = CGRectMake(0, self.containerView.bounds.size.height - self.safeAreaInsets.bottom, self.containerView.bounds.size.width, self.safeAreaInsets.bottom);
 }
 
 - (void)registerKeyboardNotifications
@@ -410,13 +434,24 @@
 - (void)adjustColletionViewInsets
 {
     CGFloat topPadding = self.safeAreaInsets.top;
+    
+    CGFloat bottomPadding;
+    if (self.keyboardHeight < FLT_EPSILON) {
+        bottomPadding = self.safeAreaInsets.bottom + self.inputPanel.frame.size.height;
+    } else {
+        bottomPadding = self.keyboardHeight + self.inputPanel.frame.size.height;
+    }
+
     UIEdgeInsets originalInset = self.collectionView.contentInset;
     UIEdgeInsets inset = originalInset;
     if (self.isInverted) {
         inset.bottom = topPadding;
+        inset.top = bottomPadding;
     } else {
         inset.top = topPadding;
+        inset.bottom = bottomPadding;
     }
+ 
     self.collectionView.contentInset = inset;
 }
 
@@ -426,12 +461,19 @@
     
     CGFloat contentHeight = self.collectionView.contentSize.height;
     
+    CGFloat bottomPadding;
+    if (keyboardHeight < FLT_EPSILON) {
+        bottomPadding = self.safeAreaInsets.bottom + inputContainerHeight;
+    } else {
+        bottomPadding = keyboardHeight + inputContainerHeight;
+    }
+    
     UIEdgeInsets originalInset = self.collectionView.contentInset;
     UIEdgeInsets inset = originalInset;
     if (self.isInverted) {
-        inset.top = keyboardHeight + inputContainerHeight;
+        inset.top = bottomPadding;
     } else {
-        inset.bottom = keyboardHeight + inputContainerHeight;
+        inset.bottom = bottomPadding;
     }
     
     CGPoint originalContentOffset = self.collectionView.contentOffset;
@@ -522,14 +564,7 @@
     
     [self.collectionLayout invalidateLayout];
     
-    UIEdgeInsets originalInset = self.collectionView.contentInset;
-    UIEdgeInsets inset = originalInset;
-    if (self.isInverted) {
-        inset.top = keyboardHeight + self.inputPanel.frame.size.height;
-    } else {
-        inset.bottom = keyboardHeight + self.inputPanel.frame.size.height;
-    }
-    self.collectionView.contentInset = inset;
+    [self adjustColletionViewInsets];
     
     CGFloat newContentHeight = 0;
     NSArray *newLayoutAttributes = [self.collectionLayout layoutAttributesForLayouts:self.layouts containerWidth:collectionViewSize.width maxHeight:CGFLOAT_MAX contentHeight:&newContentHeight];
