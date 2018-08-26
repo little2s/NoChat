@@ -421,7 +421,7 @@
 				TargetAttributes = {
 					E018A5461E4A0F680034B376 = {
 						CreatedOnToolsVersion = 8.2.1;
-						DevelopmentTeam = YGG9VRRGFV;
+						DevelopmentTeam = Y74B477B4P;
 						LastSwiftMigration = 1000;
 						ProvisioningStyle = Automatic;
 					};
@@ -682,7 +682,7 @@
 			baseConfigurationReference = 0DF9A059008AD85DC1CA9855 /* Pods-NoChat-Swift-Example.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = YGG9VRRGFV;
+				DEVELOPMENT_TEAM = Y74B477B4P;
 				INFOPLIST_FILE = "NoChat-Swift-Example/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.little2s.NoChat-Swift-Example";
@@ -697,7 +697,7 @@
 			baseConfigurationReference = 6147313DD52D7AC418226F24 /* Pods-NoChat-Swift-Example.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = YGG9VRRGFV;
+				DEVELOPMENT_TEAM = Y74B477B4P;
 				INFOPLIST_FILE = "NoChat-Swift-Example/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.little2s.NoChat-Swift-Example";
