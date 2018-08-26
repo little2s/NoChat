@@ -80,9 +80,7 @@ class MMChatViewController: NOCChatViewController, UINavigationControllerDelegat
         let rightItem = UIBarButtonItem(image: UIImage(named: "MMUserInfo"), style: .plain, target: nil, action: nil)
         navigationItem.rightBarButtonItem = rightItem
         title = chat.title
-        
-        bottomAreaView?.backgroundColor = UIColor(red: 250/255.0, green: 250/255.0, blue: 250/255.0, alpha: 1)
-        
+                
         loadMessages()
     }
     

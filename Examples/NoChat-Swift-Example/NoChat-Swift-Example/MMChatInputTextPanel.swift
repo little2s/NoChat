@@ -122,18 +122,22 @@ class MMChatInputTextPanel: NOCChatInputPanel, HPGrowingTextViewDelegate {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        backgroundView.frame = bounds
+        var safeArea = UIEdgeInsets.zero
+        if let vc = delegate as? NOCChatViewController {
+            safeArea = vc.safeAreaInsets
+        }
         
-        fieldBackground.frame = CGRect(x: 40, y: 7.5, width: bounds.width - 120, height: bounds.height - 15)
+        backgroundView.frame = CGRect(x: 0, y: 0, width: bounds.width, height: bounds.height + safeArea.bottom)
+        
+        micButton.frame = CGRect(x: safeArea.left, y: bounds.size.height - baseHeight, width: 40, height: baseHeight)
+        
+        attachButton.frame = CGRect(x: bounds.size.width - safeArea.right - 40, y: bounds.height - baseHeight, width: 40, height: baseHeight)
+
+        faceButton.frame = CGRect(x: attachButton.frame.minX - 40, y: bounds.size.height - baseHeight, width: 40, height: baseHeight)
+        
+        fieldBackground.frame = CGRect(x: micButton.frame.maxX, y: 7.5, width: bounds.width - 120 - safeArea.left - safeArea.right, height: bounds.height - 15)
         
         inputFiledClippingContainer.frame = CGRect(x: fieldBackground.frame.origin.x + 4, y: fieldBackground.frame.origin.y + 4, width: fieldBackground.frame.width - 8, height: fieldBackground.frame.height - 8)
-        
-        micButton.frame = CGRect(x: 0, y: bounds.size.height - baseHeight, width: 40, height: baseHeight)
-        
-        faceButton.frame = CGRect(x: bounds.size.width - 80, y: bounds.size.height - baseHeight, width: 40, height: baseHeight)
-        
-        attachButton.frame = CGRect(x: bounds.size.width - 40, y: bounds.height - baseHeight, width: 40, height: baseHeight)
-        
     }
     
     override func endInputting(_ animated: Bool) {

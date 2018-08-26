@@ -128,19 +128,25 @@ class TGChatInputTextPanel: NOCChatInputPanel, HPGrowingTextViewDelegate {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        backgroundView.frame = bounds
+        var safeArea = UIEdgeInsets.zero
+        if let vc = delegate as? NOCChatViewController {
+            safeArea = vc.safeAreaInsets
+        }
+        
+        backgroundView.frame = CGRect(x: 0, y: 0, width: bounds.width, height: bounds.height + safeArea.bottom)
+        
+        sendButton.frame = CGRect(x: bounds.width - safeArea.right - sendButtonWidth, y: bounds.height - baseHeight, width: sendButtonWidth, height: baseHeight)
+        
+        attachButton.frame = CGRect(x: safeArea.left, y: bounds.height - baseHeight, width: 40, height: baseHeight)
+        
+        micButton.frame = CGRect(x: bounds.width - safeArea.right - sendButtonWidth, y: bounds.height - baseHeight, width: sendButtonWidth, height: baseHeight)
         
         stripeLayer.frame = CGRect(x: 0, y: -TGRetinaPixel, width: bounds.width, height: TGRetinaPixel)
         
-        fieldBackground.frame = CGRect(x: inputFiledInsets.left, y: inputFiledInsets.top, width: bounds.width - inputFiledInsets.left - inputFiledInsets.right - sendButtonWidth - 1, height: bounds.height - inputFiledInsets.top - inputFiledInsets.bottom)
+        fieldBackground.frame = CGRect(x: inputFiledInsets.left + safeArea.left, y: inputFiledInsets.top, width: bounds.width - inputFiledInsets.left - inputFiledInsets.right - sendButtonWidth - 1 - safeArea.left - safeArea.right, height: bounds.height - inputFiledInsets.top - inputFiledInsets.bottom)
         
         inputFiledClippingContainer.frame = fieldBackground.frame
-        
-        sendButton.frame = CGRect(x: bounds.width - sendButtonWidth, y: bounds.height - baseHeight, width: sendButtonWidth, height: baseHeight)
-        
-        attachButton.frame = CGRect(x: 0, y: bounds.height - baseHeight, width: 40, height: baseHeight)
-        
-        micButton.frame = CGRect(x: bounds.width - sendButtonWidth, y: bounds.height - baseHeight, width: sendButtonWidth, height: baseHeight)
+
     }
     
     override func endInputting(_ animated: Bool) {

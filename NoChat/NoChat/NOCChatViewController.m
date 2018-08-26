@@ -81,7 +81,6 @@
     [self setupBackgroundView];
     [self setupCollectionViewScrollToTopProxy];
     [self setupCollectionView];
-    [self setupBottomAreaView];
     [self setupInputPanel];
 }
 
@@ -100,7 +99,6 @@
         [self layoutInputPanel];
         [self adjustColletionViewInsets];
     }
-    [self layoutBottomAreaView];
 }
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
@@ -325,21 +323,9 @@
     [_containerView addSubview:_inputPanel];
 }
 
-- (void)setupBottomAreaView
-{
-    _bottomAreaView = [[UIView alloc] init];
-    _bottomAreaView.backgroundColor = [UIColor colorWithRed:250/255.0 green:250/255.0 blue:250/255.0 alpha:1.0];
-    [_containerView addSubview:_bottomAreaView];
-}
-
 - (void)layoutInputPanel
 {
     _inputPanel.frame = CGRectMake(0, self.containerView.bounds.size.height - self.safeAreaInsets.bottom - self.chatInputContainerViewDefaultHeight, self.containerView.bounds.size.width, self.chatInputContainerViewDefaultHeight);
-}
-
-- (void)layoutBottomAreaView
-{
-    _bottomAreaView.frame = CGRectMake(0, self.containerView.bounds.size.height - self.safeAreaInsets.bottom, self.containerView.bounds.size.width, self.safeAreaInsets.bottom);
 }
 
 - (void)registerKeyboardNotifications

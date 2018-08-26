@@ -46,8 +46,6 @@ NS_ASSUME_NONNULL_BEGIN
 // this property would be a pointer which point to current panel.
 @property (nullable, nonatomic, strong) NOCChatInputPanel *inputPanel;
 
-@property (nullable, nonatomic, strong) UIView *bottomAreaView;
-
 @property (nonatomic, assign) CGFloat halfTransitionKeyboardHeight;
 @property (nonatomic, assign) CGFloat keyboardHeight;
 @property (nonatomic, assign) BOOL isRotating;
