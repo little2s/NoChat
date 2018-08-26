@@ -47,7 +47,7 @@ class MMTextMessageCellLayout: MMBaseMessageCellLayout {
     
     private func setupAttributedText() {
         let text = message.text
-        let attributedText = NSMutableAttributedString(string: text, attributes: [NSFontAttributeName: Style.textFont, NSForegroundColorAttributeName: Style.textColor])
+        let attributedText = NSMutableAttributedString(string: text, attributes: convertToOptionalNSAttributedStringKeyDictionary([convertFromNSAttributedStringKey(NSAttributedString.Key.font): Style.textFont, convertFromNSAttributedStringKey(NSAttributedString.Key.foregroundColor): Style.textColor]))
         
         if text == "/start" {
             attributedText.yy_setColor(Style.linkColor, range: attributedText.yy_rangeOfAll())
@@ -88,7 +88,7 @@ class MMTextMessageCellLayout: MMBaseMessageCellLayout {
         
         // dynamic font support
         let dynamicFont = Style.textFont
-        text.yy_setAttribute(NSFontAttributeName, value: dynamicFont)
+        text.yy_setAttribute(convertFromNSAttributedStringKey(NSAttributedString.Key.font), value: dynamicFont)
         
         let preferredMaxBubbleWidth = ceil(width * 0.68)
         var bubbleViewWidth = preferredMaxBubbleWidth
@@ -133,8 +133,8 @@ class MMTextMessageCellLayout: MMBaseMessageCellLayout {
         }
         static let textColor = UIColor.black
         
-        static let linkColor = UIColor(colorLiteralRed: 31/255.0, green: 121/255.0, blue: 253/255.0, alpha: 1)
-        static let linkBackgroundColor = UIColor(colorLiteralRed: 212/255.0, green: 209/255.0, blue: 209/255.0, alpha: 1)
+        static let linkColor = UIColor(red: 31/255.0, green: 121/255.0, blue: 253/255.0, alpha: 1)
+        static let linkBackgroundColor = UIColor(red: 212/255.0, green: 209/255.0, blue: 209/255.0, alpha: 1)
     }
     
 }
@@ -189,3 +189,14 @@ class MMTextLinePositionModifier: NSObject, YYTextLinePositionModifier {
     }
 }
 
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertToOptionalNSAttributedStringKeyDictionary(_ input: [String: Any]?) -> [NSAttributedString.Key: Any]? {
+	guard let input = input else { return nil }
+	return Dictionary(uniqueKeysWithValues: input.map { key, value in (NSAttributedString.Key(rawValue: key), value)})
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertFromNSAttributedStringKey(_ input: NSAttributedString.Key) -> String {
+	return input.rawValue
+}

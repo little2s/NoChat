@@ -172,6 +172,15 @@ class TGChatViewController: NOCChatViewController, UINavigationControllerDelegat
     }
     
     private func addMessages(_ messages: [Message], scrollToBottom: Bool, animated: Bool) {
+        var width: CGFloat = 0
+        if Thread.isMainThread {
+            width = self.cellWidth
+        } else {
+            DispatchQueue.main.sync {
+                width = self.cellWidth
+            }
+        }
+
         layoutQueue.async { [weak self] in
             guard let strongSelf = self else { return }
             let indexes = IndexSet(integersIn: 0..<messages.count)
@@ -179,7 +188,7 @@ class TGChatViewController: NOCChatViewController, UINavigationControllerDelegat
             var layouts = [NOCChatItemCellLayout]()
             
             for message in messages {
-                let layout = strongSelf.createLayout(with: message)!
+                let layout = strongSelf.createLayout(with: message, width: width)!
                 layouts.insert(layout, at: 0)
             }
             
@@ -195,11 +204,11 @@ class TGChatViewController: NOCChatViewController, UINavigationControllerDelegat
     // MARK: Dynamic font support
     
     private func registerContentSizeCategoryDidChangeNotification() {
-        NotificationCenter.default.addObserver(self, selector: #selector(handleContentSizeCategoryDidChanged(notification:)), name: .UIContentSizeCategoryDidChange, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleContentSizeCategoryDidChanged(notification:)), name: UIContentSizeCategory.didChangeNotification, object: nil)
     }
     
     private func unregisterContentSizeCategoryDidChangeNotification() {
-        NotificationCenter.default.removeObserver(self, name: .UIContentSizeCategoryDidChange, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIContentSizeCategory.didChangeNotification, object: nil)
     }
     
     @objc private func handleContentSizeCategoryDidChanged(notification: Notification) {

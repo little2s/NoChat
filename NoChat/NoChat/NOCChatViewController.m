@@ -34,6 +34,8 @@
 
 @interface NOCChatViewController ()
 
+@property (nonatomic, assign) UIEdgeInsets safeAreaInsets;
+
 @end
 
 @implementation NOCChatViewController
@@ -136,14 +138,14 @@
     }
 }
 
-- (nullable id<NOCChatItemCellLayout>)createLayoutWithItem:(id<NOCChatItem>)item
+- (nullable id<NOCChatItemCellLayout>)createLayoutWithItem:(id<NOCChatItem>)item width:(CGFloat)width
 {
     Class layoutClass = [[self class] cellLayoutClassForItemType:item.type];
     if (layoutClass == nil) {
         return nil;
     }
     
-    return [[layoutClass alloc] initWithChatItem:item cellWidth:self.cellWidth];
+    return [[layoutClass alloc] initWithChatItem:item cellWidth:width];
 }
 
 #pragma mark - UICollectionViewDataSource
@@ -206,7 +208,19 @@
 
 - (CGFloat)cellWidth
 {
-    return self.view.bounds.size.width;
+    NSAssert(NSThread.isMainThread, @"Must be used from main thread only");
+    return self.view.bounds.size.width - self.safeAreaInsets.left - self.safeAreaInsets.right;
+}
+
+- (UIEdgeInsets)safeAreaInsets
+{
+    UIEdgeInsets insets;
+    if (@available(iOS 11.0, *)) {
+        insets = self.view.safeAreaInsets;
+    } else {
+        insets = UIEdgeInsetsMake(self.topLayoutGuide.length, 0, 0, self.bottomLayoutGuide.length);
+    }
+    return insets;
 }
 
 #pragma mark - Private
@@ -270,6 +284,9 @@
     _collectionView = [[NOCChatCollectionView alloc] initWithFrame:CGRectMake(0, 0, collectionViewSize.width, collectionViewSize.height) collectionViewLayout:_collectionLayout];
     _collectionView.dataSource = self;
     _collectionView.delegate = self;
+    if (@available(iOS 11.0, *)) {
+        _collectionView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+    }
     
     UIEdgeInsets originalInset = UIEdgeInsetsZero;
     UIEdgeInsets inset = originalInset;
@@ -392,7 +409,7 @@
 
 - (void)adjustColletionViewInsets
 {
-    CGFloat topPadding = self.topLayoutGuide.length;
+    CGFloat topPadding = self.safeAreaInsets.top;
     UIEdgeInsets originalInset = self.collectionView.contentInset;
     UIEdgeInsets inset = originalInset;
     if (self.isInverted) {

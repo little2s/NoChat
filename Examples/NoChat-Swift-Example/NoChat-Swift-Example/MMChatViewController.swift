@@ -180,15 +180,23 @@ class MMChatViewController: NOCChatViewController, UINavigationControllerDelegat
     }
     
     private func addMessages(_ messages: [Message], scrollToBottom: Bool, animated: Bool) {
+        var width: CGFloat = 0
+        if Thread.isMainThread {
+            width = self.cellWidth
+        } else {
+            DispatchQueue.main.sync {
+                width = self.cellWidth
+            }
+        }
+        
         layoutQueue.async { [weak self] in
             guard let strongSelf = self else { return }
             let count = strongSelf.layouts.count
             let indexes = IndexSet(integersIn: count..<count+messages.count)
             
             var layouts = [NOCChatItemCellLayout]()
-            
             for message in messages {
-                let layout = strongSelf.createLayout(with: message)!
+                let layout = strongSelf.createLayout(with: message, width: width)!
                 layouts.append(layout)
             }
             

@@ -53,7 +53,7 @@ class TGTextMessageCellLayout: TGBaseMessageCellLayout {
     
     private func setupAttributedText() {
         let text = message.text
-        let attributedText = NSMutableAttributedString(string: text, attributes: [NSFontAttributeName: Style.textFont, NSForegroundColorAttributeName: Style.textColor])
+        let attributedText = NSMutableAttributedString(string: text, attributes: convertToOptionalNSAttributedStringKeyDictionary([convertFromNSAttributedStringKey(NSAttributedString.Key.font): Style.textFont, convertFromNSAttributedStringKey(NSAttributedString.Key.foregroundColor): Style.textColor]))
         
         if text == "/start" {
             attributedText.yy_setColor(Style.linkColor, range: attributedText.yy_rangeOfAll())
@@ -76,7 +76,7 @@ class TGTextMessageCellLayout: TGBaseMessageCellLayout {
     private func setupAttributedTime() {
         let timeString = Style.timeFormatter.string(from: message.date)
         let timeColor = isOutgoing ? Style.outgoingTimeColor : Style.incomingTimeColor
-        attributedTime = NSAttributedString(string: timeString, attributes: [NSFontAttributeName: Style.timeFont, NSForegroundColorAttributeName: timeColor])
+        attributedTime = NSAttributedString(string: timeString, attributes: convertToOptionalNSAttributedStringKeyDictionary([convertFromNSAttributedStringKey(NSAttributedString.Key.font): Style.timeFont, convertFromNSAttributedStringKey(NSAttributedString.Key.foregroundColor): timeColor]))
     }
     
     private func setupHasTail() {
@@ -104,7 +104,7 @@ class TGTextMessageCellLayout: TGBaseMessageCellLayout {
         
         // dynamic font support
         let dynamicFont = Style.textFont
-        text.yy_setAttribute(NSFontAttributeName, value: dynamicFont)
+        text.yy_setAttribute(convertFromNSAttributedStringKey(NSAttributedString.Key.font), value: dynamicFont)
         
         let preferredMaxBubbleWidth = ceil(width * 0.75)
         var bubbleViewWidth = preferredMaxBubbleWidth
@@ -227,11 +227,11 @@ class TGTextMessageCellLayout: TGBaseMessageCellLayout {
         }
         static let textColor = UIColor.black
         
-        static let linkColor = UIColor(colorLiteralRed: 0/255.0, green: 75/255.0, blue: 173/255.0, alpha: 1)
-        static let linkBackgroundColor = UIColor(colorLiteralRed: 191/255.0, green: 223/255.0, blue: 254/255.0, alpha: 1)
+        static let linkColor = UIColor(red: 0/255.0, green: 75/255.0, blue: 173/255.0, alpha: 1)
+        static let linkBackgroundColor = UIColor(red: 191/255.0, green: 223/255.0, blue: 254/255.0, alpha: 1)
         
         static let timeFont = UIFont.systemFont(ofSize: 12)
-        static let outgoingTimeColor = UIColor(colorLiteralRed: 59/255.0, green: 171/255.0, blue: 61/255.0, alpha: 1)
+        static let outgoingTimeColor = UIColor(red: 59/255.0, green: 171/255.0, blue: 61/255.0, alpha: 1)
         static let incomingTimeColor = UIColor.gray
         static let timeFormatter: DateFormatter = {
             let df = DateFormatter()
@@ -290,4 +290,15 @@ class TGTextLinePositionModifier: NSObject, YYTextLinePositionModifier {
         let lineHeight = font.pointSize * lineHeightMultiple
         return paddingTop + paddingBottom + ascent + descent + CGFloat(lineCount - 1) * lineHeight
     }
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertToOptionalNSAttributedStringKeyDictionary(_ input: [String: Any]?) -> [NSAttributedString.Key: Any]? {
+	guard let input = input else { return nil }
+	return Dictionary(uniqueKeysWithValues: input.map { key, value in (NSAttributedString.Key(rawValue: key), value)})
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertFromNSAttributedStringKey(_ input: NSAttributedString.Key) -> String {
+	return input.rawValue
 }

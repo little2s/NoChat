@@ -27,7 +27,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void(^NOCChatCollectionViewAction)();
+typedef void(^NOCChatCollectionViewAction)(void);
 
 @interface NOCChatCollectionView : UICollectionView
 

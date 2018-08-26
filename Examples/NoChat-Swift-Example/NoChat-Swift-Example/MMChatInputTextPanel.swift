@@ -233,7 +233,7 @@ class MMChatInputTextPanel: NOCChatInputPanel, HPGrowingTextViewDelegate {
             }
             
             let str = txt.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-            if str.characters.count > 0 {
+            if str.count > 0 {
                 if let d = delegate as? MMChatInputTextPanelDelegate {
                     d.inputTextPanel(self, requestSendText: str)
                 }
@@ -259,7 +259,7 @@ class MMChatInputTextPanel: NOCChatInputPanel, HPGrowingTextViewDelegate {
         }
         
         if duration > .ulpOfOne {
-            UIView .animate(withDuration: duration, delay: 0, options: UIViewAnimationOptions(rawValue: UInt(animationCurve << 16)), animations: block, completion: nil)
+            UIView .animate(withDuration: duration, delay: 0, options: UIView.AnimationOptions(rawValue: UInt(animationCurve << 16)), animations: block, completion: nil)
         } else {
             block()
         }

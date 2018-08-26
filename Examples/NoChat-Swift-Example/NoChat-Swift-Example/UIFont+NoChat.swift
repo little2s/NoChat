@@ -30,7 +30,7 @@ extension UIFont {
     static func noc_mediumSystemFont(ofSize fontSize: CGFloat) -> UIFont {
         var font: UIFont
         if #available(iOS 8.2, *) {
-            font = UIFont.systemFont(ofSize: fontSize, weight: UIFontWeightMedium)
+            font = UIFont.systemFont(ofSize: fontSize, weight: UIFont.Weight.medium)
         } else {
             font = UIFont(name: "HelveticaNeue-Medium", size: fontSize)!
         }

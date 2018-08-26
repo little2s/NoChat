@@ -10,6 +10,11 @@ DEPENDENCIES:
   - NOCProtoKit (from `../`)
   - YYText
 
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - HPGrowingTextView
+    - YYText
+
 EXTERNAL SOURCES:
   NoChat:
     :path: "../../"
@@ -18,10 +23,10 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   HPGrowingTextView: 88a716d97fb853bcb08a4a08e4727da17efc9b19
-  NoChat: aaa980b8b29c0db8c8bd8ecde22e718cc8ad1bf7
-  NOCProtoKit: 1eed77c8f171953c6632fbad8bc1d6f6ebf6b718
+  NoChat: 4a8c1a83ed1b8cd78c6a12271bcd944b31b6cd57
+  NOCProtoKit: 9a40eeb87fbf19d452ca620678d232f0759287af
   YYText: 5c461d709e24d55a182d1441c41dc639a18a4849
 
 PODFILE CHECKSUM: dedd2342d07b4ffed9fffa0fadb2f5447ac830a0
 
-COCOAPODS: 1.2.0.beta.1
+COCOAPODS: 1.5.3
