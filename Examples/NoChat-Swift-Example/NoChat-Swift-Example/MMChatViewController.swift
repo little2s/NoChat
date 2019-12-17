@@ -132,10 +132,12 @@ class MMChatViewController: NOCChatViewController, UINavigationControllerDelegat
     // MARK: MessageManagerDelegate
     
     func didReceiveMessages(messages: [Message], chatId: String) {
-        if isViewLoaded == false { return }
-        
-        if chatId == chat.chatId {
-            addMessages(messages, scrollToBottom: true, animated: true)
+        DispatchQueue.main.async {
+            if self.isViewLoaded == false { return }
+            
+            if chatId == self.chat.chatId {
+                self.addMessages(messages, scrollToBottom: true, animated: true)
+            }
         }
     }
     

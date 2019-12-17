@@ -467,7 +467,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-NoChat-Swift-Example/Pods-NoChat-Swift-Example-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-NoChat-Swift-Example/Pods-NoChat-Swift-Example-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/HPGrowingTextView/HPGrowingTextView.framework",
 				"${BUILT_PRODUCTS_DIR}/NOCProtoKit/NOCProtoKit.framework",
 				"${BUILT_PRODUCTS_DIR}/NoChat/NoChat.framework",
@@ -482,7 +482,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-NoChat-Swift-Example/Pods-NoChat-Swift-Example-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-NoChat-Swift-Example/Pods-NoChat-Swift-Example-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		7082105EA2915F24DD6DA011 /* [CP] Check Pods Manifest.lock */ = {

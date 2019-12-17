@@ -65,4 +65,8 @@
     return view;
 }
 
+- (void)didEndDisplay {
+    
+}
+
 @end

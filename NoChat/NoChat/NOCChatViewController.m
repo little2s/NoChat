@@ -35,6 +35,7 @@
 @interface NOCChatViewController ()
 
 @property (nonatomic, assign) BOOL isFirstLayout;
+@property (nonatomic, assign) BOOL isRegisterKeyboardNotifications;
 
 @end
 
@@ -176,6 +177,12 @@
     }];
 
     return cell;
+}
+
+- (void)collectionView:(UICollectionView *)collectionView didEndDisplayingCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
+    if ([cell isKindOfClass:[NOCChatItemCell class]]) {
+        [(NOCChatItemCell *)cell didEndDisplay];
+    }
 }
 
 #pragma mark - NOCChatCollectionViewLayoutDelegate
@@ -330,14 +337,20 @@
 
 - (void)registerKeyboardNotifications
 {
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillChangeFrame:) name:UIKeyboardWillChangeFrameNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidChangeFrame:) name:UIKeyboardDidChangeFrameNotification object:nil];
+    if (!self.isRegisterKeyboardNotifications) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillChangeFrame:) name:UIKeyboardWillChangeFrameNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidChangeFrame:) name:UIKeyboardDidChangeFrameNotification object:nil];
+        self.isRegisterKeyboardNotifications = YES;
+    }
 }
 
 - (void)unregisterKeyboardNotifications
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillChangeFrameNotification object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardDidChangeFrameNotification object:nil];
+    if (self.isRegisterKeyboardNotifications) {
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillChangeFrameNotification object:nil];
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardDidChangeFrameNotification object:nil];
+        self.isRegisterKeyboardNotifications = NO;
+    }
 }
 
 - (void)keyboardWillChangeFrame:(NSNotification *)notification

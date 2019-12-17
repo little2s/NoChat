@@ -41,7 +41,7 @@
         self.scrollsToTop = NO;
         self.alwaysBounceVertical = YES;
         self.exclusiveTouch = YES;
-        self.delaysContentTouches = NO;
+        //self.delaysContentTouches = NO;
     }
     return self;
 }

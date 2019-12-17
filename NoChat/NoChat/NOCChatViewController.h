@@ -85,6 +85,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable id<NOCChatItemCellLayout>)createLayoutWithItem:(id<NOCChatItem>)item width:(CGFloat)width;
 
+- (void)adjustCollectionViewForSize:(CGSize)size keyboardHeight:(CGFloat)keyboardHeight inputContainerHeight:(CGFloat)inputContainerHeight scrollToBottom:(BOOL)scrollToBottom duration:(NSTimeInterval)duration animationCurve:(int)animationCurve;
+
+- (void)registerKeyboardNotifications;
+- (void)unregisterKeyboardNotifications;
+
+- (void)adjustColletionViewInsets;
+
 @end
 
 //
