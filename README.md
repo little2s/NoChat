@@ -1,7 +1,5 @@
 ⚠️ DEPRECATED, NO LONGER MAINTAINED
 
-<img src="https://github.com/little2s/NoChat/raw/master/Examples/NoChat-Example/NoChat-Example/Assets.xcassets/AppIcon.appiconset/Icon-60%402x.png" width="100" height="100" />
-
 [![Languages](https://img.shields.io/badge/languages-ObjC%20%7C%20Swift-orange.svg)](https://github.com/little2s/NoChat)
 
 # NoChat
