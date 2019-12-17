@@ -75,13 +75,22 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, assign, readonly) CGFloat cellWidth;
 
+@property (nonatomic, assign, readonly) UIEdgeInsets safeAreaInsets;
+
 + (nullable Class)cellLayoutClassForItemType:(NSString *)type;
 + (nullable Class)inputPanelClass;
 - (void)registerChatItemCells;
 
 - (void)didTapStatusBar;
 
-- (nullable id<NOCChatItemCellLayout>)createLayoutWithItem:(id<NOCChatItem>)item;
+- (nullable id<NOCChatItemCellLayout>)createLayoutWithItem:(id<NOCChatItem>)item width:(CGFloat)width;
+
+- (void)adjustCollectionViewForSize:(CGSize)size keyboardHeight:(CGFloat)keyboardHeight inputContainerHeight:(CGFloat)inputContainerHeight scrollToBottom:(BOOL)scrollToBottom duration:(NSTimeInterval)duration animationCurve:(int)animationCurve;
+
+- (void)registerKeyboardNotifications;
+- (void)unregisterKeyboardNotifications;
+
+- (void)adjustColletionViewInsets;
 
 @end
 

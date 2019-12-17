@@ -75,7 +75,7 @@
         NSString *chatType = message[@"ctype"];
         NSString *targetId = message[@"to"];
         if ([chatType isEqualToString:@"bot"] && targetId) {
-            NOCClient *client = [_table objectForKey:targetId];
+            NOCClient *client = [self->_table objectForKey:targetId];
             if (client) {
                 id<NOCClientDelegate> delegate = client.delegate;
                 if ([delegate respondsToSelector:@selector(clientDidReceiveMessage:)]) {

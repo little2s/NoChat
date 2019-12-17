@@ -41,7 +41,7 @@
         self.scrollsToTop = NO;
         self.alwaysBounceVertical = YES;
         self.exclusiveTouch = YES;
-        self.delaysContentTouches = NO;
+        //self.delaysContentTouches = NO;
     }
     return self;
 }
@@ -61,6 +61,8 @@
     UIEdgeInsets inset = self.scrollIndicatorInsets;
     inset.top = contentInset.top;
     inset.bottom = contentInset.bottom;
+    inset.left = contentInset.left;
+    inset.right = contentInset.right;
     self.scrollIndicatorInsets = inset;
 }
 

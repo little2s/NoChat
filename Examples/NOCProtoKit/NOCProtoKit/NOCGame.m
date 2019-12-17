@@ -130,7 +130,7 @@
     }
 }
 
-- (void)print:(NSArray *)msgs completed:(void (^)())completed
+- (void)print:(NSArray *)msgs completed:(void (^)(void))completed
 {
     __block float delay = 0.65;
     [msgs enumerateObjectsUsingBlock:^(NSString *text, NSUInteger idx, BOOL *stop) {

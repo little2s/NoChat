@@ -34,6 +34,9 @@
 
 @interface NOCChatViewController ()
 
+@property (nonatomic, assign) BOOL isFirstLayout;
+@property (nonatomic, assign) BOOL isRegisterKeyboardNotifications;
+
 @end
 
 @implementation NOCChatViewController
@@ -91,7 +94,12 @@
 - (void)viewWillLayoutSubviews
 {
     [super viewWillLayoutSubviews];
-    [self adjustColletionViewInsets];
+    self.containerView.frame = self.view.bounds;
+    if (self.isFirstLayout) {
+        self.isFirstLayout = NO;
+        [self layoutInputPanel];
+        [self adjustColletionViewInsets];
+    }
 }
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
@@ -136,14 +144,14 @@
     }
 }
 
-- (nullable id<NOCChatItemCellLayout>)createLayoutWithItem:(id<NOCChatItem>)item
+- (nullable id<NOCChatItemCellLayout>)createLayoutWithItem:(id<NOCChatItem>)item width:(CGFloat)width
 {
     Class layoutClass = [[self class] cellLayoutClassForItemType:item.type];
     if (layoutClass == nil) {
         return nil;
     }
     
-    return [[layoutClass alloc] initWithChatItem:item cellWidth:self.cellWidth];
+    return [[layoutClass alloc] initWithChatItem:item cellWidth:width];
 }
 
 #pragma mark - UICollectionViewDataSource
@@ -169,6 +177,12 @@
     }];
 
     return cell;
+}
+
+- (void)collectionView:(UICollectionView *)collectionView didEndDisplayingCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
+    if ([cell isKindOfClass:[NOCChatItemCell class]]) {
+        [(NOCChatItemCell *)cell didEndDisplay];
+    }
 }
 
 #pragma mark - NOCChatCollectionViewLayoutDelegate
@@ -206,13 +220,26 @@
 
 - (CGFloat)cellWidth
 {
-    return self.view.bounds.size.width;
+    NSAssert(NSThread.isMainThread, @"Must be used from main thread only");
+    return self.view.bounds.size.width - self.safeAreaInsets.left - self.safeAreaInsets.right;
+}
+
+- (UIEdgeInsets)safeAreaInsets
+{
+    UIEdgeInsets insets;
+    if (@available(iOS 11.0, *)) {
+        insets = self.view.safeAreaInsets;
+    } else {
+        insets = UIEdgeInsetsMake(self.topLayoutGuide.length, 0, 0, self.bottomLayoutGuide.length);
+    }
+    return insets;
 }
 
 #pragma mark - Private
 
 - (void)commonInit
 {
+    _isFirstLayout = YES;
     _inverted = YES;
     _chatInputContainerViewDefaultHeight = 45;
     _scrollFractionalThreshold = 0.05;
@@ -224,7 +251,6 @@
 - (void)setupContainerView
 {
     _containerView = [[NOCChatContainerView alloc] initWithFrame:self.view.bounds];
-    _containerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     _containerView.backgroundColor = [UIColor whiteColor];
     _containerView.clipsToBounds = YES;
     __weak typeof(self) weakSelf = self;
@@ -270,6 +296,9 @@
     _collectionView = [[NOCChatCollectionView alloc] initWithFrame:CGRectMake(0, 0, collectionViewSize.width, collectionViewSize.height) collectionViewLayout:_collectionLayout];
     _collectionView.dataSource = self;
     _collectionView.delegate = self;
+    if (@available(iOS 11.0, *)) {
+        _collectionView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+    }
     
     UIEdgeInsets originalInset = UIEdgeInsetsZero;
     UIEdgeInsets inset = originalInset;
@@ -296,21 +325,32 @@
 - (void)setupInputPanel
 {
     Class inputPanelClass = [[self class] inputPanelClass];
-    _inputPanel = [[inputPanelClass alloc] initWithFrame:CGRectMake(0, self.containerView.bounds.size.height - self.chatInputContainerViewDefaultHeight, self.containerView.bounds.size.width, self.chatInputContainerViewDefaultHeight)];
+    _inputPanel = [[inputPanelClass alloc] initWithFrame:CGRectMake(0, self.containerView.bounds.size.height - self.safeAreaInsets.bottom - self.chatInputContainerViewDefaultHeight, self.containerView.bounds.size.width, self.chatInputContainerViewDefaultHeight)];
     _inputPanel.delegate = self;
     [_containerView addSubview:_inputPanel];
 }
 
+- (void)layoutInputPanel
+{
+    _inputPanel.frame = CGRectMake(0, self.containerView.bounds.size.height - self.safeAreaInsets.bottom - self.chatInputContainerViewDefaultHeight, self.containerView.bounds.size.width, self.chatInputContainerViewDefaultHeight);
+}
+
 - (void)registerKeyboardNotifications
 {
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillChangeFrame:) name:UIKeyboardWillChangeFrameNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidChangeFrame:) name:UIKeyboardDidChangeFrameNotification object:nil];
+    if (!self.isRegisterKeyboardNotifications) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillChangeFrame:) name:UIKeyboardWillChangeFrameNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidChangeFrame:) name:UIKeyboardDidChangeFrameNotification object:nil];
+        self.isRegisterKeyboardNotifications = YES;
+    }
 }
 
 - (void)unregisterKeyboardNotifications
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillChangeFrameNotification object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardDidChangeFrameNotification object:nil];
+    if (self.isRegisterKeyboardNotifications) {
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillChangeFrameNotification object:nil];
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardDidChangeFrameNotification object:nil];
+        self.isRegisterKeyboardNotifications = NO;
+    }
 }
 
 - (void)keyboardWillChangeFrame:(NSNotification *)notification
@@ -392,14 +432,29 @@
 
 - (void)adjustColletionViewInsets
 {
-    CGFloat topPadding = self.topLayoutGuide.length;
+    UIEdgeInsets safeAreaInsets = self.safeAreaInsets;
+    
+    CGFloat topPadding = safeAreaInsets.top;
+    
+    CGFloat bottomPadding;
+    if (self.keyboardHeight < FLT_EPSILON) {
+        bottomPadding = safeAreaInsets.bottom + self.inputPanel.frame.size.height;
+    } else {
+        bottomPadding = self.keyboardHeight + self.inputPanel.frame.size.height;
+    }
+
     UIEdgeInsets originalInset = self.collectionView.contentInset;
     UIEdgeInsets inset = originalInset;
     if (self.isInverted) {
         inset.bottom = topPadding;
+        inset.top = bottomPadding;
     } else {
         inset.top = topPadding;
+        inset.bottom = bottomPadding;
     }
+    inset.left = safeAreaInsets.left;
+    inset.right = safeAreaInsets.right;
+ 
     self.collectionView.contentInset = inset;
 }
 
@@ -409,12 +464,19 @@
     
     CGFloat contentHeight = self.collectionView.contentSize.height;
     
+    CGFloat bottomPadding;
+    if (keyboardHeight < FLT_EPSILON) {
+        bottomPadding = self.safeAreaInsets.bottom + inputContainerHeight;
+    } else {
+        bottomPadding = keyboardHeight + inputContainerHeight;
+    }
+    
     UIEdgeInsets originalInset = self.collectionView.contentInset;
     UIEdgeInsets inset = originalInset;
     if (self.isInverted) {
-        inset.top = keyboardHeight + inputContainerHeight;
+        inset.top = bottomPadding;
     } else {
-        inset.bottom = keyboardHeight + inputContainerHeight;
+        inset.bottom = bottomPadding;
     }
     
     CGPoint originalContentOffset = self.collectionView.contentOffset;
@@ -464,6 +526,7 @@
     CGFloat maxOriginY = self.isInverted ? self.collectionView.contentOffset.y + self.collectionView.contentInset.top : self.collectionView.contentOffset.y + self.collectionView.bounds.size.height - self.collectionView.contentInset.bottom;
     CGPoint previousContentOffset = self.collectionView.contentOffset;
     CGRect previousCollectionFrame = self.collectionView.frame;
+    UIEdgeInsets previousContentInset = self.collectionView.contentInset;
     
     NSInteger anchorItemIndex = -1;
     CGFloat anchorItemOriginY = 0;
@@ -475,7 +538,7 @@
     
     NSMutableSet *previousVisibleItemIndices = [[NSMutableSet alloc] init];
     
-    NSArray *previousLayoutAttributes = [self.collectionLayout layoutAttributesForLayouts:self.layouts containerWidth:previousCollectionFrame.size.width maxHeight:CGFLOAT_MAX contentHeight:NULL];
+    NSArray *previousLayoutAttributes = [self.collectionLayout layoutAttributesForLayouts:self.layouts containerWidth:previousCollectionFrame.size.width-previousContentInset.left-previousContentInset.right maxHeight:CGFLOAT_MAX contentHeight:NULL];
     
     NSInteger chatItemsCount = self.layouts.count;
     for (NSInteger i = 0; i < chatItemsCount; i++) {
@@ -505,19 +568,13 @@
     
     [self.collectionLayout invalidateLayout];
     
-    UIEdgeInsets originalInset = self.collectionView.contentInset;
-    UIEdgeInsets inset = originalInset;
-    if (self.isInverted) {
-        inset.top = keyboardHeight + self.inputPanel.frame.size.height;
-    } else {
-        inset.bottom = keyboardHeight + self.inputPanel.frame.size.height;
-    }
-    self.collectionView.contentInset = inset;
+    [self adjustColletionViewInsets];
     
     CGFloat newContentHeight = 0;
-    NSArray *newLayoutAttributes = [self.collectionLayout layoutAttributesForLayouts:self.layouts containerWidth:collectionViewSize.width maxHeight:CGFLOAT_MAX contentHeight:&newContentHeight];
+    NSArray *newLayoutAttributes = [self.collectionLayout layoutAttributesForLayouts:self.layouts containerWidth:collectionViewSize.width-self.collectionView.contentInset.left-self.collectionView.contentInset.right maxHeight:CGFLOAT_MAX contentHeight:&newContentHeight];
     
     CGPoint newContentOffset = CGPointZero;
+    newContentOffset.x = -self.collectionView.contentInset.left;
     newContentOffset.y = -self.collectionView.contentInset.top;
     if (anchorItemIndex >= 0 && anchorItemIndex < newLayoutAttributes.count) {
         UICollectionViewLayoutAttributes *attributes = newLayoutAttributes[anchorItemIndex];
@@ -567,7 +624,7 @@
         self.collectionView.clipsToBounds = NO;
         
         CGFloat contentOffsetDifference = newContentOffset.y - previousContentOffset.y + (self.collectionView.frame.size.height - previousCollectionFrame.size.height);
-        CGFloat widthDifference = self.collectionView.frame.size.width - previousCollectionFrame.size.width;
+        CGFloat widthDifference = (self.collectionView.frame.size.width-self.collectionView.contentInset.left-self.collectionView.contentInset.right) - (previousCollectionFrame.size.width-previousContentInset.left-previousContentInset.right);
         
         NSMutableArray *itemFramesToRestore = [[NSMutableArray alloc] init];
         

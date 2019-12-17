@@ -57,13 +57,13 @@ class TGChatInputTextPanel: NOCChatInputPanel, HPGrowingTextViewDelegate {
     private var keyboardHeight = CGFloat(0)
     
     override init(frame: CGRect) {
-        sendButtonWidth = min(150, (NSLocalizedString("Send", comment: "") as NSString).size(attributes: [NSFontAttributeName: UIFont.noc_mediumSystemFont(ofSize: 17)]).width + 8)
+        sendButtonWidth = min(150, (NSLocalizedString("Send", comment: "") as NSString).size(withAttributes: convertToOptionalNSAttributedStringKeyDictionary([convertFromNSAttributedStringKey(NSAttributedString.Key.font): UIFont.noc_mediumSystemFont(ofSize: 17)])).width + 8)
         
         backgroundView = UIView()
-        backgroundView.backgroundColor = UIColor(colorLiteralRed: 250/255.0, green: 250/255.0, blue: 250/255.0, alpha: 1)
+        backgroundView.backgroundColor = UIColor(red: 250/255.0, green: 250/255.0, blue: 250/255.0, alpha: 1)
         
         stripeLayer = CALayer()
-        stripeLayer.backgroundColor = UIColor(colorLiteralRed: 179/255.0, green: 170/255.0, blue: 178/255.0, alpha: 1).cgColor
+        stripeLayer.backgroundColor = UIColor(red: 179/255.0, green: 170/255.0, blue: 178/255.0, alpha: 1).cgColor
         
         let filedBackgroundImage = UIImage(named: "TGInputFieldBackground")!
         fieldBackground = UIImageView(image: filedBackgroundImage)
@@ -89,8 +89,8 @@ class TGChatInputTextPanel: NOCChatInputPanel, HPGrowingTextViewDelegate {
         sendButton = UIButton(type: .system)
         sendButton.isExclusiveTouch = true
         sendButton.setTitle(NSLocalizedString("Send", comment: ""), for: .normal)
-        sendButton.setTitleColor(UIColor(colorLiteralRed: 0/255.0, green: 126/255.0, blue: 229/255.0, alpha: 1), for: .normal)
-        sendButton.setTitleColor(UIColor(colorLiteralRed: 142/255.0, green: 142/255.0, blue: 147/255.0, alpha: 1), for: .disabled)
+        sendButton.setTitleColor(UIColor(red: 0/255.0, green: 126/255.0, blue: 229/255.0, alpha: 1), for: .normal)
+        sendButton.setTitleColor(UIColor(red: 142/255.0, green: 142/255.0, blue: 147/255.0, alpha: 1), for: .disabled)
         sendButton.titleLabel?.font = UIFont.noc_mediumSystemFont(ofSize: 17)
         sendButton.isEnabled = false
         sendButton.isHidden = true
@@ -128,19 +128,25 @@ class TGChatInputTextPanel: NOCChatInputPanel, HPGrowingTextViewDelegate {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        backgroundView.frame = bounds
+        var safeArea = UIEdgeInsets.zero
+        if let vc = delegate as? NOCChatViewController {
+            safeArea = vc.safeAreaInsets
+        }
+        
+        backgroundView.frame = CGRect(x: 0, y: 0, width: bounds.width, height: bounds.height + safeArea.bottom)
+        
+        sendButton.frame = CGRect(x: bounds.width - safeArea.right - sendButtonWidth, y: bounds.height - baseHeight, width: sendButtonWidth, height: baseHeight)
+        
+        attachButton.frame = CGRect(x: safeArea.left, y: bounds.height - baseHeight, width: 40, height: baseHeight)
+        
+        micButton.frame = CGRect(x: bounds.width - safeArea.right - sendButtonWidth, y: bounds.height - baseHeight, width: sendButtonWidth, height: baseHeight)
         
         stripeLayer.frame = CGRect(x: 0, y: -TGRetinaPixel, width: bounds.width, height: TGRetinaPixel)
         
-        fieldBackground.frame = CGRect(x: inputFiledInsets.left, y: inputFiledInsets.top, width: bounds.width - inputFiledInsets.left - inputFiledInsets.right - sendButtonWidth - 1, height: bounds.height - inputFiledInsets.top - inputFiledInsets.bottom)
+        fieldBackground.frame = CGRect(x: inputFiledInsets.left + safeArea.left, y: inputFiledInsets.top, width: bounds.width - inputFiledInsets.left - inputFiledInsets.right - sendButtonWidth - 1 - safeArea.left - safeArea.right, height: bounds.height - inputFiledInsets.top - inputFiledInsets.bottom)
         
         inputFiledClippingContainer.frame = fieldBackground.frame
-        
-        sendButton.frame = CGRect(x: bounds.width - sendButtonWidth, y: bounds.height - baseHeight, width: sendButtonWidth, height: baseHeight)
-        
-        attachButton.frame = CGRect(x: 0, y: bounds.height - baseHeight, width: 40, height: baseHeight)
-        
-        micButton.frame = CGRect(x: bounds.width - sendButtonWidth, y: bounds.height - baseHeight, width: sendButtonWidth, height: baseHeight)
+
     }
     
     override func endInputting(_ animated: Bool) {
@@ -182,7 +188,14 @@ class TGChatInputTextPanel: NOCChatInputPanel, HPGrowingTextViewDelegate {
         }
         
         let inputContainerHeight = heightForInputFiledHeight(inputField.frame.size.height)
-        let newInputContainerFrame = CGRect(x: 0, y: messageAreaSize.height - keyboardHeight - inputContainerHeight, width: messageAreaSize.width, height: inputContainerHeight)
+        var newInputContainerFrame: CGRect = .zero
+        if (abs(keyboardHeight) < TG_EPSILON) {
+            if let vc = self.delegate as? NOCChatViewController {
+                newInputContainerFrame = CGRect(x: 0, y: messageAreaSize.height - vc.safeAreaInsets.bottom - keyboardHeight - inputContainerHeight, width: messageAreaSize.width, height: inputContainerHeight)
+            }
+        } else {
+            newInputContainerFrame = CGRect(x: 0, y: messageAreaSize.height - keyboardHeight - inputContainerHeight, width: messageAreaSize.width, height: inputContainerHeight)
+        }
         
         if duration > .ulpOfOne {
             if inputFieldSnapshotView != nil {
@@ -222,7 +235,14 @@ class TGChatInputTextPanel: NOCChatInputPanel, HPGrowingTextViewDelegate {
     
     func growingTextView(_ growingTextView: HPGrowingTextView!, willChangeHeight height: Float) {
         let inputContainerHeight = heightForInputFiledHeight(CGFloat(height))
-        let newInputContainerFrame = CGRect(x: 0, y: messageAreaSize.height - keyboardHeight - inputContainerHeight, width: messageAreaSize.width, height: inputContainerHeight)
+        var newInputContainerFrame: CGRect = .zero
+        if (abs(keyboardHeight) < TG_EPSILON) {
+            if let vc = self.delegate as? NOCChatViewController {
+                newInputContainerFrame = CGRect(x: 0, y: messageAreaSize.height - vc.safeAreaInsets.bottom - keyboardHeight - inputContainerHeight, width: messageAreaSize.width, height: inputContainerHeight)
+            }
+        } else {
+            newInputContainerFrame = CGRect(x: 0, y: messageAreaSize.height - keyboardHeight - inputContainerHeight, width: messageAreaSize.width, height: inputContainerHeight)
+        }
         
         UIView.animate(withDuration: 0.3) { 
             self.frame = newInputContainerFrame
@@ -236,13 +256,13 @@ class TGChatInputTextPanel: NOCChatInputPanel, HPGrowingTextViewDelegate {
         toggleSendButtonEnabled()
     }
     
-    func didTapSendButton(_ sender: UIButton) {
+    @objc func didTapSendButton(_ sender: UIButton) {
         guard let text = inputField.internalTextView.text else {
             return
         }
         
         let str = text.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-        if str.characters.count > 0 {
+        if str.count > 0 {
             if let d = delegate as? TGChatInputTextPanelDelegate {
                 d.inputTextPanel(self, requestSendText: str)
             }
@@ -258,12 +278,18 @@ class TGChatInputTextPanel: NOCChatInputPanel, HPGrowingTextViewDelegate {
             self.keyboardHeight = keyboardHeight
             
             let inputContainerHeight = self.heightForInputFiledHeight(inputFiledHeight)
-            self.frame = CGRect(x: 0, y: messageAreaSize.height - keyboardHeight - inputContainerHeight, width: self.messageAreaSize.width, height: inputContainerHeight)
+            if (abs(keyboardHeight) < TG_EPSILON) {
+                if let vc = self.delegate as? NOCChatViewController {
+                    self.frame = CGRect(x: 0, y: messageAreaSize.height - vc.safeAreaInsets.bottom - keyboardHeight - inputContainerHeight, width: self.messageAreaSize.width, height: inputContainerHeight)
+                }
+            } else {
+                self.frame = CGRect(x: 0, y: messageAreaSize.height - keyboardHeight - inputContainerHeight, width: self.messageAreaSize.width, height: inputContainerHeight)
+            }
             self.layoutSubviews()
         }
         
         if duration > .ulpOfOne {
-            UIView .animate(withDuration: duration, delay: 0, options: UIViewAnimationOptions(rawValue: UInt(animationCurve << 16)), animations: block, completion: nil)
+            UIView .animate(withDuration: duration, delay: 0, options: UIView.AnimationOptions(rawValue: UInt(animationCurve << 16)), animations: block, completion: nil)
         } else {
             block()
         }
@@ -306,4 +332,15 @@ class TGChatInputTextPanel: NOCChatInputPanel, HPGrowingTextViewDelegate {
         }
     }
     
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertToOptionalNSAttributedStringKeyDictionary(_ input: [String: Any]?) -> [NSAttributedString.Key: Any]? {
+	guard let input = input else { return nil }
+	return Dictionary(uniqueKeysWithValues: input.map { key, value in (NSAttributedString.Key(rawValue: key), value)})
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertFromNSAttributedStringKey(_ input: NSAttributedString.Key) -> String {
+	return input.rawValue
 }

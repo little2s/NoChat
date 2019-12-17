@@ -23,7 +23,7 @@ Telegram or WeChat very easily. You can custom your own with NoChat :].
 
 ## Requirements
 - iOS 8.0+
-- Xcode 8.2.1 or above
+- Xcode 10
 
 ## Install
 NoChat supports multiple methods for install.

@@ -42,6 +42,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSString *)reuseIdentifier;
 
+- (void)didEndDisplay;
+
 @end
 
 NS_ASSUME_NONNULL_END

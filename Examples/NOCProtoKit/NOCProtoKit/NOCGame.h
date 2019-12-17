@@ -47,7 +47,7 @@
 
 + (instancetype)shared;
 - (void)play;
-- (void)print:(NSArray *)msgs completed:(void (^)())completed;
+- (void)print:(NSArray *)msgs completed:(void (^)(void))completed;
 - (void)nextScene:(NSString *)sceneName;
 
 @end

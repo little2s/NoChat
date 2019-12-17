@@ -27,8 +27,13 @@ import UIKit
 
 class TGAvatarButton: UIButton {
     
+    private var widthConstraint: NSLayoutConstraint!
+    private var heightConstraint: NSLayoutConstraint!
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
+        self.widthConstraint = NSLayoutConstraint(item: self, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .width, multiplier: 1, constant: 28)
+        self.heightConstraint = NSLayoutConstraint(item: self, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .height, multiplier: 1, constant: 28)
         setImage(UIImage(named: "TGUserInfo")!, for: .normal)
         regularLayout()
     }
@@ -46,11 +51,13 @@ class TGAvatarButton: UIButton {
     }
     
     private func regularLayout() {
-        frame = CGRect(x: 0, y: 0, width: 37, height: 37)
+        self.widthConstraint.isActive = false
+        self.heightConstraint.isActive = false
     }
     
     private func compactLayout() {
-        frame = CGRect(x: 0, y: 0, width: 28, height: 28)
+        self.widthConstraint.isActive = true
+        self.heightConstraint.isActive = true
     }
     
 }

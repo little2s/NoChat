@@ -80,7 +80,7 @@ class MMChatViewController: NOCChatViewController, UINavigationControllerDelegat
         let rightItem = UIBarButtonItem(image: UIImage(named: "MMUserInfo"), style: .plain, target: nil, action: nil)
         navigationItem.rightBarButtonItem = rightItem
         title = chat.title
-        
+                
         loadMessages()
     }
     
@@ -132,10 +132,12 @@ class MMChatViewController: NOCChatViewController, UINavigationControllerDelegat
     // MARK: MessageManagerDelegate
     
     func didReceiveMessages(messages: [Message], chatId: String) {
-        if isViewLoaded == false { return }
-        
-        if chatId == chat.chatId {
-            addMessages(messages, scrollToBottom: true, animated: true)
+        DispatchQueue.main.async {
+            if self.isViewLoaded == false { return }
+            
+            if chatId == self.chat.chatId {
+                self.addMessages(messages, scrollToBottom: true, animated: true)
+            }
         }
     }
     
@@ -180,15 +182,23 @@ class MMChatViewController: NOCChatViewController, UINavigationControllerDelegat
     }
     
     private func addMessages(_ messages: [Message], scrollToBottom: Bool, animated: Bool) {
+        var width: CGFloat = 0
+        if Thread.isMainThread {
+            width = self.cellWidth
+        } else {
+            DispatchQueue.main.sync {
+                width = self.cellWidth
+            }
+        }
+        
         layoutQueue.async { [weak self] in
             guard let strongSelf = self else { return }
             let count = strongSelf.layouts.count
             let indexes = IndexSet(integersIn: count..<count+messages.count)
             
             var layouts = [NOCChatItemCellLayout]()
-            
             for message in messages {
-                let layout = strongSelf.createLayout(with: message)!
+                let layout = strongSelf.createLayout(with: message, width: width)!
                 layouts.append(layout)
             }
             

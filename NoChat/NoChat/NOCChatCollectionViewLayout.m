@@ -72,10 +72,12 @@
     
     [_layoutAttributes removeAllObjects];
     
-    CGFloat contentHeight = 0;
-    [_layoutAttributes addObjectsFromArray:[self layoutAttributesForLayouts:[(id<NOCChatCollectionViewLayoutDelegate>)self.collectionView.delegate cellLayouts] containerWidth:self.collectionView.bounds.size.width maxHeight:CGFLOAT_MAX contentHeight:&contentHeight]];
+    CGFloat contentWidth = self.collectionView.bounds.size.width - self.collectionView.contentInset.left - self.collectionView.contentInset.right;
     
-    _contentSize = CGSizeMake(self.collectionView.bounds.size.width, contentHeight);
+    CGFloat contentHeight = 0;
+    [_layoutAttributes addObjectsFromArray:[self layoutAttributesForLayouts:[(id<NOCChatCollectionViewLayoutDelegate>)self.collectionView.delegate cellLayouts] containerWidth:contentWidth maxHeight:CGFLOAT_MAX contentHeight:&contentHeight]];
+    
+    _contentSize = CGSizeMake(contentWidth, contentHeight);
 }
 
 - (CGSize)collectionViewContentSize
