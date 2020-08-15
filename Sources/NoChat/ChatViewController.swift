@@ -159,7 +159,7 @@ open class ChatViewController: UIViewController {
                 strongSelf.performSizeChange(with: strongSelf.isRotating ? 0.3 : 0.0, size: size)
             }
         }
-        view.addSubview(backgroundView)
+        view.addSubview(containerView)
     }
     
     private func setupCollectionView() {
