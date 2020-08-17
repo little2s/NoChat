@@ -50,6 +50,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) CGFloat keyboardHeight;
 @property (nonatomic, assign) BOOL isRotating;
 
+
+// Default is YES.
+@property (nonatomic, assign, getter=isAutoInControllerTransition) BOOL autoInControllerTransition;
 @property (nonatomic, assign) BOOL isInControllerTransition;
 
 //
@@ -65,13 +68,12 @@ NS_ASSUME_NONNULL_BEGIN
 //
 // inverted is YES               inverted is NO
 //
-@property (nonatomic, strong) NSMutableArray<id<NOCChatItemCellLayout>> *layouts;
+@property (atomic, strong) NSMutableArray<id<NOCChatItemCellLayout>> *layouts;
 
 // Default is YES.
 @property (nonatomic, assign, getter=isInverted) BOOL inverted;
 
 @property (nonatomic, assign) CGFloat chatInputContainerViewDefaultHeight;
-@property (nonatomic, assign) CGFloat scrollFractionalThreshold; // in [0, 1]
 
 @property (nonatomic, assign, readonly) CGFloat cellWidth;
 
@@ -91,38 +93,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)unregisterKeyboardNotifications;
 
 - (void)adjustColletionViewInsets;
-
-@end
-
-//
-// Pay more attention to use these methods with inverted mode.
-// These methods won't check or even map the relationship
-// between layouts and their indexes for you.
-//
-@interface NOCChatViewController (NOCChanges)
-
-- (void)insertLayouts:(NSArray<id<NOCChatItemCellLayout>> *)layouts atIndexes:(NSIndexSet *)indexes animated:(BOOL)animated;
-- (void)deleteLayoutsAtIndexes:(NSIndexSet *)indexes animated:(BOOL)animated;
-- (void)updateLayoutAtIndex:(NSUInteger)index toLayout:(id<NOCChatItemCellLayout>)layout animated:(BOOL)animated;
-
-@end
-
-//
-// These scrolling methods already deal with inverted mode for you.
-// For example `isScrolledAtBottom`, the `bottom` is the bottom you see on screen,
-// maybe not real bottom of collectionView.
-//
-@interface NOCChatViewController (NOCScrolling)
-
-- (BOOL)isCloseToTop;
-- (BOOL)isScrolledAtTop;
-- (void)scrollToTopAnimated:(BOOL)animated;
-
-- (BOOL)isCloseToBottom;
-- (BOOL)isScrolledAtBottom;
-- (void)scrollToBottomAnimated:(BOOL)animated;
-
-- (void)stopScrollIfNeeded;
 
 @end
 

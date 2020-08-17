@@ -31,7 +31,35 @@ typedef void(^NOCChatCollectionViewAction)(void);
 
 @interface NOCChatCollectionView : UICollectionView
 
+// Default is YES.
+@property (nonatomic, assign, getter=isInverted) BOOL inverted;
+
+@property (nonatomic, assign) CGFloat scrollFractionalThreshold; // in [0, 1]
+
 @property (nullable, nonatomic, copy) NOCChatCollectionViewAction tapAction;
+
+@property (nullable, nonatomic, copy) NOCChatCollectionViewAction contentInsetChangedAction;
+
+- (void)changeWithInsertIndexPathes:(NSArray<NSIndexPath *> *)insertIndexPathes
+                  deleteIndexPathes:(NSArray<NSIndexPath *> *)deleteIndexPathes
+                  updateIndexPahtes:(NSArray<NSIndexPath *> *)updateIndexPahtes
+                           animated:(BOOL)animated
+                         completion:(void (^ _Nullable)(void))completion;
+
+//
+// These scrolling methods already deal with inverted mode for you.
+// For example `isScrolledAtBottom`, the `bottom` is the bottom you see on screen,
+// maybe not real bottom of collectionView.
+//
+- (BOOL)isCloseToTop;
+- (BOOL)isScrolledAtTop;
+- (void)scrollToTopAnimated:(BOOL)animated;
+
+- (BOOL)isCloseToBottom;
+- (BOOL)isScrolledAtBottom;
+- (void)scrollToBottomAnimated:(BOOL)animated;
+
+- (void)stopScrollIfNeeded;
 
 @end
 

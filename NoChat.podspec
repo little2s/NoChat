@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "NoChat"
-  s.version      = "0.4.0"
+  s.version      = "0.5.0"
   s.summary      = "A lightweight chat framework."
   s.homepage     = "https://github.com/little2s/NoChat.git"
   s.license      = "MIT"

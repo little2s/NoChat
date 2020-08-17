@@ -1,6 +1,6 @@
 PODS:
   - HPGrowingTextView (1.1)
-  - NoChat (0.4.0)
+  - NoChat (0.5.0)
   - NOCProtoKit (0.3.2)
   - YYText (1.0.7)
 
@@ -23,10 +23,10 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   HPGrowingTextView: 88a716d97fb853bcb08a4a08e4727da17efc9b19
-  NoChat: 45d10eaafdd228fae0e8b0396518311e0e9d28fd
+  NoChat: 7b3454076c14ee4ac1a7487de231bf5291766c7e
   NOCProtoKit: 1eed77c8f171953c6632fbad8bc1d6f6ebf6b718
   YYText: 5c461d709e24d55a182d1441c41dc639a18a4849
 
 PODFILE CHECKSUM: dedd2342d07b4ffed9fffa0fadb2f5447ac830a0
 
-COCOAPODS: 1.8.4
+COCOAPODS: 1.9.3
