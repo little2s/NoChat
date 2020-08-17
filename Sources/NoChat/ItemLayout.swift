@@ -32,7 +32,7 @@ public protocol ItemLayout: Identifiable, CellReuseIdentifiable, SizeCalculator 
     init(item: Item)
 }
 
-extension ItemLayout {
+public extension ItemLayout {
     var uniqueIdentifier: String { item.uniqueIdentifier }
 }
 

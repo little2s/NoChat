@@ -66,9 +66,14 @@ open class ItemsView: UICollectionView {
     // MARK: - Change
         
     public struct Change {
-        var insertIndexPathes: [IndexPath] = []
-        var deleteIndexPathes: [IndexPath] = []
-        var updateIndexPahtes: [IndexPath] = []
+        public var insertIndexPathes: [IndexPath] = []
+        public var deleteIndexPathes: [IndexPath] = []
+        public var updateIndexPahtes: [IndexPath] = []
+        public init(insertIndexPathes: [IndexPath] = [], deleteIndexPathes: [IndexPath] = [], updateIndexPahtes: [IndexPath] = []) {
+            self.insertIndexPathes = insertIndexPathes
+            self.deleteIndexPathes = deleteIndexPathes
+            self.updateIndexPahtes = updateIndexPahtes
+        }
     }
     
     open func performChange(_ change: Change, animated: Bool, completion: (() -> Void)? = nil) {
@@ -191,7 +196,7 @@ open class ItemsView: UICollectionView {
         let offsetY = max(-contentInset.top, contentHeight - boundsHeight + contentInset.bottom)
         var contentOffset = self.contentOffset
         contentOffset.y = offsetY
-        setContentOffset(contentOffset, animated: true)
+        setContentOffset(contentOffset, animated: animated)
     }
     
     private enum VerticalEdge {

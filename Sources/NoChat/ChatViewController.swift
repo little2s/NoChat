@@ -22,12 +22,7 @@ open class ChatViewController: UIViewController {
     ///
     /// inverted is true             inverted is false
     ///
-    open var layouts: [AnyItemLayout] {
-        set { _lock.lock(); defer { _lock.unlock() }; _layouts = newValue }
-        get { _lock.lock(); defer { _lock.unlock() }; return _layouts }
-    }
-    private var _layouts: [AnyItemLayout] = []
-    private var _lock = UnfairLock()
+    open var layouts: [AnyItemLayout] = []
     
     private var cellRegisterTable: [String: Bool] = [:]
     
@@ -40,11 +35,11 @@ open class ChatViewController: UIViewController {
     public let containerView = ContainerView()
     public let backgroundView = UIImageView()
     
-    public let collectionView: ItemsView
-    public let collectionViewLayout = ItemsViewLayout()
+    public var collectionView: ItemsView
+    public var collectionViewLayout = ItemsViewLayout()
     public let scrollProxy = UIScrollView()
     
-    public let inputPanel: InputPanel
+    public var inputPanel: InputPanel
     open var inputPanelDefaultHeight: CGFloat = 0
 
     private var isRegisterKeyboardNotifications: Bool = false
