@@ -78,9 +78,10 @@
 - (void)loadView
 {
     [super loadView];
-    [self setupContainerView];
+    self.view.backgroundColor = [UIColor whiteColor];
     [self setupBackgroundView];
     [self setupCollectionViewScrollToTopProxy];
+    [self setupContainerView];
     [self setupCollectionView];
     [self setupInputPanel];
 }
@@ -99,6 +100,22 @@
         self.isFirstLayout = NO;
         [self layoutInputPanel];
         [self adjustColletionViewInsets];
+    }
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    if (self.autoInControllerTransition) {
+        self.isInControllerTransition = NO;
+    }
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    if (self.autoInControllerTransition) {
+        self.isInControllerTransition = YES;
     }
 }
 
@@ -138,9 +155,9 @@
 
 - (void)didTapStatusBar
 {
-    BOOL shouldScrollToTop = ![self isScrolledAtTop];
+    BOOL shouldScrollToTop = ![self.collectionView isScrolledAtTop];
     if (shouldScrollToTop) {
-        [self scrollToTopAnimated:YES];
+        [self.collectionView scrollToTopAnimated:YES];
     }
 }
 
@@ -210,14 +227,6 @@
 
 #pragma mark - Getters
 
-- (NSMutableArray<id<NOCChatItemCellLayout>> *)layouts
-{
-    if (!_layouts) {
-        _layouts = [[NSMutableArray alloc] init];
-    }
-    return _layouts;
-}
-
 - (CGFloat)cellWidth
 {
     NSAssert(NSThread.isMainThread, @"Must be used from main thread only");
@@ -239,10 +248,12 @@
 
 - (void)commonInit
 {
+    _layouts = [[NSMutableArray alloc] init];
     _isFirstLayout = YES;
     _inverted = YES;
     _chatInputContainerViewDefaultHeight = 45;
-    _scrollFractionalThreshold = 0.05;
+    _autoInControllerTransition = YES;
+    _isInControllerTransition = NO;
     self.automaticallyAdjustsScrollViewInsets = NO;
     self.hidesBottomBarWhenPushed = YES;
     [self registerKeyboardNotifications];
@@ -251,7 +262,7 @@
 - (void)setupContainerView
 {
     _containerView = [[NOCChatContainerView alloc] initWithFrame:self.view.bounds];
-    _containerView.backgroundColor = [UIColor whiteColor];
+    _containerView.backgroundColor = [UIColor clearColor];
     _containerView.clipsToBounds = YES;
     __weak typeof(self) weakSelf = self;
     _containerView.layoutForSize = ^(CGSize size) {
@@ -265,16 +276,16 @@
 
 - (void)setupBackgroundView
 {
-    _backgroundView = [[UIImageView alloc] initWithFrame:_containerView.bounds];
+    _backgroundView = [[UIImageView alloc] initWithFrame:self.view.bounds];
     _backgroundView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     _backgroundView.contentMode = UIViewContentModeScaleAspectFill;
     _backgroundView.clipsToBounds = YES;
-    [_containerView addSubview:_backgroundView];
+    [self.view addSubview:_backgroundView];
 }
 
 - (void)setupCollectionViewScrollToTopProxy
 {
-    _collectionViewScrollToTopProxy = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, _containerView.bounds.size.width, 8)];
+    _collectionViewScrollToTopProxy = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 8)];
     _collectionViewScrollToTopProxy.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     _collectionViewScrollToTopProxy.contentSize = CGSizeMake(1, 16);
     _collectionViewScrollToTopProxy.contentOffset = CGPointMake(0, 8);
@@ -284,7 +295,7 @@
     _collectionViewScrollToTopProxy.showsHorizontalScrollIndicator = NO;
     _collectionViewScrollToTopProxy.backgroundColor = [UIColor clearColor];
     _collectionViewScrollToTopProxy.delegate = self;
-    [_containerView addSubview:_collectionViewScrollToTopProxy];
+    [self.view addSubview:_collectionViewScrollToTopProxy];
 }
 
 - (void)setupCollectionView
@@ -294,6 +305,7 @@
     _collectionLayout = [[NOCChatCollectionViewLayout alloc] initWithInverted:self.isInverted];
     
     _collectionView = [[NOCChatCollectionView alloc] initWithFrame:CGRectMake(0, 0, collectionViewSize.width, collectionViewSize.height) collectionViewLayout:_collectionLayout];
+    _collectionView.inverted = self.isInverted;
     _collectionView.dataSource = self;
     _collectionView.delegate = self;
     if (@available(iOS 11.0, *)) {
@@ -325,14 +337,14 @@
 - (void)setupInputPanel
 {
     Class inputPanelClass = [[self class] inputPanelClass];
-    _inputPanel = [[inputPanelClass alloc] initWithFrame:CGRectMake(0, self.containerView.bounds.size.height - self.safeAreaInsets.bottom - self.chatInputContainerViewDefaultHeight, self.containerView.bounds.size.width, self.chatInputContainerViewDefaultHeight)];
+    _inputPanel = [[inputPanelClass alloc] initWithFrame:CGRectMake(0, self.view.bounds.size.height - self.safeAreaInsets.bottom - self.chatInputContainerViewDefaultHeight, self.view.bounds.size.width, self.chatInputContainerViewDefaultHeight)];
     _inputPanel.delegate = self;
-    [_containerView addSubview:_inputPanel];
+    [self.view addSubview:_inputPanel];
 }
 
 - (void)layoutInputPanel
 {
-    _inputPanel.frame = CGRectMake(0, self.containerView.bounds.size.height - self.safeAreaInsets.bottom - self.chatInputContainerViewDefaultHeight, self.containerView.bounds.size.width, self.chatInputContainerViewDefaultHeight);
+    _inputPanel.frame = CGRectMake(0, self.view.bounds.size.height - self.safeAreaInsets.bottom - self.chatInputContainerViewDefaultHeight, self.view.bounds.size.width, self.chatInputContainerViewDefaultHeight);
 }
 
 - (void)registerKeyboardNotifications
@@ -401,7 +413,7 @@
                 });
             }
         } else {
-            [self.inputPanel adjustForSize:self.containerView.bounds.size keyboardHeight:keyboardHeight  duration:duration animationCurve:curve];
+            [self.inputPanel adjustForSize:self.view.bounds.size keyboardHeight:keyboardHeight  duration:duration animationCurve:curve];
             [self adjustCollectionViewForSize:self.containerView.bounds.size keyboardHeight:keyboardHeight inputContainerHeight:self.inputPanel.frame.size.height scrollToBottom:NO duration:duration animationCurve:curve];
         }
     }
@@ -425,7 +437,7 @@
         
         self.keyboardHeight = keyboardHeight;
         
-        [self.inputPanel adjustForSize:self.containerView.bounds.size keyboardHeight:keyboardHeight duration:duration animationCurve:curve];
+        [self.inputPanel adjustForSize:self.view.bounds.size keyboardHeight:keyboardHeight duration:duration animationCurve:curve];
         [self adjustCollectionViewForSize:self.containerView.bounds.size keyboardHeight:keyboardHeight inputContainerHeight:self.inputPanel.frame.size.height scrollToBottom:NO duration:duration animationCurve:curve];
     }
 }
@@ -460,7 +472,7 @@
 
 - (void)adjustCollectionViewForSize:(CGSize)size keyboardHeight:(CGFloat)keyboardHeight inputContainerHeight:(CGFloat)inputContainerHeight scrollToBottom:(BOOL)scrollToBottom duration:(NSTimeInterval)duration animationCurve:(int)animationCurve
 {
-    [self stopScrollIfNeeded];
+    [self.collectionView stopScrollIfNeeded];
     
     CGFloat contentHeight = self.collectionView.contentSize.height;
     
@@ -515,7 +527,7 @@
 
 - (void)performSizeChangesWithDuration:(NSTimeInterval)duration size:(CGSize)size
 {
-    [self stopScrollIfNeeded];
+    [self.collectionView stopScrollIfNeeded];
     
     BOOL animated = duration > DBL_EPSILON;
     CGSize collectionViewSize = size;
@@ -688,245 +700,6 @@
     layout.width = cell.frame.size.width;
     [layout calculateLayout];
     cell.layout = layout;
-}
-
-@end
-
-#pragma mark - Changes
-
-@implementation NOCChatViewController (NOCChanges)
-
-- (void)insertLayouts:(NSArray<id<NOCChatItemCellLayout>> *)layouts atIndexes:(NSIndexSet *)indexes animated:(BOOL)animated
-{
-    if (layouts.count != indexes.count) {
-        return;
-    }
-    
-    NSMutableArray *insertedPaths = [[NSMutableArray alloc] init];
-    
-    __block NSUInteger i = 0;
-    [indexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-        id<NOCChatItemCellLayout> layout = layouts[i];
-        [self.layouts insertObject:layout atIndex:idx];
-        
-        [insertedPaths addObject:[NSIndexPath indexPathForItem:idx inSection:0]];
-        i++;
-    }];
-    
-    NOCChatCollectionView *collectionView = self.collectionView;
-    
-    if (animated) {
-        [collectionView performBatchUpdates:^{
-            [collectionView insertItemsAtIndexPaths:insertedPaths];
-        } completion:nil];
-    } else {
-        [self.collectionLayout prepareLayout];
-        [collectionView reloadData];
-        [collectionView layoutIfNeeded];
-    }
-}
-
-- (void)deleteLayoutsAtIndexes:(NSIndexSet *)indexes animated:(BOOL)animated
-{
-    NSMutableArray *insertedPaths = [[NSMutableArray alloc] init];
-    
-    __block NSUInteger i = 0;
-    [indexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-        [self.layouts removeObjectAtIndex:idx];
-        
-        [insertedPaths addObject:[NSIndexPath indexPathForItem:idx inSection:0]];
-        i++;
-    }];
-    
-    NOCChatCollectionView *collectionView = self.collectionView;
-    
-    if (animated) {
-        [collectionView performBatchUpdates:^{
-            [collectionView deleteItemsAtIndexPaths:insertedPaths];
-        } completion:nil];
-    } else {
-        [self.collectionLayout prepareLayout];
-        [collectionView reloadData];
-        [collectionView layoutIfNeeded];
-    }
-}
-
-- (void)updateLayoutAtIndex:(NSUInteger)index toLayout:(id<NOCChatItemCellLayout>)layout animated:(BOOL)animated
-{
-    if (index >= self.layouts.count) {
-        return;
-    }
-    
-    self.layouts[index] = layout;
-    
-    NOCChatCollectionView *collectionView = self.collectionView;
-    
-    if (animated) {
-        [collectionView performBatchUpdates:^{
-            [collectionView reloadItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:index inSection:0]]];
-        } completion:nil];
-    } else {
-        [self.collectionLayout prepareLayout];
-        [collectionView reloadData];
-        [collectionView layoutIfNeeded];
-    }
-}
-
-@end
-
-#pragma mark - Scrolling
-
-@implementation NOCChatViewController (NOCScrolling)
-
-typedef NS_ENUM(NSUInteger, NOCChatCellVerticalEdge) {
-    NOCChatCellVerticalEdgeTop,
-    NOCChatCellVerticalEdgeBottom
-};
-
-- (BOOL)isCloseToTop
-{
-    return self.isInverted ? [self isCloseToCollectionViewBottom] : [self isCloseToCollectionViewTop];
-}
-
-- (BOOL)isScrolledAtTop
-{
-    return self.isInverted ? [self isScrolledAtCollectionViewBottom] : [self isScrolledAtCollectionViewTop];
-}
-
-- (void)scrollToTopAnimated:(BOOL)animated
-{
-    if (self.isInverted) {
-        [self scrollToCollectionViewBottom:animated];
-    } else {
-        [self scrollToCollectionViewTop:animated];
-    }
-}
-
-- (BOOL)isCloseToBottom
-{
-    return self.isInverted ? [self isCloseToCollectionViewTop] : [self isCloseToCollectionViewBottom];
-}
-
-- (BOOL)isScrolledAtBottom
-{
-    return self.isInverted ? [self isScrolledAtCollectionViewTop] : [self isScrolledAtCollectionViewBottom];
-}
-
-- (void)scrollToBottomAnimated:(BOOL)animated
-{
-    if (self.isInverted) {
-        [self scrollToCollectionViewTop:animated];
-    } else {
-        [self scrollToCollectionViewBottom:animated];
-    }
-}
-
-#pragma mark - Private
-
-- (BOOL)isCloseToCollectionViewTop
-{
-    NOCChatCollectionView *collectionView = self.collectionView;
-    if (collectionView.contentSize.height > 0) {
-        CGFloat minY = CGRectGetMinY([self collectionViewVisibleRect]);
-        return (minY / collectionView.contentSize.height) < self.scrollFractionalThreshold;
-    } else {
-        return YES;
-    }
-}
-
-- (BOOL)isScrolledAtCollectionViewTop
-{
-    NOCChatCollectionView *collectionView = self.collectionView;
-    if (collectionView.numberOfSections > 0 && [collectionView numberOfItemsInSection:0] > 0) {
-        NSIndexPath *firstIndexPath = [NSIndexPath indexPathForItem:0 inSection:0];
-        return [self isIndexPathOfCollectionViewVisible:firstIndexPath atEdge:NOCChatCellVerticalEdgeTop];
-    } else {
-        return YES;
-    }
-}
-
-- (void)scrollToCollectionViewTop:(BOOL)animated
-{
-    NOCChatCollectionView *collectionView = self.collectionView;
-    
-    CGFloat offsetY = -collectionView.contentInset.top;
-    CGPoint contentOffset = CGPointMake(collectionView.contentOffset.x, offsetY);
-
-    [collectionView setContentOffset:contentOffset animated:animated];
-}
-
-- (BOOL)isCloseToCollectionViewBottom
-{
-    NOCChatCollectionView *collectionView = self.collectionView;
-    if (collectionView.contentSize.height > 0) {
-        CGFloat maxY = CGRectGetMaxY([self collectionViewVisibleRect]);
-        return (maxY / collectionView.contentSize.height) > (1 - self.scrollFractionalThreshold);
-    } else {
-        return YES;
-    }
-}
-
-- (BOOL)isScrolledAtCollectionViewBottom
-{
-    NOCChatCollectionView *collectionView = self.collectionView;
-    if (collectionView.numberOfSections > 0 && [collectionView numberOfItemsInSection:0] > 0) {
-        NSInteger sectionIndex = [collectionView numberOfSections] - 1;
-        NSInteger itemIndex = [collectionView numberOfItemsInSection:sectionIndex] - 1;
-        NSIndexPath *lastIndexPath = [NSIndexPath indexPathForItem:itemIndex inSection:sectionIndex];
-        return [self isIndexPathOfCollectionViewVisible:lastIndexPath atEdge:NOCChatCellVerticalEdgeBottom];
-    } else {
-        return YES;
-    }
-}
-
-- (void)scrollToCollectionViewBottom:(BOOL)animated
-{
-    NOCChatCollectionView *collectionView = self.collectionView;
-    CGFloat contentHeight = collectionView.collectionViewLayout.collectionViewContentSize.height;
-    CGFloat boundsHeight = collectionView.bounds.size.height;
-    
-    if (!(contentHeight >= 0 && contentHeight < CGFLOAT_MAX && boundsHeight >= 0)) {
-        return;
-    }
-    
-    CGFloat offsetY = MAX(-collectionView.contentInset.top, contentHeight - boundsHeight + collectionView.contentInset.bottom);
-    CGPoint contentOffset = CGPointMake(collectionView.contentOffset.x, offsetY);
-    
-    [collectionView setContentOffset:contentOffset animated:animated];
-}
-
-- (BOOL)isIndexPathOfCollectionViewVisible:(NSIndexPath *)indexPath atEdge:(NOCChatCellVerticalEdge)edge
-{
-    UICollectionViewLayoutAttributes *layoutAttributes = [self.collectionView.collectionViewLayout layoutAttributesForItemAtIndexPath:indexPath];
-    if (layoutAttributes) {
-        CGRect visibleRect = [self collectionViewVisibleRect];
-        CGRect cellRect = layoutAttributes.frame;
-        CGRect intersection = CGRectIntersection(visibleRect, cellRect);
-        if (edge == NOCChatCellVerticalEdgeTop) {
-            return ABS(CGRectGetMinY(intersection) - CGRectGetMinY(cellRect)) < FLT_EPSILON;
-        } else {
-            return ABS(CGRectGetMaxY(intersection) - CGRectGetMaxY(cellRect)) < FLT_EPSILON;
-        }
-    } else {
-        return NO;
-    }
-}
-
-- (CGRect)collectionViewVisibleRect
-{
-    NOCChatCollectionView *collectionView = self.collectionView;
-    UIEdgeInsets contentInset = collectionView.contentInset;
-    CGRect bounds = collectionView.bounds;
-    CGSize contentSize = collectionView.collectionViewLayout.collectionViewContentSize;
-    return CGRectMake(0, collectionView.contentOffset.y + contentInset.top, bounds.size.width, MIN(contentSize.height, bounds.size.height - contentInset.top - contentInset.bottom));
-}
-
-- (void)stopScrollIfNeeded
-{
-    NOCChatCollectionView *collectionView = self.collectionView;
-    if (collectionView.isTracking || collectionView.isDragging || collectionView.isDecelerating) {
-        [collectionView setContentOffset:collectionView.contentOffset animated:NO];
-    }
 }
 
 @end

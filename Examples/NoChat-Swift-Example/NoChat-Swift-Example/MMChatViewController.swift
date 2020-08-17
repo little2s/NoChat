@@ -107,8 +107,8 @@ class MMChatViewController: NOCChatViewController, UINavigationControllerDelegat
     // MARK: MMChatInputTextPanelDelegate
     
     func didInputTextPanelStartInputting(_ inputTextPanel: MMChatInputTextPanel) {
-        if isScrolledAtBottom() == false {
-            scrollToBottom(animated: true)
+        if collectionView?.isScrolledAtBottom() == false {
+            collectionView?.scrollToBottom(animated: true)
         }
     }
     
@@ -203,9 +203,13 @@ class MMChatViewController: NOCChatViewController, UINavigationControllerDelegat
             }
             
             DispatchQueue.main.async {
-                strongSelf.insertLayouts(layouts, at: indexes, animated: animated)
+                for (index, layout) in layouts.enumerated() {
+                    strongSelf.layouts.insert(layout, at: index)
+                }
+                let indexPathes = indexes.map { IndexPath(item: $0, section: 0) }
+                strongSelf.collectionView?.change(withInsertIndexPathes: indexPathes, deleteIndexPathes: [], updateIndexPahtes: [], animated: animated, completion: nil)
                 if scrollToBottom {
-                    strongSelf.scrollToBottom(animated: animated)
+                    strongSelf.collectionView?.scrollToBottom(animated: animated)
                 }
             }
         }
