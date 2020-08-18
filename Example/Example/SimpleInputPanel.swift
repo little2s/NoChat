@@ -90,7 +90,11 @@ class SimpleInputPanel: InputPanel, HPGrowingTextViewDelegate {
         super.init(frame: frame)
 
         backgroundView = UIView()
-        backgroundView.backgroundColor = UIColor.white
+        if #available(iOS 13.0, *) {
+            backgroundView.backgroundColor = UIColor.systemBackground
+        } else {
+            backgroundView.backgroundColor = UIColor.white
+        }
         backgroundView.clipsToBounds = true
         
         fieldBackground = UIView()
@@ -118,8 +122,12 @@ class SimpleInputPanel: InputPanel, HPGrowingTextViewDelegate {
         inputField.internalTextView.enablesReturnKeyAutomatically = true
         inputField.internalTextView.returnKeyType = .send
         inputField.internalTextView.scrollIndicatorInsets = UIEdgeInsets(top: -Layout.inputFiledInternalEdgeInsets.top, left: 0, bottom: 5-0.5, right: 0)
-        inputField.placeholder = "Messages"
-        inputField.placeholderColor = #colorLiteral(red: 0.6666666667, green: 0.6666666667, blue: 0.6666666667, alpha: 1)
+        inputField.placeholder = "Message"
+        if #available(iOS 13.0, *) {
+            inputField.placeholderColor = UIColor.placeholderText
+        } else {
+            inputField.placeholderColor = #colorLiteral(red: 0.6666666667, green: 0.6666666667, blue: 0.6666666667, alpha: 1)
+        }
                 
         addSubview(backgroundView)
         addSubview(fieldBackground)

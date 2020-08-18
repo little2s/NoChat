@@ -18,7 +18,15 @@ class TextMessageCell: ItemCell {
         didSet {
             guard let layout = self.layout?.value as? TextMessageLayout else { return }
             bubbleView.frame = layout.bubbleViewFrame
-            bubbleView.backgroundColor = layout.item.isOutgoing ? #colorLiteral(red: 0.04705882353, green: 0.3882352941, blue: 0.9921568627, alpha: 1) : #colorLiteral(red: 0.8862745098, green: 0.8862745098, blue: 0.8980392157, alpha: 1)
+            if layout.item.isOutgoing {
+                bubbleView.backgroundColor = #colorLiteral(red: 0.04705882353, green: 0.3882352941, blue: 0.9921568627, alpha: 1)
+            } else {
+                if #available(iOS 13, *) {
+                    bubbleView.backgroundColor = UIColor.systemGray5
+                } else {
+                    bubbleView.backgroundColor = #colorLiteral(red: 0.8862745098, green: 0.8862745098, blue: 0.8980392157, alpha: 1)
+                }
+            }
             textView.frame = layout.textViewFrame
             textView.attributedText = layout.attributedString
         }

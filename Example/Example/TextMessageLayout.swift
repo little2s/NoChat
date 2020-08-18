@@ -25,7 +25,17 @@ struct TextMessageLayout: ItemLayout {
         self.item = item
         switch item.body {
         case .text(let string):
-            let textColor = item.isOutgoing ? UIColor.white : UIColor.black
+            let textColor: UIColor
+            if item.isOutgoing {
+                textColor = UIColor.white
+            } else {
+                if #available(iOS 13.0, *) {
+                    textColor = UIColor.label
+                } else {
+                    textColor = UIColor.black
+                }
+            }
+
             self.attributedString = NSAttributedString(string: string, attributes: [.font: Style.font, .foregroundColor: textColor])
         }
     }

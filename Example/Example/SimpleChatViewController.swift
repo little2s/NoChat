@@ -27,7 +27,7 @@ class SimpleChatViewController: ChatViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor.white
+        title = "Simple"
         inputCoordinator = SimpleInputCoordinator(chatViewController: self)
         dataSource.chatViewController = self
         dataSource.loadMessages()
