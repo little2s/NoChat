@@ -329,6 +329,8 @@ open class ChatViewController: UIViewController {
         
         collectionView.frame = containerView.bounds
         
+        adjustCollectionViewInsets()
+        
         collectionView.collectionViewLayout.invalidateLayout()
         
         for (index, layout) in self.layouts.enumerated() {
