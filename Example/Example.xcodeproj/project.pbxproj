@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E0EBF9A324EB866600DF3349 /* HPGrowingTextView in Frameworks */ = {isa = PBXBuildFile; productRef = E0EBF9A224EB866600DF3349 /* HPGrowingTextView */; };
 		E0F4B87924EB55A9006C5946 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0F4B87824EB55A9006C5946 /* AppDelegate.swift */; };
 		E0F4B88024EB55A9006C5946 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E0F4B87E24EB55A9006C5946 /* Main.storyboard */; };
 		E0F4B88224EB55AC006C5946 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E0F4B88124EB55AC006C5946 /* Assets.xcassets */; };
@@ -41,6 +42,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E0EBF9A324EB866600DF3349 /* HPGrowingTextView in Frameworks */,
 				E0F4B89B24EB5746006C5946 /* NoChat in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -109,6 +111,7 @@
 			name = Example;
 			packageProductDependencies = (
 				E0F4B89A24EB5746006C5946 /* NoChat */,
+				E0EBF9A224EB866600DF3349 /* HPGrowingTextView */,
 			);
 			productName = Example;
 			productReference = E0F4B87524EB55A9006C5946 /* Example.app */;
@@ -138,6 +141,9 @@
 				Base,
 			);
 			mainGroup = E0F4B86C24EB55A9006C5946;
+			packageReferences = (
+				E0EBF9A124EB866600DF3349 /* XCRemoteSwiftPackageReference "GrowingTextView" */,
+			);
 			productRefGroup = E0F4B87624EB55A9006C5946 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -370,7 +376,23 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		E0EBF9A124EB866600DF3349 /* XCRemoteSwiftPackageReference "GrowingTextView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/little2s/GrowingTextView.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
+		E0EBF9A224EB866600DF3349 /* HPGrowingTextView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E0EBF9A124EB866600DF3349 /* XCRemoteSwiftPackageReference "GrowingTextView" */;
+			productName = HPGrowingTextView;
+		};
 		E0F4B89A24EB5746006C5946 /* NoChat */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = NoChat;

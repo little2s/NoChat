@@ -12,10 +12,23 @@ import NoChat
 class SimpleChatViewController: ChatViewController {
     
     private let dataSource = SimpleChatDataSource()
+    
+    private var inputCoordinator: SimpleInputCoordinator!
+    
+    init() {
+        super.init(nibName: nil, bundle: nil)
+        self.inputPanel = SimpleInputPanel()
+        self.inputPanelDefaultHeight = SimpleInputPanel.Layout.baseHeight
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor.white
+        inputCoordinator = SimpleInputCoordinator(chatViewController: self)
         dataSource.chatViewController = self
         dataSource.loadMessages()
     }
