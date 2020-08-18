@@ -65,9 +65,13 @@ class SimpleChatDataSource {
     
     func loadMessages() {
         let messages: [Message] = [
-            Message.text(from: "bot", content: "NoChat is a lightweight chat UI framework which has no particular faces. "),
-            Message.text(from: "me", content: "The projects in Examples directory show you how to use this framework to implement a text game with user interface like Telegram or WeChat very easily."),
-            Message.text(from: "me", content: "You can custom your own with NoChat :].")
+            Message.text(from: "bot", content: "NoChat is a lightweight chat UI framework which has no particular faces."),
+            Message.text(from: "bot", content: """
+            - Inverted mode
+            - Adaptive user interface
+            - Custom chat items and input panel
+            - Simple MVC pattern
+            """)
         ]
         appendMessages(messages, scrollToBottom: true, animated: false, isLoad: true)
     }
