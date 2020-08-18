@@ -35,6 +35,21 @@ class SimpleChatViewController: ChatViewController {
     
 }
 
+extension SimpleChatViewController: SimpleInputPanelDelegate {
+    
+    func didInputTextPanelStartInputting(_ inputTextPanel: SimpleInputPanel) {
+        if !collectionView.isScrolledAtBottom {
+            collectionView.scrollToBottom(animated: true)
+        }
+    }
+    
+    func inputTextPanel(_ inputTextPanel: SimpleInputPanel, requestSendText text: String) {
+        let msg = Message.text(from: "me", content: text)
+        dataSource.send(message: msg)
+    }
+
+}
+
 
 class SimpleChatDataSource {
     
@@ -49,27 +64,38 @@ class SimpleChatDataSource {
     }()
     
     func loadMessages() {
-        let width = UIScreen.main.bounds.width
-        layoutQueue.addOperation {
-            let messages: [Message] = [
-                Message.text(from: "bot", content: "NoChat is a lightweight chat UI framework which has no particular faces. "),
-                Message.text(from: "me", content: "The projects in Examples directory show you how to use this framework to implement a text game with user interface like Telegram or WeChat very easily."),
-                Message.text(from: "me", content: "You can custom your own with NoChat :].")
-            ]
-            
-            let layouts: [AnyItemLayout] = messages.map {
-                var layout = TextMessageLayout(item: $0)
+        let messages: [Message] = [
+            Message.text(from: "bot", content: "NoChat is a lightweight chat UI framework which has no particular faces. "),
+            Message.text(from: "me", content: "The projects in Examples directory show you how to use this framework to implement a text game with user interface like Telegram or WeChat very easily."),
+            Message.text(from: "me", content: "You can custom your own with NoChat :].")
+        ]
+        appendMessages(messages, scrollToBottom: true, animated: false, isLoad: true)
+    }
+    
+    func send(message: Message) {
+        appendMessages([message], scrollToBottom: true, animated: true)
+    }
+    
+    private func appendMessages(_ messages: [Message], scrollToBottom: Bool, animated: Bool, isLoad: Bool = false) {
+        guard let vc = self.chatViewController else { return }
+        let width = vc.cellWidth
+        layoutQueue.addOperation { [weak vc] in
+            guard let strongVC = vc else { return }
+            let count = strongVC.layouts.count
+            var insertLayouts = [AnyItemLayout]()
+            for message in messages {
+                var layout = TextMessageLayout(item: message)
                 layout.calculate(preferredWidth: width)
-                return layout.toAny()
+                insertLayouts.append(layout.toAny())
             }
-            
+            let insertIndexPathes: [IndexPath] = (count ..< (count + insertLayouts.count)).map { IndexPath(item: $0, section: 0) }
             OperationQueue.main.addOperation {
-                self.chatViewController?.layouts = layouts
-                self.chatViewController?.collectionView.collectionViewLayout.prepare()
-                self.chatViewController?.collectionView.reloadData()
-                self.chatViewController?.collectionView.layoutIfNeeded()
+                strongVC.layouts.append(contentsOf: insertLayouts)
+                strongVC.collectionView.performChange(.init(insertIndexPathes: insertIndexPathes), animated: animated)
+                if scrollToBottom {
+                    strongVC.collectionView.scrollToBottom(animated: animated)
+                }
             }
         }
     }
-    
 }
