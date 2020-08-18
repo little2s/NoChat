@@ -7,7 +7,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--NoChat-->
+        <!--Chats-->
         <scene sceneID="C3k-29-r3Q">
             <objects>
                 <tableViewController id="hKK-6Q-srt" customClass="MainTableViewController" customModule="Example" customModuleProvider="target" sceneMemberID="viewController">
@@ -47,7 +47,7 @@
                             <outlet property="delegate" destination="hKK-6Q-srt" id="PyI-vf-Iyd"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="NoChat" id="2Qv-pr-PUS"/>
+                    <navigationItem key="navigationItem" title="Chats" id="2Qv-pr-PUS"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="2SV-qv-rGS" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
