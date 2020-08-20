@@ -65,19 +65,41 @@ class SimpleInputPanel: InputPanel, HPGrowingTextViewDelegate {
             return window.safeAreaInsets
         }
         static let safeAreaBottomHeight: CGFloat = rootWindowSafeAreaInsets.bottom
-        static let baseHeight: CGFloat = 70
-        static let inputFiledInsets = UIEdgeInsets(top: 6, left: 12, bottom: 6, right: 6)
-        static let inputFiledEdgeInsets = UIEdgeInsets(top: 9, left: 16, bottom: 9, right: 16)
-        static let inputFiledInternalEdgeInsets = UIEdgeInsets(top: 2, left: 0, bottom: 0, right: 0)
+        static let baseHeight: CGFloat = 45
+        static let inputFiledInsets = UIEdgeInsets(top: 5, left: 20, bottom: 4, right: 0)
+        static let inputFiledEdgeInsets = UIEdgeInsets(top: 0, left: 6, bottom: 0, right: 6)
+        static let inputFiledInternalEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
     }
     
-    var textPanelHeight: CGFloat = Layout.baseHeight
+    private class BackgroundView: UIView {
+        private let effectView = UIVisualEffectView()
+        
+        override init(frame: CGRect) {
+            super.init(frame: frame)
+            backgroundColor = .clear
+            effectView.effect = UIBlurEffect(style: .regular)
+            addSubview(effectView)
+        }
+        
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+        
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            effectView.frame = bounds
+        }
+    }
+    
+    private var sendButtonWidth = CGFloat(80)
         
     var backgroundView: UIView!
     
     var inputField: HPGrowingTextView!
     var inputFiledClippingContainer: UIView!
     var fieldBackground: UIView!
+    
+    var sendButton: UIButton!
             
     private var parentSize = CGSize.zero
     
@@ -87,32 +109,37 @@ class SimpleInputPanel: InputPanel, HPGrowingTextViewDelegate {
     weak var inputCoordinator: SimpleInputCoordinator?
     
     override init(frame: CGRect) {
-        super.init(frame: frame)
-
-        backgroundView = UIView()
-        if #available(iOS 13.0, *) {
-            backgroundView.backgroundColor = UIColor.systemBackground
-        } else {
-            backgroundView.backgroundColor = UIColor.white
-        }
+        backgroundView = BackgroundView()
+//        if #available(iOS 13.0, *) {
+//            backgroundView.backgroundColor = UIColor.systemBackground
+//        } else {
+//            backgroundView.backgroundColor = UIColor.white
+//        }
         backgroundView.clipsToBounds = true
         
         fieldBackground = UIView()
-        fieldBackground.frame = CGRect(x: Layout.inputFiledInsets.left, y: Layout.inputFiledInsets.top, width: bounds.width - Layout.inputFiledInsets.left - Layout.inputFiledInsets.right, height: bounds.height - Layout.inputFiledInsets.top - Layout.inputFiledInsets.bottom)
+        fieldBackground.frame = CGRect(x: Layout.inputFiledInsets.left, y: Layout.inputFiledInsets.top, width: frame.width - Layout.inputFiledInsets.left - Layout.inputFiledInsets.right - sendButtonWidth - 1, height: frame.height - Layout.inputFiledInsets.top - Layout.inputFiledInsets.bottom)
+        fieldBackground.layer.borderWidth = 0.5
+        if #available(iOS 13.0, *) {
+            fieldBackground.layer.borderColor = UIColor.systemGray.cgColor
+        } else {
+            fieldBackground.layer.borderColor = #colorLiteral(red: 0.7019607843, green: 0.6666666667, blue: 0.6980392157, alpha: 1)
+        }
         fieldBackground.layer.masksToBounds = true
+        fieldBackground.layer.cornerRadius = 18
         fieldBackground.backgroundColor = UIColor.clear
         
         inputFiledClippingContainer = UIView()
         inputFiledClippingContainer.clipsToBounds = true
         
-        let inputFiledClippingFrame = CGRect(x: fieldBackground.frame.origin.x + Layout.inputFiledEdgeInsets.left, y: fieldBackground.frame.origin.y + Layout.inputFiledEdgeInsets.top, width: fieldBackground.frame.width - Layout.inputFiledEdgeInsets.left - Layout.inputFiledEdgeInsets.right, height: fieldBackground.frame.height - Layout.inputFiledEdgeInsets.top - Layout.inputFiledEdgeInsets.bottom)
+        let inputFiledClippingFrame = fieldBackground.frame.inset(by: Layout.inputFiledEdgeInsets)
         inputFiledClippingContainer.frame = inputFiledClippingFrame
         
         inputField = HPGrowingTextView()
         inputField.frame = CGRect(x: Layout.inputFiledInternalEdgeInsets.left, y: Layout.inputFiledInternalEdgeInsets.top, width: inputFiledClippingFrame.width - Layout.inputFiledInternalEdgeInsets.left, height: inputFiledClippingFrame.height)
         inputField.animateHeightChange = false
         inputField.animationDuration = 0
-        inputField.font = UIFont.systemFont(ofSize: 18, weight: .regular)
+        inputField.font = UIFont.systemFont(ofSize: 16, weight: .regular)
         inputField.backgroundColor = UIColor.clear
         inputField.isOpaque = false
         inputField.clipsToBounds = true
@@ -128,14 +155,31 @@ class SimpleInputPanel: InputPanel, HPGrowingTextViewDelegate {
         } else {
             inputField.placeholderColor = #colorLiteral(red: 0.6666666667, green: 0.6666666667, blue: 0.6666666667, alpha: 1)
         }
+        
+        sendButton = UIButton(type: .system)
+        sendButton.isExclusiveTouch = true
+        sendButton.setTitle("Send", for: .normal)
+        sendButton.setTitleColor(UIColor(red: 0/255.0, green: 126/255.0, blue: 229/255.0, alpha: 1), for: .normal)
+        if #available(iOS 13, *) {
+            sendButton.setTitleColor(UIColor.placeholderText, for: .disabled)
+        } else {
+            sendButton.setTitleColor(UIColor(red: 142/255.0, green: 142/255.0, blue: 147/255.0, alpha: 1), for: .disabled)
+        }
+        sendButton.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: .medium)
+        sendButton.isEnabled = false
+        
+        super.init(frame: frame)
                 
         addSubview(backgroundView)
         addSubview(fieldBackground)
         addSubview(inputFiledClippingContainer)
+        addSubview(sendButton)
         
         inputField.maxNumberOfLines = maxNumberOfLines(forSize: parentSize)
         inputField.delegate = self
         inputFiledClippingContainer.addSubview(inputField)
+        
+        sendButton.addTarget(self, action: #selector(didTapSendButton), for: .touchUpInside)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -145,14 +189,21 @@ class SimpleInputPanel: InputPanel, HPGrowingTextViewDelegate {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        fieldBackground.frame = CGRect(x: Layout.inputFiledInsets.left, y: Layout.inputFiledInsets.top, width: bounds.width - Layout.inputFiledInsets.left - Layout.inputFiledInsets.right, height: bounds.height - Layout.inputFiledInsets.top - Layout.inputFiledInsets.bottom)
+        var safeArea = UIEdgeInsets.zero
+        if let vc = delegate as? SimpleChatViewController {
+            safeArea = vc.safeAreaInsets
+        }
         
-        inputFiledClippingContainer.frame = CGRect(x: fieldBackground.frame.origin.x + Layout.inputFiledEdgeInsets.left, y: fieldBackground.frame.origin.y + Layout.inputFiledEdgeInsets.top, width: fieldBackground.frame.width - Layout.inputFiledEdgeInsets.left - Layout.inputFiledEdgeInsets.right, height: fieldBackground.frame.height - Layout.inputFiledEdgeInsets.top - Layout.inputFiledEdgeInsets.bottom)
+        fieldBackground.frame = CGRect(x: Layout.inputFiledInsets.left + safeArea.left, y: Layout.inputFiledInsets.top, width: bounds.width - Layout.inputFiledInsets.left - Layout.inputFiledInsets.right - sendButtonWidth - 1 - safeArea.left - safeArea.right, height: bounds.height - Layout.inputFiledInsets.top - Layout.inputFiledInsets.bottom)
+        
+        inputFiledClippingContainer.frame = fieldBackground.frame.inset(by: Layout.inputFiledEdgeInsets)
                         
         if let window = UIApplication.shared.delegate?.window {
             let backgroundViewHeight = (window?.bounds.height ?? self.frame.minY) - self.frame.minY
             backgroundView.frame = CGRect(x: 0, y: 0, width: bounds.width, height: backgroundViewHeight)
         }
+        
+        sendButton.frame = CGRect(x: bounds.width - safeArea.right - sendButtonWidth, y: bounds.height - Layout.baseHeight, width: sendButtonWidth, height: Layout.baseHeight)
     }
     
     override func endInputting(animated: Bool) {
@@ -194,7 +245,10 @@ class SimpleInputPanel: InputPanel, HPGrowingTextViewDelegate {
         let inputContainerHeight = heightForInputFiledHeight(inputField.frame.size.height)
         var newInputContainerFrame: CGRect = .zero
         if (abs(keyboardHeight) < .ulpOfOne) {
-            newInputContainerFrame = CGRect(x: 0, y: messageAreaSize.height - Layout.safeAreaBottomHeight - keyboardHeight - inputContainerHeight, width: messageAreaSize.width, height: inputContainerHeight)
+            if let vc = self.delegate as? SimpleChatViewController {
+                newInputContainerFrame = CGRect(x: 0, y: messageAreaSize.height - vc.safeAreaInsets.bottom - keyboardHeight - inputContainerHeight, width: messageAreaSize.width, height: inputContainerHeight)
+
+            }
         } else {
              newInputContainerFrame = CGRect(x: 0, y: messageAreaSize.height - keyboardHeight - inputContainerHeight, width: messageAreaSize.width, height: inputContainerHeight)
         }
@@ -230,7 +284,10 @@ class SimpleInputPanel: InputPanel, HPGrowingTextViewDelegate {
         let inputContainerHeight = heightForInputFiledHeight(CGFloat(height))
         var newInputContainerFrame: CGRect = .zero
         if (abs(keyboardHeight) < .ulpOfOne) {
-            newInputContainerFrame = CGRect(x: 0, y: messageAreaSize.height - Layout.safeAreaBottomHeight - keyboardHeight - inputContainerHeight, width: messageAreaSize.width, height: inputContainerHeight)
+            if let vc = self.delegate as? SimpleChatViewController {
+                newInputContainerFrame = CGRect(x: 0, y: messageAreaSize.height - vc.safeAreaInsets.bottom - keyboardHeight - inputContainerHeight, width: messageAreaSize.width, height: inputContainerHeight)
+
+            }
         } else {
             newInputContainerFrame = CGRect(x: 0, y: messageAreaSize.height - keyboardHeight - inputContainerHeight, width: messageAreaSize.width, height: inputContainerHeight)
         }
@@ -252,30 +309,6 @@ class SimpleInputPanel: InputPanel, HPGrowingTextViewDelegate {
         if let d = delegate as? SimpleInputPanelDelegate {
             d.didInputTextPanelStartInputting(self)
         }
-    }
-    
-    func growingTextView(_ growingTextView: HPGrowingTextView!, shouldChangeTextIn range: NSRange, replacementText text: String!) -> Bool {
-        if growingTextView != self.inputField {
-            return true
-        }
-        
-        if text == "\n" {
-            guard let txt = inputField.internalTextView.text else {
-                return true
-            }
-            
-            let str = txt.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-            if str.count > 0 {
-                if let d = delegate as? SimpleInputPanelDelegate {
-                    d.inputTextPanel(self, requestSendText: str)
-                }
-                clearInputField()
-            }
-            
-            return false
-        }
-        
-        return true
     }
     
     private func adjust(for size: CGSize, keyboardHeight: CGFloat, inputFiledHeight: CGFloat, duration: TimeInterval, animationCurve: Int) {
@@ -302,7 +335,7 @@ class SimpleInputPanel: InputPanel, HPGrowingTextViewDelegate {
     }
     
     private func heightForInputFiledHeight(_ inputFiledHeight: CGFloat) -> CGFloat {
-        return max(self.textPanelHeight, inputFiledHeight + Layout.inputFiledInsets.top + Layout.inputFiledInsets.bottom + (inputFiledHeight > 40 ? 10 : 0))
+        return max(Layout.baseHeight, inputFiledHeight + Layout.inputFiledInsets.top + Layout.inputFiledInsets.bottom)
     }
     
     private func updateInputFiledLayout() {
@@ -313,7 +346,7 @@ class SimpleInputPanel: InputPanel, HPGrowingTextViewDelegate {
         let inputFiledInsets = Layout.inputFiledInsets
         let inputFiledInternalEdgeInsets = Layout.inputFiledInternalEdgeInsets
         
-        let inputFiledClippingFrame = CGRect(x: inputFiledInsets.left + Layout.inputFiledEdgeInsets.left, y: inputFiledInsets.top + Layout.inputFiledEdgeInsets.top, width: parentSize.width - inputFiledInsets.left - inputFiledInsets.right - Layout.inputFiledEdgeInsets.left - Layout.inputFiledEdgeInsets.right, height: 0)
+        let inputFiledClippingFrame = CGRect(x: inputFiledInsets.left, y: inputFiledInsets.top, width: parentSize.width - inputFiledInsets.left - inputFiledInsets.right - sendButtonWidth - 1, height: 0)
         
         let inputFieldFrame = CGRect(x: inputFiledInternalEdgeInsets.left, y: inputFiledInternalEdgeInsets.top, width: inputFiledClippingFrame.width - inputFiledInternalEdgeInsets.left, height: 0)
         
@@ -329,7 +362,36 @@ class SimpleInputPanel: InputPanel, HPGrowingTextViewDelegate {
     }
     
     private func maxNumberOfLines(forSize size: CGSize) -> Int32 {
-        return 3
+        if size.height <= 320 {
+            return 3
+        } else if (size.height <= 480) {
+            return 5;
+        } else {
+            return 7
+        }
+    }
+    
+    func growingTextViewDidChange(_ growingTextView: HPGrowingTextView!) {
+        toggleSendButtonEnabled()
+    }
+    
+    @objc func didTapSendButton(_ sender: UIButton) {
+        guard let text = inputField.internalTextView.text else {
+            return
+        }
+        
+        let str = text.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+        if str.count > 0 {
+            if let d = delegate as? SimpleInputPanelDelegate {
+                d.inputTextPanel(self, requestSendText: str)
+            }
+            clearInputField()
+        }
+    }
+    
+    func toggleSendButtonEnabled() {
+        let hasText = inputField.internalTextView.hasText
+        sendButton.isEnabled = hasText
     }
     
 }
