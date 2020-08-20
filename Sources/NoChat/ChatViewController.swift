@@ -226,10 +226,10 @@ open class ChatViewController: UIViewController {
             
             if abs(collectionViewSize.width - collectionView.frame.width) > .ulpOfOne {
                 if Thread.isMainThread {
-                    self.performSizeChange(with: 0.3, size: self.containerView.bounds.size)
+                    self.performSizeChange(with: 0.3, size: collectionViewSize)
                 } else {
                     DispatchQueue.main.async {
-                        self.performSizeChange(with: 0.3, size: self.containerView.bounds.size)
+                        self.performSizeChange(with: 0.3, size: collectionViewSize)
                     }
                 }
             } else {
@@ -334,14 +334,16 @@ open class ChatViewController: UIViewController {
         collectionView.collectionViewLayout.invalidateLayout()
         
         for (index, layout) in self.layouts.enumerated() {
-            if let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? ItemCell {
-                cell.layout = layout
-            }
+            var l = layout
+            l.calculate(preferredWidth: collectionView.bounds.width)
+            self.layouts[index] = l
         }
-        
-        collectionView.layoutSubviews()
+        collectionView.reloadData()
+        collectionView.collectionViewLayout.prepare()
+        collectionView.layoutIfNeeded()
         
         // TODO: adjust conentOffset and animation
+        collectionView.scrollToBottom(animated: true)
     }
     
     open func statusBarDidTap() {
