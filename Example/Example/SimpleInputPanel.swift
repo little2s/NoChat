@@ -110,11 +110,6 @@ class SimpleInputPanel: InputPanel, HPGrowingTextViewDelegate {
     
     override init(frame: CGRect) {
         backgroundView = BackgroundView()
-//        if #available(iOS 13.0, *) {
-//            backgroundView.backgroundColor = UIColor.systemBackground
-//        } else {
-//            backgroundView.backgroundColor = UIColor.white
-//        }
         backgroundView.clipsToBounds = true
         
         fieldBackground = UIView()
@@ -147,7 +142,6 @@ class SimpleInputPanel: InputPanel, HPGrowingTextViewDelegate {
         inputField.internalTextView.isOpaque = false
         inputField.internalTextView.contentMode = .left
         inputField.internalTextView.enablesReturnKeyAutomatically = true
-        inputField.internalTextView.returnKeyType = .send
         inputField.internalTextView.scrollIndicatorInsets = UIEdgeInsets(top: -Layout.inputFiledInternalEdgeInsets.top, left: 0, bottom: 5-0.5, right: 0)
         inputField.placeholder = "Message"
         if #available(iOS 13.0, *) {
