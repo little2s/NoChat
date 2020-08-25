@@ -54,7 +54,7 @@ open class ItemsView: UICollectionView {
     
     private func setupTapGestureRecognizer() {
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(onTapped))
-        tapGestureRecognizer.cancelsTouchesInView = true
+        tapGestureRecognizer.cancelsTouchesInView = false
         addGestureRecognizer(tapGestureRecognizer)
         self.tapGestureRecognizer = tapGestureRecognizer
     }
