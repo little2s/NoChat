@@ -282,18 +282,21 @@ open class ChatViewController: UIViewController {
             contentOffset.y = max(contentOffset.y, -inset.top);
         }
         
-        if duration > .ulpOfOne {
-            UIView.animate(withDuration: duration, delay: 0, options: UIView.AnimationOptions(rawValue: UInt(animationCurve << 16)), animations: {
-                self.collectionView.contentInset = inset
-                if contentOffset != originalContentOffset {
-                    self.collectionView.contentOffset = contentOffset
-                }
-            }, completion: nil)
-        } else {
-            self.collectionView.contentInset = inset
+        func subjob() {
             if contentOffset != originalContentOffset {
                 self.collectionView.contentOffset = contentOffset
             }
+            UIView.performWithoutAnimation {
+                self.collectionView.contentInset = inset
+            }
+        }
+        
+        if duration > .ulpOfOne {
+            UIView.animate(withDuration: duration, delay: 0, options: UIView.AnimationOptions(rawValue: UInt(animationCurve << 16)), animations: {
+                subjob()
+            }, completion: nil)
+        } else {
+            subjob()
         }
     }
     
