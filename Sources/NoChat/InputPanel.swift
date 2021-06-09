@@ -7,7 +7,7 @@
 
 import UIKit
 
-public protocol InputPanelDelegate: class {
+public protocol InputPanelDelegate: AnyObject {
     func inputPanel(_ inputPanel: InputPanel, willChange height: CGFloat, duration: TimeInterval, animationCurve: Int)
 }
 

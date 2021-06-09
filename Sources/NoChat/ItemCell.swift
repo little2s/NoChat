@@ -7,11 +7,11 @@
 
 import UIKit
 
-public protocol ItemCellDelegate: class { }
+public protocol ItemCellDelegate: AnyObject { }
 
 open class ItemCell: UICollectionViewCell {
     
-    open class var reuseIdentifier: String { "\(Self.self)" }
+    open class var reuseIdentifier: String { NSStringFromClass(Self.self) }
     
     open weak var delegate: ItemCellDelegate?
     
