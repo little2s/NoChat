@@ -7,7 +7,7 @@
 
 import UIKit
 
-public protocol ItemsViewLayoutDelegate: class {
+public protocol ItemsViewLayoutDelegate: AnyObject {
     var layouts: [AnyItemLayout] { get set }
 }
 
